@@ -1,0 +1,19 @@
+
+.closeDialogUp{
+    font-size: 20px;
+    position: absolute;
+    top: 18px;
+    right: 10px;
+    background: transparent;
+    color:white;
+    border:none ;
+  
+    background: #3e8b87;
+    border-radius: 50%;
+    padding-top: 4px;
+  }
+  .closeDialogUp:hover {
+    cursor: pointer;
+    opacity: 0.9;
+  }
+  

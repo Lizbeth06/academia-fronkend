@@ -1,0 +1,48 @@
+pass bd: observatorio1236*
+
+node
+https://nodejs.org/es
+node -v
+npm -v
+
+instalar angular
+npm install -g @angular/cli
+ng version
+
+para crear nuevo proyecto
+ng new nombre-del-proyecto
+
+para hacer ejecutar
+ng serve
+
+instalar angular material
+ng add @angular/material
+
+instalar SweetAlert2
+npm install sweetalert2
+
+para crear componentes  sin test (prueba unitario)
+ng g c admin/perfiles --skip-tests
+
+El JwtModule una biblioteca útil para manejar y trabajar con JSON Web Tokens (JWT)
+npm install @auth0/angular-jwt
+
+para crear un interceptor
+ng generate interceptor intercepto/server-error
+
+para crear un clase
+ng g class interceptor/ServerErrorInterceptor --skip-tests
+
+para crear una clase servicio
+ng g s services/Menu --skip-tests
+
+para crear una clase interface en model
+ng g interface model/Usuario
+
+Comando para crear un módulo
+ng g module auth/Auth
+
+
+
+
+

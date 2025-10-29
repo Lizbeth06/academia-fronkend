@@ -1,0 +1,8 @@
+<h2 mat-dialog-title>¿Estás seguro que deseas eliminar: {{data.clase}} ?</h2>
+<mat-dialog-content>
+    <p>Una vez eliminado no podrá recuperarlo</p>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+    <button mat-raised-button color="primary" (click)="confirmar()">Sí</button>
+    <button mat-button (click)="cancelar()">No</button>
+</mat-dialog-actions>

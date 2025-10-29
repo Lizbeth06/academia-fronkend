@@ -1,0 +1,357 @@
+<div class="container mt-4">
+  <!-- Header principal -->
+  <div class="row">
+    <div class="col-md-12">
+      <div class="card shadow-lg">
+        <div class="card-header text-center text-white color-ch">
+          <h3 class="mb-0">ACADEMIA IPD</h3>
+          <small>Panel de Administración - Sistema de Integrado de Academía de IPD </small>
+        </div>
+        <div class="card-body">
+          <p class="text-center">Bienvenido al <strong>campus</strong>.</p>
+          <p class="text-center">
+            Una plataforma integral para formar campeones: Alumnos, entrenadores y resultado en un solo sistema
+          </p>
+          <hr />
+          <div class="text-center">
+            <span class="font-weight-bold text-secondary">Accesos rápidos</span>
+            <i class="material-icons text-primary">dashboard</i>
+          </div>
+          <div class="d-flex flex-wrap justify-content-center mt-3">
+            <a class="btn btn-outline-primary m-2" routerLink="/admin/tiendas">
+              <mat-icon>place</mat-icon> Sedes
+            </a>
+            <a class="btn btn-outline-success m-2" routerLink="/admin/planes">
+              <mat-icon>campaign</mat-icon> Convocatorias
+            </a>
+            <a class="btn btn-outline-warning m-2" routerLink="/admin/productos">
+              <mat-icon>edit-note</mat-icon> Inscripciones
+            </a>
+            <a class="btn btn-outline-info m-2" routerLink="/admin/pedidos">
+              <mat-icon>school</mat-icon> Talentos
+            </a>
+            <a class="btn btn-outline-danger m-2" routerLink="/admin/reportes">
+              <mat-icon>assessment</mat-icon> Reportes
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- KPIs principales - Primera fila -->
+  <div class="row mt-4">
+    <div class="col-lg-3 col-md-6 mb-4">
+      <div class="card border-left-primary shadow h-100 py-2">
+        <div class="card-body">
+          <div class="row no-gutters align-items-center">
+            <div class="col mr-2">
+              <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                Inscritos 2025
+              </div>
+              <div class="h5 mb-0 font-weight-bold text-gray-800">{{ tiendasActivas }}</div>
+            </div>
+            <div class="col-auto">
+              <mat-icon class="kpi-icon text-primary">edit-note</mat-icon>
+            </div>
+          </div>
+          <div class="mt-2">
+            <small class="text-success">
+              <mat-icon class="icon-small">trending_up</mat-icon>
+              +{{ nuevasTiendasMes }} este mes
+            </small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6 mb-4">
+      <div class="card border-left-success shadow h-100 py-2">
+        <div class="card-body">
+          <div class="row no-gutters align-items-center">
+            <div class="col mr-2">
+              <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                Talentos
+              </div>
+              <div class="h5 mb-0 font-weight-bold text-gray-800">
+                {{ ingresosMensuales }}
+              </div>
+            </div>
+            <div class="col-auto">
+              <mat-icon class="kpi-icon text-success">school</mat-icon>
+            </div>
+          </div>
+          <div class="mt-2">
+            <small class="text-success">
+              <mat-icon class="icon-small">trending_up</mat-icon>
+              +{{ crecimientoIngresos }}% vs mes anterior
+            </small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6 mb-4">
+      <div class="card border-left-info shadow h-100 py-2">
+        <div class="card-body">
+          <div class="row no-gutters align-items-center">
+            <div class="col mr-2">
+              <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                Logros
+              </div>
+              <div class="h5 mb-0 font-weight-bold text-gray-800">{{ totalProductos }}</div>
+            </div>
+            <div class="col-auto">
+              <mat-icon class="kpi-icon text-info">emoji_events</mat-icon>
+            </div>
+          </div>
+          <div class="mt-2">
+            <small class="text-muted"> {{ categoriaProductos }} Oros </small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6 mb-4">
+      <div class="card border-left-warning shadow h-100 py-2">
+        <div class="card-body">
+          <div class="row no-gutters align-items-center">
+            <div class="col mr-2">
+              <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                Profesores
+              </div>
+              <div class="h5 mb-0 font-weight-bold text-gray-800">{{ pedidosMes }}</div>
+            </div>
+            <div class="col-auto">
+              <mat-icon class="kpi-icon text-warning">person</mat-icon>
+            </div>
+          </div>
+          <div class="mt-2">
+            <small class="text-warning"> {{ pedidosPendientes }} % por region </small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Gráficos y distribución de planes -->
+  <div class="row mt-4">
+    <!-- Distribución de planes -->
+    <div class="col-lg-6 col-md-6 mb-4">
+      <div class="card shadow">
+        <div class="card-header py-3">
+          <h6 class="m-0 font-weight-bold text-primary">
+            <mat-icon class="align-middle">pie_chart</mat-icon>
+            Distribución de por región
+          </h6>
+        </div>
+        <div class="card-body">
+          <h5 class="card-title">
+            Total de inscritos: <strong>{{ totalTiendas }}</strong>
+          </h5>
+
+          <div class="mb-3">
+            <div class="d-flex justify-content-between mb-1">
+              <small>Lima</small>
+              <small
+                ><strong>{{ tiendasPlanBasico }}</strong> ({{ porcentajePlanBasico }}%)</small
+              >
+            </div>
+            <div class="progress" style="height: 25px">
+              <div
+                class="progress-bar bg-info"
+                role="progressbar"
+                [style.width]="porcentajePlanBasico + '%'"
+              >
+                {{ tiendasPlanBasico }}
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <div class="d-flex justify-content-between mb-1">
+              <small>Arequipa</small>
+              <small
+                ><strong>{{ tiendasPlanPro }}</strong> ({{ porcentajePlanPro }}%)</small
+              >
+            </div>
+            <div class="progress" style="height: 25px">
+              <div
+                class="progress-bar bg-primary"
+                role="progressbar"
+                [style.width]="porcentajePlanPro + '%'"
+              >
+                {{ tiendasPlanPro }}
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <div class="d-flex justify-content-between mb-1">
+              <small>Chiclayo</small>
+              <small
+                ><strong>{{ tiendasPlanPremium }}</strong> ({{ porcentajePlanPremium }}%)</small
+              >
+            </div>
+            <div class="progress" style="height: 25px">
+              <div
+                class="progress-bar bg-success"
+                role="progressbar"
+                [style.width]="porcentajePlanPremium + '%'"
+              >
+                {{ tiendasPlanPremium }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Alertas y notificaciones -->
+    <div class="col-lg-6 col-md-6 mb-4">
+      <div class="card shadow">
+        <div class="card-header py-3">
+          <h6 class="m-0 font-weight-bold text-warning">
+            <mat-icon class="align-middle">notifications_active</mat-icon>
+            Alertas y Notificaciones
+          </h6>
+        </div>
+        <div class="card-body">
+          <div class="alert alert-warning" *ngIf="suscripcionesPorVencer > 0">
+            <mat-icon class="align-middle">warning</mat-icon>
+            <strong>{{ suscripcionesPorVencer }}</strong> inscritos últimos 7 días
+          </div>
+
+          <div class="alert alert-info" *ngIf="tiendasInactivas > 0">
+            <mat-icon class="align-middle">info</mat-icon>
+            <strong>{{ tiendasInactivas }}</strong> inscritos durante este mes
+          </div>
+
+          <div class="alert alert-danger" *ngIf="pagosRechazados > 0">
+            <mat-icon class="align-middle">error</mat-icon>
+            <strong>{{ pagosRechazados }}</strong> inscritos hoy dia
+          </div>
+
+          <div class="alert alert-success">
+            <mat-icon class="align-middle">check_circle</mat-icon>
+            Sistema operando normalmente
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Top tiendas y productos más vendidos -->
+  <div class="row mt-4">
+    <div class="col-12">
+      <div class="card shadow mb-4">
+        <div class="card-header py-3">
+          <h6 class="m-0 font-weight-bold text-primary">
+            <mat-icon class="align-middle">star</mat-icon>
+            Top 5 Regiones con Más talentos
+          </h6>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Región</th>
+                  <th>disciplinas</th>
+                  <th>total en verificación</th>
+                  <th>total </th>
+                  <th>Calificación</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr >
+                  <td>1</td>
+                  <td>
+                    <strong>Lima</strong>
+                  </td>
+                  <td>
+                    <span class="badge badge-primary">futbol</span>
+                  </td>
+                  <td>45</td>
+                  <td>16</td>
+                  <td>
+                    <mat-icon class="text-warning">star</mat-icon>
+                    5
+                  </td>
+                </tr>
+
+                <tr >
+                  <td>1</td>
+                  <td>
+                    <strong>Arequipa</strong>
+                  </td>
+                  <td>
+                    <span class="badge badge-primary">Atletismo</span>
+                    <span class="badge badge-primary">futbol</span>
+                  </td>
+                  <td>75</td>
+                  <td>16</td>
+                  <td>
+                    <mat-icon class="text-warning">star</mat-icon>
+                    5
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Productos más buscados -->
+  <!-- Productos más buscados con carrusel -->
+  <div class="row">
+    <div class="col-12">
+      <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex justify-content-between align-items-center">
+          <h6 class="m-0 font-weight-bold text-success">
+            <mat-icon class="align-middle">search</mat-icon>
+            Sedes habilitados 2025
+          </h6>
+          <div class="carousel-navigation">
+            <button mat-icon-button class="swiper-button-prev-custom">
+              <mat-icon>chevron_left</mat-icon>
+            </button>
+            <button mat-icon-button class="swiper-button-next-custom">
+              <mat-icon>chevron_right</mat-icon>
+            </button>
+          </div>
+        </div>
+        <div class="card-body">
+          <swiper-container
+            #swiperContainer
+            slides-per-view="1"
+            space-between="20"
+            loop="true"
+            autoplay-delay="3000"
+            autoplay-disable-on-interaction="false"
+            navigation-next-el=".swiper-button-next-custom"
+            navigation-prev-el=".swiper-button-prev-custom"
+            breakpoints='{"640":{"slidesPerView":2},"768":{"slidesPerView":3},"1024":{"slidesPerView":4}}'
+          >
+            <swiper-slide *ngFor="let producto of productosMasBuscados">
+              <div class="card text-center py-3 h-100 product-card">
+                <div class="card-body">
+                  <mat-icon class="product-icon">place</mat-icon>
+                  <h5 class="mt-2">{{ producto.nombre }}</h5>
+                  <p class="small mb-0 text-muted">{{ producto.categoria }}</p>
+                  <p class="small text-primary">
+                    <mat-icon class="icon-small">search</mat-icon>
+                    <strong>{{ producto.busquedas }}</strong> inscritos
+                  </p>
+                </div>
+              </div>
+            </swiper-slide>
+          </swiper-container>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
