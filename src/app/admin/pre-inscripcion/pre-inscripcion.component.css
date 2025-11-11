@@ -1,0 +1,266 @@
+.pre-inscripcion-container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Header Section */
+.header-section {
+  text-align: center;
+  margin-bottom: 40px;
+  padding: 30px 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 12px;
+  color: white;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.titulo-principal {
+  font-size: 32px;
+  font-weight: 700;
+  margin: 0 0 10px 0;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.subtitulo {
+  font-size: 18px;
+  font-weight: 400;
+  margin: 0;
+  opacity: 0.95;
+}
+
+/* Stepper Customization */
+::ng-deep .mat-stepper-horizontal {
+  background: transparent;
+}
+
+::ng-deep .mat-step-header {
+  padding: 16px 24px !important;
+}
+
+::ng-deep .mat-step-header .mat-step-icon {
+  background-color: #667eea !important;
+  color: white !important;
+  width: 40px;
+  height: 40px;
+}
+
+::ng-deep .mat-step-header .mat-step-icon-selected {
+  background-color: #764ba2 !important;
+}
+
+::ng-deep .mat-step-header .mat-step-label {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+::ng-deep .mat-step-header .mat-step-label.mat-step-label-active {
+  color: #764ba2;
+}
+
+/* Form Card */
+.form-card {
+  margin: 20px 0;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  background: white;
+}
+
+.form-card mat-card-header {
+  margin-bottom: 20px;
+}
+
+.form-card mat-card-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #667eea;
+  text-align: center;
+}
+
+/* Form Fields */
+.field-full {
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.field-half {
+  width: calc(50% - 8px);
+  margin-bottom: 16px;
+}
+
+.form-row {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 768px) {
+  .field-half {
+    width: 100%;
+  }
+}
+
+/* Form Field Customization */
+::ng-deep .mat-form-field-appearance-outline .mat-form-field-outline {
+  color: rgba(0, 0, 0, 0.12);
+}
+
+::ng-deep .mat-form-field-appearance-outline.mat-focused .mat-form-field-outline-thick {
+  color: #667eea;
+}
+
+::ng-deep .mat-form-field-appearance-outline .mat-form-field-label {
+  color: rgba(0, 0, 0, 0.6);
+}
+
+::ng-deep .mat-form-field-appearance-outline.mat-focused .mat-form-field-label {
+  color: #667eea;
+}
+
+/* Buttons */
+.button-row {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  margin-top: 30px;
+  padding: 20px 0;
+}
+
+.button-row button {
+  min-width: 140px;
+  height: 44px;
+  font-size: 15px;
+  font-weight: 500;
+  border-radius: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+::ng-deep .mat-raised-button.mat-primary {
+  background-color: #667eea !important;
+  color: white !important;
+}
+
+::ng-deep .mat-raised-button.mat-primary:hover {
+  background-color: #5568d3 !important;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+::ng-deep .mat-raised-button.mat-accent {
+  background-color: #4caf50 !important;
+  color: white !important;
+}
+
+::ng-deep .mat-raised-button.mat-accent:hover {
+  background-color: #45a049 !important;
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
+}
+
+/* Icons in Buttons */
+.button-row button mat-icon {
+  margin-left: 8px;
+  font-size: 20px;
+  height: 20px;
+  width: 20px;
+}
+
+/* Loading State */
+mat-hint {
+  color: #667eea;
+  font-style: italic;
+}
+
+/* Errors */
+::ng-deep .mat-error {
+  font-size: 12px;
+  color: #f44336;
+}
+
+/* Select Dropdown */
+::ng-deep .mat-select-arrow {
+  color: #667eea;
+}
+
+/* Datepicker */
+::ng-deep .mat-datepicker-toggle {
+  color: #667eea;
+}
+
+::ng-deep .mat-calendar-body-selected {
+  background-color: #667eea;
+  color: white;
+}
+
+/* Textarea */
+::ng-deep .mat-form-field textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+/* Card Content Padding */
+mat-card-content {
+  padding: 20px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .pre-inscripcion-container {
+    padding: 10px;
+  }
+
+  .titulo-principal {
+    font-size: 24px;
+  }
+
+  .subtitulo {
+    font-size: 16px;
+  }
+
+  .form-card {
+    padding: 15px;
+  }
+
+  .button-row {
+    flex-direction: column;
+  }
+
+  .button-row button {
+    width: 100%;
+  }
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.form-card {
+  animation: fadeIn 0.4s ease-in-out;
+}
+
+/* Success Message */
+.success-message {
+  padding: 20px;
+  background-color: #4caf50;
+  color: white;
+  border-radius: 8px;
+  text-align: center;
+  margin: 20px 0;
+  box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
+}
+
+/* Validation hints */
+.validation-hint {
+  font-size: 12px;
+  color: #666;
+  margin-top: 4px;
+}

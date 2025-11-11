@@ -1,0 +1,189 @@
+/* Estilos para el carrusel */
+swiper-container {
+  width: 100%;
+  padding: 20px 10px;
+}
+
+swiper-slide {
+  height: auto;
+}
+
+.product-card {
+  transition: all 0.3s ease;
+  border: 1px solid #e3e6f0;
+  height: 100%;
+  cursor: pointer;
+}
+
+.product-card:hover {
+  border-color: #4e73df;
+  box-shadow: 0 0.5rem 1rem rgba(78, 115, 223, 0.2);
+  transform: translateY(-5px);
+}
+
+.product-icon {
+  font-size: 48px !important;
+  width: 48px !important;
+  height: 48px !important;
+  color: #4e73df;
+  margin: 0 auto;
+}
+
+.carousel-navigation {
+  display: flex;
+  gap: 5px;
+}
+
+.swiper-button-prev-custom,
+.swiper-button-next-custom {
+  background-color: #fff;
+  border: 1px solid #e3e6f0;
+}
+
+.swiper-button-prev-custom:hover,
+.swiper-button-next-custom:hover {
+  background-color: #4e73df;
+  color: white;
+}
+
+.swiper-button-prev-custom mat-icon,
+.swiper-button-next-custom mat-icon {
+  font-size: 24px;
+}
+
+/* Iconos de KPI - agregar al final de tu CSS */
+.kpi-icon {
+  font-size: 40px !important;
+  width: 40px !important;
+  height: 40px !important;
+  line-height: 40px !important;
+}
+
+.text-gray-800 {
+  color: #5a5c69;
+}
+
+.text-primary {
+  color: #4e73df !important;
+}
+
+.text-success {
+  color: #1cc88a !important;
+}
+
+.text-info {
+  color: #36b9cc !important;
+}
+
+.text-warning {
+  color: #f6c23e !important;
+}
+
+
+.icon-small {
+  font-size: 16px !important;
+  width: 16px !important;
+  height: 16px !important;
+  line-height: 16px !important;
+  vertical-align: middle;
+}
+
+/* Ajuste para el card-body de KPIs */
+.card-body {
+  padding: 1rem;
+}
+
+.no-gutters {
+  margin-right: 0;
+  margin-left: 0;
+}
+
+.no-gutters > .col,
+.no-gutters > [class*="col-"] {
+  padding-right: 0;
+  padding-left: 0;
+}
+
+.color-ch {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.card {
+  border: none;
+  border-radius: 0.5rem;
+  box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 0.5rem 2rem 0 rgba(58, 59, 69, 0.25);
+}
+
+.border-left-primary {
+  border-left: 0.25rem solid #4e73df !important;
+}
+
+.border-left-success {
+  border-left: 0.25rem solid #1cc88a !important;
+}
+
+.border-left-info {
+  border-left: 0.25rem solid #36b9cc !important;
+}
+
+.border-left-warning {
+  border-left: 0.25rem solid #f6c23e !important;
+}
+
+.progress {
+  height: 25px;
+  border-radius: 5px;
+}
+
+.progress-bar {
+  font-size: 14px;
+  line-height: 25px;
+  font-weight: bold;
+}
+
+.text-xs {
+  font-size: 0.75rem;
+}
+
+.icon-small {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+  vertical-align: middle;
+}
+
+.product-card {
+  transition: all 0.3s ease;
+  border: 1px solid #e3e6f0;
+}
+
+.product-card:hover {
+  border-color: #4e73df;
+  box-shadow: 0 0.5rem 1rem rgba(78, 115, 223, 0.2);
+}
+
+.alert {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.badge-primary {
+  background-color: #4e73df;
+}
+
+.align-middle {
+  vertical-align: middle;
+  margin-right: 5px;
+}
+
+.table-hover tbody tr:hover {
+  background-color: #f8f9fc;
+}

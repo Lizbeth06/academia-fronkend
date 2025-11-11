@@ -1,0 +1,162 @@
+/* You can add global styles to this file, and also import other style files */
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+/* input */
+.mat-mdc-form-field{
+ display: block !important;
+}
+
+/* Dialog */
+/*********/
+.cdk-overlay-pane.mat-mdc-dialog-panel {
+  max-width: var(--mat-dialog-container-max-width, 700px) !important;
+}
+.mat-mdc-unelevated-button, .mat-mdc-unelevated-button .mdc-button__ripple{
+  border-radius: 0.25rem !important;
+}
+
+/* Table */
+.mat-mdc-header-cell{
+    text-align: center !important;;
+}
+.btnAccion{
+  display: flex;
+}
+/*Botones Modal*/
+.mat-mdc-outlined-button {
+    border-radius: 0.25rem !important;
+    background-color: #3e8b87 !important;
+    color: #ffff !important;
+    border-color: transparent !important;
+}
+/*Checkbox horizontal*/
+.mat-mdc-checkbox label{
+  margin-bottom: 0 !important;
+}
+/*Botones*/
+.btnCancelar{
+    border: 1.5px solid #3e8b87 !important;
+  
+    &:hover{
+      border: 1.5px solid #275755;
+    }
+    &:active{
+      border: 1.5px solid #49a39f;
+    }
+  }
+/* Botones de accciones */
+
+.btnActionDetail {
+  color: #00A16B!important;
+}
+
+.btnActionEdit {
+  color: #123f88d7!important;
+}
+
+.btnActionDelete {
+  color: #8f1b1bd6!important;
+}
+
+.btnActionActivate{
+  color: #FFB22B!important;
+}
+.btnBuscar{
+  height: 36px !important;
+}
+
+.btn-nuevo{
+  margin-bottom: 20px;
+}
+
+
+/*modal*/
+.title-modal {
+    background-color: #3e8b87;
+    color: white;
+    font-size: 15px;
+    padding: 20px 20px;
+    font-weight: 600;
+}
+.mat-mdc-raised-button:not(:disabled) {
+    color: #3e8b87 !important;
+    border-radius: 0.25rem;
+}
+.mat-mdc-unelevated-button:not(:disabled){
+    background-color:#3e8b87 !important;
+}
+.mat-mdc-raised-button[disabled], .mat-mdc-raised-button.mat-mdc-button-disabled {
+  border-radius: 0.25rem !important;
+}
+/* Para guia*/
+.breadcrumb{
+  background-color:#e9ecef;
+  display: flex;
+  flex-wrap: wrap;
+  padding: .75rem 1rem;
+  margin-bottom: 1rem; 
+  border-radius: .25rem;
+  a{
+    text-decoration: none;
+  }
+}
+
+/* Chips states*/
+.chip-pendiente {
+  background-color: rgba(255, 178, 43, 1) !important;
+  height: auto !important;
+  margin: 0.5rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: hsl(40, 100%, 23%);
+}
+
+.chip-active {
+  background-color: rgba(0, 215, 75, 0.8) !important;
+  height: auto !important;
+  margin: 0.5rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: hsl(145, 100%, 23%);
+}
+
+.chip-inactive {
+  background-color: rgba(239, 83, 80, 0.8) !important;
+  width: auto;
+  height: auto !important;
+  margin: 0.5rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: hsl(6, 77%, 60%);
+}
+.chip-reservado{
+   background-color: rgba(34, 84, 165, 0.8) !important; 
+  width: auto;
+  height: auto !important;
+  margin: 0.5rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: hsl(217, 77%, 35%);
+}
