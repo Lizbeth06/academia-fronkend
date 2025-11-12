@@ -1,28 +1,112 @@
-/* Estilos para pantallas pequeñas */
+/* ----------------------------
+   Cursores
+---------------------------- */
+.sidebar-nav-link,
+.sidebar-nav-icon,
+.sidebar-nav-name,
+.sidebar-nav-end,
+.menu-icon-wrapper {
+  cursor: pointer;
+}
+
+/* ----------------------------
+   Layout Sidebar
+---------------------------- */
+.adminx-sidebar {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: transform 0.3s ease;
+}
+
+/* inicio Footer siempre al final */
+.adminx-content {
+  flex: 1; 
+  display: flex;
+  flex-direction: column;
+}
+
+.adminx-main-content {
+  flex: 1;
+}
+
+
+footer {
+  margin-top: auto; /* ✅ siempre empuja el footer al fondo */
+}
+/* fin Footer siempre al final */
+
+/* Opcional: si usas fixed-top en el navbar, deja espacio */
+.adminx-main-content {
+  padding-top: 70px; /* ajusta según la altura de tu navbar */
+}
+
+/* Sidebar responsive: escondida en móviles */
 @media (max-width: 767.98px) {
-    .adminx-sidebar {
-      -webkit-transform: translateX(-100%);
-      transform: translateX(-100%);
-    }
+  .adminx-sidebar {
+    transform: translateX(-100%);
   }
-  
-  /* Clase para mostrar la barra lateral en pantallas pequeñas */
   .adminx-sidebar.open {
-    -webkit-transform: translateX(0);
     transform: translateX(0);
   }
-  
-  .color-header{
-    background-color: #663081;
-    color: aliceblue;
-  }
-  .navbar{
-    z-index: 1;
-  }
+}
 
-  
-  
-  
-  
-  
-  
+/* ----------------------------
+   Sidebar Items
+---------------------------- */
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  overflow-y: auto; /* Scroll si hay muchos items */
+}
+
+.logout-item {
+  margin-top: auto; /* Siempre al final */
+}
+
+/* ----------------------------
+   Menu Icon Wrapper
+---------------------------- */
+.menu-icon-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  height: 100%;
+}
+
+.menu-icon-wrapper .small-icon {
+  font-size: 18px !important;
+  width: 18px !important;
+  height: 18px !important;
+}
+
+.menu-icon-wrapper .icon-label {
+  font-size: 10px;
+  margin-top: 2px;
+  font-weight: 500;
+  opacity: 0.8;
+}
+
+/* Mostrar/ocultar labels según estado del sidebar */
+.adminx-sidebar.collapsed-sidebar:not(.sidebar-hovered) .icon-label {
+  display: inline;
+}
+.adminx-sidebar.expanded-sidebar .icon-label,
+.adminx-sidebar.sidebar-hovered .icon-label {
+  display: none;
+}
+
+/* ----------------------------
+   Header y Navbar
+---------------------------- */
+.color-header {
+  background-color: #366EB7;
+  color: aliceblue;
+}
+
+.navbar {
+  z-index: 10;
+}

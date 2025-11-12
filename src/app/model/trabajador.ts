@@ -14,8 +14,6 @@ export class Trabajador {
     metas:          string;
     observaciones:  string;
     bonificaciones: number;
-    linkedin:       string;
-    urlFoto:       string;
     persona:       Persona;
     niveleducacion: Niveleducacion;
     oficina:       Oficina;

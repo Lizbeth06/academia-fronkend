@@ -12,7 +12,7 @@ export class Usuario {
     usernombres:string;
     termino1:string;
     termino2:string;
-    urlFoto:string;
+    
     trabajador: Trabajador;
     roles: Rol[] = [];
 }

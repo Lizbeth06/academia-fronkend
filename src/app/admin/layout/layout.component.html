@@ -1,233 +1,169 @@
 <div class="adminx-container z-0">
-    <nav class="navbar navbar-expand justify-content-between fixed-top">
-      <a class="navbar-brand mb-0 h1 d-none d-md-block" href="/admin">
-        <img src="https://res.cloudinary.com/dpumt2sth/image/upload/v1760922675/logo_academia_1_flddol.png" class="navbar-brand-image d-inline-block align-top mr-2" alt="" />
-        ACADEMINIA IPD
-      </a>
-  
-      <form class="form-inline form-quicksearch d-none d-md-block mx-auto">
-        <div class="input-group">
-          <div class="input-group-prepend">
-            <div class="input-group-icon">
-              <i data-feather="search"></i>
-            </div>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand justify-content-between fixed-top">
+    <a class="navbar-brand mb-0 h1 d-none d-md-block" routerLink="/admin">
+      <img
+        [src]="logoinstitucion()"
+        class="navbar-brand-image d-inline-block mr-2"
+        alt=""
+        style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover;"
+      />
+      {{ nombreinstitucion() }}
+    </a>
+
+
+    <form class="form-inline form-quicksearch d-none d-md-block mx-auto">
+      <div class="input-group">
+        <div class="input-group-prepend">
+          <div class="input-group-icon">
+            <i data-feather="search"></i>
           </div>
-          <input type="text" class="form-control" id="search" placeholder="Type to search..." />
         </div>
-      </form>
-  
-      <div class="d-flex flex-1 d-block d-md-none">
-        <a class="sidebar-toggle ml-3">
-          <i data-feather="menu"></i>
-        </a>
+        <input type="text" class="form-control" id="search" placeholder="Type to search..." />
       </div>
-  
-      <ul class="navbar-nav d-flex justify-content-end mr-2">
-        <!-- Notificatoins -->
-        <li class="nav-item dropdown d-flex align-items-center mr-2">
-          <a class="nav-link nav-link-notifications" id="dropdownNotifications" data-toggle="dropdown" href="#">
-            <i class="oi oi-bell display-inline-block align-middle"></i>
-            <span class="nav-link-notification-number">3</span>
-          </a>
-          <div class="dropdown-menu dropdown-menu-right dropdown-menu-notifications"
-            aria-labelledby="dropdownNotifications">
-            <div class="notifications-header d-flex justify-content-between align-items-center">
-              <span class="notifications-header-title"> Notifications </span>
-              <a href="#" class="d-flex"><small>Mark all as read</small></a>
-            </div>
-  
-            <div class="list-group">
-              <a href="#" class="list-group-item list-group-item-action unread">
-                <p class="mb-1">
-                  Invitation for <strong>Lunch</strong> on
-                  <strong>Jan 12th 2018</strong> by <strong>Laura</strong>
-                </p>
-  
-                <div class="mb-1">
-                  <button type="button" class="btn btn-primary btn-sm">
-                    Accept invite
-                  </button>
-                  <button type="button" class="btn btn-outline-danger btn-sm">
-                    Decline
-                  </button>
-                </div>
-  
-                <small>1 hour ago</small>
-              </a>
-  
-              <a href="#" class="list-group-item list-group-item-action">
-                <p class="mb-1">
-                  <strong class="text-success">Goal completed</strong><br />1,000
-                  new members today
-                </p>
-                <small>3 days ago</small>
-              </a>
-  
-              <a href="#" class="list-group-item list-group-item-action">
-                <p class="mb-1 text-danger">
-                  <strong>System error detected</strong>
-                </p>
-                <small>3 days ago</small>
-              </a>
-  
-              <a href="#" class="list-group-item list-group-item-action">
-                <p class="mb-1">
-                  Your task <strong>Design Draft</strong> is due today.
-                </p>
-                <small>4 days ago</small>
-              </a>
-            </div>
-  
-            <div class="notifications-footer text-center">
-              <a href="#"><small>View all notifications</small></a>
-            </div>
-          </div>
-        </li>
-        <!-- Notifications -->
-        <li class="nav-item dropdown">
-          <a class="nav-link avatar-with-name" id="navbarDropdownMenuLink" data-toggle="dropdown" href="#">
-            <span class="mr-2 d-none d-lg-inline text-gray-600 small">{{ nombreConRol }}</span>
-            <img [src]="headerProfileImage" class="d-inline-block align-top" alt="" />
-          </a>
-          <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
+    </form>
 
-            <a class="dropdown-item" routerLink="/admin/usuario/perfil">Mi perfil</a>
-            <a class="dropdown-item" routerLink="/admin/usuario/institucion">Institución</a>
-            <a class="dropdown-item" routerLink="/admin/usuario/trabajador">Trabajadores</a>
-            <a class="dropdown-item" routerLink="/admin/usuario/usuario">Gestión de Usuario</a>
-            <a class="dropdown-item" routerLink="/admin/usuario/ayuda">Ayuda</a>
-
-            <!-- <a class="dropdown-item" href="">Ajustes</a>-->
-            <div class="dropdown-divider"></div>
-            <a class="dropdown-item text-danger" (click)="logout()">desconectar</a>
-          </div>
-        </li>
-      </ul>
-    </nav>
-  
-    <!-- Sidebar -->
-<div class="adminx-sidebar expand-hover push">
-  <ul class="sidebar-nav">
-    <!-- 🔹 Principal -->
-    <li class="sidebar-nav-item">
-      <a href="/admin" class="sidebar-nav-link active">
-        <span class="sidebar-nav-icon"><i data-feather="home"></i></span>
-        <span class="sidebar-nav-name"> Principal</span>
+    <div class="d-flex flex-1 d-block d-md-none">
+      <a class="sidebar-toggle ml-3">
+        <i data-feather="menu"></i>
       </a>
-    </li>
-
-    <!--  Gestión de Inscripción -->
-    <li class="sidebar-nav-item">
-      <a class="sidebar-nav-link collapsed" data-toggle="collapse" href="#documento">
-        <span class="sidebar-nav-icon"><i data-feather="award"></i></span>
-        <span class="sidebar-nav-name"> Gestión de inscripción </span>
-        <span class="sidebar-nav-end">
-          <i data-feather="chevron-right" class="nav-collapse-icon"></i>
-        </span>  
-      </a>
-      <ul class="sidebar-sub-nav collapse" id="documento">
-        @for (o of gestionInscripcionOptions; track $index) {
-          <item-menu-option [itemOption]="o"></item-menu-option>
-        }
-      </ul>
-    </li>
-
-    <!--  Gestión de Estudiantes -->
-    <li class="sidebar-nav-item">
-      <a class="sidebar-nav-link collapsed" data-toggle="collapse" href="#estudiante">
-        <span class="sidebar-nav-icon"><i data-feather="grid"></i></span>
-        <span class="sidebar-nav-name"> RNTD </span>
-        <span class="sidebar-nav-end">
-          <i data-feather="chevron-right" class="nav-collapse-icon"></i>
-        </span>
-      </a>
-      <ul class="sidebar-sub-nav collapse" id="estudiante">
-        @for (o of rntdOptions; track $index) {
-          <item-menu-option [itemOption]="o"></item-menu-option>
-        }
-      </ul>
-    </li>
-
-    <!--  Control de asistencia -->
-    <li class="sidebar-nav-item">
-      <a href="/admin/mensajes" class="sidebar-nav-link">
-        <span class="sidebar-nav-icon">
-          <i data-feather="message-circle"></i>
-        </span>
-        <span class="sidebar-nav-name">
-          Control de asistencia
-        </span>
-        <span class="sidebar-nav-end">
-          <span class="badge badge-info">45</span>
-        </span>
-      </a>
-    </li>
-
-    
-    <!--  Indicadores físicos -->
-    <li class="sidebar-nav-item">
-      <a href="/admin/mensajes" class="sidebar-nav-link">
-        <span class="sidebar-nav-icon">
-          <i data-feather="message-circle"></i>
-        </span>
-        <span class="sidebar-nav-name">
-          Indicadores físicos
-        </span>
-        <span class="sidebar-nav-end">
-          <span class="badge badge-info">45</span>
-        </span>
-      </a>
-    </li>
-
-    <!--  Reportes -->
-    <li class="sidebar-nav-item">
-      <a class="sidebar-nav-link collapsed" data-toggle="collapse" href="#gestionCursos">
-        <span class="sidebar-nav-icon"><i data-feather="book"></i></span>
-        <span class="sidebar-nav-name"> Reportes </span>
-        <span class="sidebar-nav-end">
-          <i data-feather="chevron-right" class="nav-collapse-icon"></i>
-        </span>
-      </a>
-      <ul class="sidebar-sub-nav collapse" id="gestionCursos">
-        @for (o of ReportesOptions; track $index) {
-          <item-menu-option [itemOption]="o"></item-menu-option>
-        }
-      </ul>
-    </li>
-
-   
-
-    <!--<li class="sidebar-nav-item">
-      <a href="/admin/productos" class="sidebar-nav-link">
-        <span class="sidebar-nav-icon">
-          <i data-feather="shopping-cart"></i>
-        </span>
-        <span class="sidebar-nav-name">
-          Productos y Servicios
-        </span>
-        <span class="sidebar-nav-end">
-          <span class="badge badge-info">{{totalProductos()}}</span>
-        </span>
-      </a>
-    </li>-->
-
-  </ul>
-</div>
-<!-- Sidebar End -->
-
-    <div class="adminx-content">
-      <div class="adminx-main-content">
-        <div class="container-fluid">
-          <router-outlet></router-outlet>
-        </div>
-      </div>
-
-      <!-- Pie de página -->
-      <footer class="text-white text-center text-lg-start mt-5 color-header">
-        <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.2)">
-          &copy; 2025 Academia IPD. Todos los derechos reservados.
-          <a class="text-white" href="https://iadataperu.com/">ipd.gob.pe</a>
-        </div>
-      </footer>
     </div>
+
+    <ul class="navbar-nav d-flex justify-content-end mr-2">
+      <!-- Notifications -->
+      <li class="nav-item dropdown d-flex align-items-center mr-2">
+        <a class="nav-link nav-link-notifications" id="dropdownNotifications" data-toggle="dropdown" href="#">
+          <i class="oi oi-bell display-inline-block align-middle"></i>
+          <span class="nav-link-notification-number">3</span>
+        </a>
+        <div class="dropdown-menu dropdown-menu-right dropdown-menu-notifications" aria-labelledby="dropdownNotifications">
+          <div class="notifications-header d-flex justify-content-between align-items-center">
+            <span class="notifications-header-title">Notifications</span>
+            <a href="#" class="d-flex"><small>Mark all as read</small></a>
+          </div>
+          <div class="list-group">
+            <!-- Ejemplo de notificación -->
+            <a href="#" class="list-group-item list-group-item-action unread">
+              <p class="mb-1">
+                Invitation for <strong>Lunch</strong> on <strong>Jan 12th 2018</strong> by <strong>Laura</strong>
+              </p>
+              <div class="mb-1">
+                <button type="button" class="btn btn-primary btn-sm">Accept invite</button>
+                <button type="button" class="btn btn-outline-danger btn-sm">Decline</button>
+              </div>
+              <small>1 hour ago</small>
+            </a>
+            <!-- Otras notificaciones -->
+          </div>
+          <div class="notifications-footer text-center">
+            <a href="#"><small>View all notifications</small></a>
+          </div>
+        </div>
+      </li>
+
+      <!-- User dropdown -->
+      <li class="nav-item dropdown">
+        <a class="nav-link avatar-with-name" id="navbarDropdownMenuLink" data-toggle="dropdown" href="#">
+          <span class="mr-2 d-none d-lg-inline text-gray-600 small">{{ nombreConRol }}</span>
+          <img [src]="fotopersona()" class="d-inline-block align-top" alt="" />
+        </a>
+        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
+          <a class="dropdown-item" *ngFor="let menu of menusDropdown" [routerLink]="menu.urlMenu">
+            <mat-icon>{{ menu.icono }}</mat-icon> {{ menu.nombreMenu| titlecase }}
+          </a>
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item text-danger sidebar-nav-link" (click)="confirmLogout()">Salir</a>
+        </div>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- Sidebar -->
+  <div class="adminx-sidebar expand-hover push "
+  style="z-index: 10;"
+       [class.collapsed-sidebar]="isCollapsed"
+       [class.sidebar-hovered]="isCollapsed && isHovered"
+       [class.expanded-sidebar]="!isCollapsed"
+       (mouseenter)="onSidebarHover(true)"
+       (mouseleave)="onSidebarHover(false)">
+    <ul class="sidebar-nav">
+      <!-- Principal -->
+      <li class="sidebar-nav-item">
+        <a routerLink="/admin" class="sidebar-nav-link active">
+          <span class="sidebar-nav-icon menu-icon-wrapper">
+            <mat-icon class="small-icon">home</mat-icon>
+            <span class="icon-label">Principal</span>
+          </span>
+          <span class="sidebar-nav-name">Principal</span>
+        </a>
+      </li>
+
+      <!-- Menús con grupos -->
+      @for (grupoMenu of menuGrupos; track grupoMenu.grupo.idMenugrupo) {
+        <li class="sidebar-nav-item">
+          <a class="sidebar-nav-link collapsed" data-toggle="collapse" [attr.href]="'#menuGrupo' + grupoMenu.grupo.idMenugrupo">
+            <span class="sidebar-nav-icon menu-icon-wrapper" [matTooltip]="grupoMenu.grupo.titulo">
+              <mat-icon class="small-icon">{{ grupoMenu.grupo.icono }}</mat-icon>
+              <span class="icon-label">{{ grupoMenu.grupo.titulo }}</span>
+            </span>
+            <span class="sidebar-nav-name">{{ grupoMenu.grupo.descripcion }}</span>
+            <span class="sidebar-nav-end">
+              <mat-icon class="nav-collapse-icon">chevron_right</mat-icon>
+            </span>
+          </a>
+          <ul class="sidebar-sub-nav collapse" [attr.id]="'menuGrupo' + grupoMenu.grupo.idMenugrupo">
+            @for (item of grupoMenu.items; track item.idMenu) {
+              <item-menu-option [itemOption]="{
+                   href: item.urlMenu ,
+                   icono: item.icono,
+                   name: item.nombreMenu  | titlecase
+                 }"></item-menu-option>
+            }
+          </ul>
+        </li>
+      }
+
+      <!-- Menús sin grupo -->
+      @for (menu of menusSinGrupo; track menu.idMenu) {
+        <li class="sidebar-nav-item">
+          <a [routerLink]="menu.urlMenu" class="sidebar-nav-link" [ngClass]="{'active': menu.urlMenu === '/admin'}">
+            <span class="sidebar-nav-icon menu-icon-wrapper">
+              <mat-icon>{{ menu.icono }}</mat-icon>
+              <span class="icon-label">{{ menu.nombreMenu  | titlecase }}</span>
+            </span>
+            <span class="sidebar-nav-name">{{ menu.nombreMenu  | titlecase }}</span>
+          </a>
+        </li>
+      }
+
+      <!-- Cerrar sesión -->
+      <li class="sidebar-nav-item logout-item">
+        <a class="sidebar-nav-link text-danger" (click)="confirmLogout()">
+          <span class="sidebar-nav-icon menu-icon-wrapper" matTooltip="Cerrar sesión">
+            <mat-icon class="small-icon">logout</mat-icon>
+            <span class="icon-label">Salir</span>
+          </span>
+          <span class="sidebar-nav-name">Cerrar sesión</span>
+        </a>
+      </li>
+    </ul>
   </div>
+  <!-- Sidebar End -->
+
+  <!-- Main Content -->
+  <div class="adminx-content">
+    <div class="adminx-main-content">
+      <div class="container-fluid">
+        <router-outlet></router-outlet>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="text-white text-center text-lg-start mt-5 color-header">
+      <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.2)">
+        &copy; {{ currentYear }} Mercadito. Todos los derechos reservados.
+        <a class="text-white" href="https://iadataperu.com/">iadataperu.com</a>
+      </div>
+    </footer>
+  </div>
+</div>

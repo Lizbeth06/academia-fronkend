@@ -1,6 +1,9 @@
+import { Menugrupo } from "./menugrupo";
+
 export interface Menu {
     idMenu: number,
     icono: string,
-    nombre_menu: string,
-    url_menu: string,
+    nombreMenu: string,
+    urlMenu: string,
+    menugrupo: Menugrupo;
 }

@@ -64,7 +64,7 @@ export class UsuarioFormComponent {
         isActive:this.usuario.isActive,
         username:this.usuario.username,
         password:this.usuario.password,
-        urlFoto:this.usuario.urlFoto,
+        urlFoto:this.usuario.trabajador?.persona?.urlFoto,
         termino1:this.usuario.termino1,
         termino2:this.usuario.termino2
     });

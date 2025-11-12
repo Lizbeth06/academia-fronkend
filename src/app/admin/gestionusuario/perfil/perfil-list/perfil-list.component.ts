@@ -80,7 +80,7 @@ export class PerfilListaComponent implements OnInit {
   }
 
   get profileImage(): string {
-    return this.usuario?.urlFoto || 'assets/default-profile.png';
+    return this.usuario?.trabajador.persona.urlFoto || 'assets/default-profile.png';
   }
 
   onFileSelected(event: any): void {
@@ -93,7 +93,7 @@ export class PerfilListaComponent implements OnInit {
           // 2. Actualizar el usuario con la URL que devolvió el backend
           this.usuarioService.actualizarFoto(this.usuario!.idUsuario!, fotoUrl).subscribe({
             next: () => {
-              this.usuario!.urlFoto = fotoUrl;
+              this.usuario!.trabajador.persona.urlFoto = fotoUrl;
               console.log('Foto actualizada con nueva URL');
             },
             error: err => console.error('Error al actualizar la foto con la URL', err)

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Menu } from '../model/menu';
 import { Subject } from 'rxjs';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { environment } from '../environments/environment';
 import { GenericService } from './generic.service';
 
@@ -22,6 +22,14 @@ export class MenuService extends GenericService<Menu>{
 
   getMenuByUser(username:string){
     return this.http.post<Menu[]>(`${this.url}/usuario`,username);
+  }
+
+  getMenuByidRolUsuario(idRol:number,idUsuario:number){
+      const params = new HttpParams()
+      .set('id_rol', idRol)
+      .set('id_usuario', idUsuario);
+
+    return this.http.get<Menu[]>(`${environment.HOST}/api/menu/allusuariorol`, { params });
   }
 
   //Cambios
