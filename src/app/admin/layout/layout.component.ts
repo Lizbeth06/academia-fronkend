@@ -36,42 +36,42 @@ export class LayoutComponent implements OnInit {
   
   gestionInscripcionOptions: MenuOption[] = [
     {
-      href: "/admin/operacion/inscripcion",
+      href: "/admin/inscripcion/validacioninscripcion",
       icono: "VI",
       name: "Validación de inscripción",
     },
     {
-      href: "/admin/operacion/pago",
+      href: "/admin/inscripcion/pre-inscripcion",
       icono: "ID",
       name: "Inscripcion directa",
     },
     {
-      href: "/admin/operacion/reserva",
+      href: "/admin/inscripcion/convocatoria",
       icono: "Co",
       name: "Convocatorias",
     },
     {
-      href: "/admin/operacion/reserva",
+      href: "/admin/inscripcion/horarios",
       icono: "Hr",
       name: "Horarios",
     },
     {
-      href: "/admin/operacion/reserva",
+      href: "/admin/inscripcion/turnos",
       icono: "Tu",
       name: "Turnos",
     },
     {
-      href: "/admin/operacion/reserva",
+      href: "/admin/inscripcion/sedes",
       icono: "Se",
       name: "Sedes",
     },
     {
-      href: "/admin/operacion/reserva",
+      href: "/admin/inscripcion/disciplina",
       icono: "Di",
       name: "Disciplinas",
     },
     {
-      href: "/admin/operacion/reserva",
+      href: "/admin/inscripcion/temporada",
       icono: "Te",
       name: "Temporada",
     },

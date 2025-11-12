@@ -1,12 +1,5 @@
 import { Routes } from '@angular/router';
 import { HomeComponent } from './home/home.component';
-import { InstitucionListComponent } from './institucion/institucion-list/institucion-list.component';
-
-import { AyudaListaComponent } from './ayuda/ayuda-lista/ayuda-lista.component';
-import { PerfilListaComponent } from './perfil/perfil-list/perfil-list.component';
-import { UsuarioListComponet } from './usuario/usuario-list/usuario-list.component';
-import { TrabajadorListComponent } from './trabajador/trabajador-list/trabajador-list.component';
-import { ConvocatoriaListaComponent } from './gestionregistros/convocatoria/convocatoria-lista/convocatoria-lista.component';
 
 
 export const ADMIN_ROUTES: Routes = [
@@ -15,40 +8,20 @@ export const ADMIN_ROUTES: Routes = [
     component: HomeComponent,
   },
 
-  //  Rutas de Gestión de Perfiles
-  {
-    path: 'perfil',
-    component: PerfilListaComponent,
-  },
-  {
-    path: 'trabajador',
-    component: TrabajadorListComponent,
-  },
+  //gestion de usuario
   {
     path: 'usuario',
-    component: UsuarioListComponet,
-  },
-  {
-    path: 'institucion',
-    component: InstitucionListComponent,
-  },
-  {
-    path: 'ayuda',
-    component: AyudaListaComponent,
+    loadChildren: () => import('./gestionusuario/usuario.routes').then((r) => r.usuarioRoutes),
   },
 
 
- 
-  
- 
-
-  
+  //gestion de inscripcion
   {
-    path: 'convocatoria',
-    component: ConvocatoriaListaComponent, 
+    path: 'inscripcion',
+    loadChildren: () => import('./gestioninscripcion/inscripcion.routes').then((r) => r.inscripcionRoutes),
   },
-  // Redirección por defecto si la ruta no existe
-  {
+
+ {
     path: '**',
     redirectTo: '',
   }

@@ -1,0 +1,233 @@
+<div class="convocatoria-container">
+  
+  <!-- Header -->
+  <div class="header-section">
+    <h1 class="titulo-principal">CONVOCATORIAS ABIERTAS</h1>
+    <p class="subtitulo">Encuentra oportunidades para formar parte de nuestra comunidad deportiva</p>
+  </div>
+
+  <!-- Barra de búsqueda y filtros -->
+  <div class="search-filter-section">
+    
+    <!-- Buscador principal -->
+    <div class="search-container">
+      <mat-form-field appearance="outline" class="search-field">
+        <mat-label>Buscar convocatorias</mat-label>
+        <input matInput 
+               [(ngModel)]="busqueda" 
+               (ngModelChange)="aplicarFiltros()"
+               placeholder="Título, organización, descripción...">
+        <mat-icon matPrefix>search</mat-icon>
+        <button mat-icon-button matSuffix *ngIf="busqueda" (click)="busqueda=''; aplicarFiltros()">
+          <mat-icon>close</mat-icon>
+        </button>
+      </mat-form-field>
+
+      <!-- Botón toggle filtros -->
+      <button mat-raised-button 
+              color="primary" 
+              class="btn-filtros"
+              (click)="toggleFiltros()">
+        <mat-icon>filter_list</mat-icon>
+        {{ mostrarFiltros ? 'Ocultar Filtros' : 'Mostrar Filtros' }}
+      </button>
+    </div>
+
+    <!-- Panel de filtros -->
+    <div class="filtros-panel" [class.expanded]="mostrarFiltros">
+      <div class="filtros-grid">
+        
+        <!-- Filtro por Región -->
+        <mat-form-field appearance="outline">
+          <mat-label>Región</mat-label>
+          <mat-select [(ngModel)]="regionSeleccionada" (ngModelChange)="aplicarFiltros()">
+            <mat-option value="">Todas las regiones</mat-option>
+            <mat-option *ngFor="let region of regiones" [value]="region">
+              {{ region }}
+            </mat-option>
+          </mat-select>
+          <mat-icon matPrefix>location_on</mat-icon>
+        </mat-form-field>
+
+        <!-- Filtro por Sede -->
+        <mat-form-field appearance="outline">
+          <mat-label>Sede</mat-label>
+          <mat-select [(ngModel)]="sedeSeleccionada" (ngModelChange)="aplicarFiltros()">
+            <mat-option value="">Todas las sedes</mat-option>
+            <mat-option *ngFor="let sede of sedes" [value]="sede">
+              {{ sede }}
+            </mat-option>
+          </mat-select>
+          <mat-icon matPrefix>stadium</mat-icon>
+        </mat-form-field>
+
+        <!-- Filtro por Estado -->
+        <mat-form-field appearance="outline">
+          <mat-label>Estado</mat-label>
+          <mat-select [(ngModel)]="estadoSeleccionado" (ngModelChange)="aplicarFiltros()">
+            <mat-option value="">Todos los estados</mat-option>
+            <mat-option *ngFor="let estado of estados" [value]="estado.value">
+              {{ estado.label }}
+            </mat-option>
+          </mat-select>
+          <mat-icon matPrefix>info</mat-icon>
+        </mat-form-field>
+
+        <!-- Filtro fecha desde -->
+        <mat-form-field appearance="outline">
+          <mat-label>Fecha inicio desde</mat-label>
+          <input matInput 
+                 [matDatepicker]="pickerInicio" 
+                 [(ngModel)]="fechaInicioFiltro"
+                 (ngModelChange)="aplicarFiltros()">
+          <mat-datepicker-toggle matSuffix [for]="pickerInicio"></mat-datepicker-toggle>
+          <mat-datepicker #pickerInicio></mat-datepicker>
+        </mat-form-field>
+
+        <!-- Filtro fecha hasta -->
+        <mat-form-field appearance="outline">
+          <mat-label>Fecha fin hasta</mat-label>
+          <input matInput 
+                 [matDatepicker]="pickerFin" 
+                 [(ngModel)]="fechaFinFiltro"
+                 (ngModelChange)="aplicarFiltros()">
+          <mat-datepicker-toggle matSuffix [for]="pickerFin"></mat-datepicker-toggle>
+          <mat-datepicker #pickerFin></mat-datepicker>
+        </mat-form-field>
+
+        <!-- Botón limpiar filtros -->
+        <button mat-raised-button 
+                class="btn-limpiar"
+                (click)="limpiarFiltros()">
+          <mat-icon>clear_all</mat-icon>
+          Limpiar Filtros
+        </button>
+      </div>
+    </div>
+
+    <!-- Resultados encontrados -->
+    <div class="resultados-info">
+      <p>
+        <strong>{{ convocatoriasFiltradas.length }}</strong> 
+        {{ convocatoriasFiltradas.length === 1 ? 'convocatoria encontrada' : 'convocatorias encontradas' }}
+      </p>
+    </div>
+  </div>
+
+  <!-- Loader -->
+  <div *ngIf="cargando" class="loader-container">
+    <mat-spinner></mat-spinner>
+    <p>Cargando convocatorias...</p>
+  </div>
+
+  <!-- Grid de Convocatorias -->
+  <div *ngIf="!cargando" class="convocatorias-grid">
+    
+    <!-- Tarjeta de convocatoria -->
+    <mat-card *ngFor="let conv of convocatoriasFiltradas" class="convocatoria-card">
+      
+      <!-- Imagen de cabecera -->
+      <div class="card-image-container">
+        <img mat-card-image 
+             [src]="conv.imagen" 
+             [alt]="conv.titulo"
+             onerror="this.src='assets/images/placeholder-convocatoria.jpg'">
+        
+        <!-- Badge de estado -->
+        <div class="estado-badge" [ngClass]="getEstadoClass(conv.estado)">
+          {{ getEstadoTexto(conv.estado) }}
+        </div>
+      </div>
+
+      <!-- Contenido de la tarjeta -->
+      <mat-card-content>
+        
+        <!-- Título -->
+        <h3 class="card-title">{{ conv.titulo }}</h3>
+        
+        <!-- Organización -->
+        <p class="card-organizacion">{{ conv.organizacion }}</p>
+
+        <!-- Información con íconos -->
+        <div class="card-info">
+          
+          <!-- Fechas -->
+          <div class="info-item">
+            <mat-icon>event</mat-icon>
+            <span>Del {{ conv.fechaInicio | date:'dd \'de\' MMMM' }} al {{ conv.fechaFin | date:'dd \'de\' MMMM' }}</span>
+          </div>
+
+          <!-- Horario -->
+          <div class="info-item">
+            <mat-icon>schedule</mat-icon>
+            <span>{{ conv.horario }}</span>
+          </div>
+
+          <!-- Ubicación -->
+          <div class="info-item">
+            <mat-icon>place</mat-icon>
+            <span>{{ conv.ubicacion }}</span>
+          </div>
+        </div>
+
+        <!-- Cupos disponibles -->
+        <div class="cupos-container">
+          <div class="cupos-info">
+            <strong>Cupos disponibles: {{ conv.cuposDisponibles }}</strong>
+            <span class="cupos-total">de {{ conv.cuposTotales }}</span>
+          </div>
+          
+          <!-- Barra de progreso -->
+          <div class="progress-bar">
+            <div class="progress-fill" 
+                 [style.width.%]="getPorcentajeCupos(conv)"
+                 [ngClass]="{
+                   'progress-low': getPorcentajeCupos(conv) < 50,
+                   'progress-medium': getPorcentajeCupos(conv) >= 50 && getPorcentajeCupos(conv) < 80,
+                   'progress-high': getPorcentajeCupos(conv) >= 80
+                 }">
+            </div>
+          </div>
+        </div>
+
+      </mat-card-content>
+
+      <!-- Acciones -->
+      <mat-card-actions class="card-actions">
+        
+        <!-- Botón principal: Inscribirme -->
+        <button mat-raised-button 
+                color="accent" 
+                class="btn-inscribirse"
+                [disabled]="conv.estado !== 'activa' || conv.cuposDisponibles === 0"
+                (click)="inscribirse(conv)">
+          <mat-icon>how_to_reg</mat-icon>
+          {{ conv.estado === 'activa' ? 'Inscribirme' : 'No disponible' }}
+        </button>
+
+        <!-- Botón secundario: Ver detalles -->
+        <button mat-stroked-button 
+                class="btn-compartir"
+                matTooltip="Compartir"
+                (click)="compartir(conv)">
+          <mat-icon>share</mat-icon>
+          Compartir
+        </button>
+
+      </mat-card-actions>
+
+    </mat-card>
+
+  </div>
+
+  <!-- Mensaje cuando no hay resultados -->
+  <div *ngIf="!cargando && convocatoriasFiltradas.length === 0" class="no-results">
+    <mat-icon>search_off</mat-icon>
+    <h3>No se encontraron convocatorias</h3>
+    <p>Intenta ajustar los filtros de búsqueda</p>
+    <button mat-raised-button color="primary" (click)="limpiarFiltros()">
+      Limpiar filtros
+    </button>
+  </div>
+
+</div>
