@@ -1,488 +1,804 @@
 <div class="pre-inscripcion-container">
+  
+  <!-- Header -->
   <div class="header-section">
-    <h1 class="titulo-principal">PRE-INSCRIPCIÓN 2025 II</h1>
-    <h4 class="subtitulo">Ciclo: Marzo - Noviembre</h4>
+    <h1 class="titulo-principal">PRE - INSCRIPCIÓN 2025 II</h1>
+    <p class="subtitulo">Ciclo: Marzo - Noviembre</p>
   </div>
 
-  <mat-stepper #stepper linear>
+  <!-- Stepper -->
+  <mat-stepper [linear]="true" #stepper *ngIf="!datosInscripcion && !mostrarPasoDocumentos">
     
-    <!-- PASO 1: DATOS DEL PADRE Y/O APODERADO -->
+    <!-- ========================================== -->
+    <!-- PASO 1: DATOS DEL PADRE Y/O APODERADO(A) -->
+    <!-- ========================================== -->
     <mat-step [stepControl]="apoderadoForm">
-      <form [formGroup]="apoderadoForm">
-        <ng-template matStepLabel>Datos del Apoderado</ng-template>
-        
-        <mat-card class="form-card">
-          <mat-card-header>
-            <mat-card-title>DATOS DEL PADRE Y/O APODERADO(A)</mat-card-title>
-          </mat-card-header>
-          
-          <mat-card-content>
+      <ng-template matStepLabel>Datos del Padre y/o Apoderado(a)</ng-template>
+      
+      <mat-card class="form-card">
+        <mat-card-header>
+          <mat-card-title>DATOS DEL PADRE Y/O APODERADO(A)</mat-card-title>
+        </mat-card-header>
+
+        <mat-card-content>
+          <form [formGroup]="apoderadoForm">
+            
+            <!-- Fila 1: Tipo de Documento y Número de Documento -->
             <div class="form-row">
-              <!-- Tipo de Documento -->
               <mat-form-field appearance="outline" class="field-half">
                 <mat-label>Tipo de Documento</mat-label>
                 <mat-select formControlName="tipoDocumento">
                   <mat-option *ngFor="let tipo of tiposDocumento" [value]="tipo.value">
-                    {{tipo.label}}
+                    {{ tipo.label }}
                   </mat-option>
                 </mat-select>
-                <mat-error *ngIf="apoderadoForm.get('tipoDocumento')?.hasError('required')">
-                  Seleccione un tipo de documento
-                </mat-error>
+                <mat-error>Campo obligatorio</mat-error>
               </mat-form-field>
 
-              <!-- Número de Documento -->
               <mat-form-field appearance="outline" class="field-half">
                 <mat-label>Número de Documento</mat-label>
                 <input matInput 
-                       formControlName="numeroDocumento" 
-                       maxlength="8"
-                       (blur)="buscarApoderado()"
-                       (keypress)="soloNumeros($event)">
-                <mat-hint *ngIf="cargandoApoderado">Buscando...</mat-hint>
-                <mat-error *ngIf="apoderadoForm.get('numeroDocumento')?.hasError('required')">
-                  Ingrese el número de documento
-                </mat-error>
-                <mat-error *ngIf="apoderadoForm.get('numeroDocumento')?.hasError('minlength')">
-                  Debe tener 8 dígitos
-                </mat-error>
+                       formControlName="numeroDocumento"
+                       (keypress)="soloNumeros($event)"
+                       maxlength="8">
+                <button mat-icon-button matSuffix 
+                        type="button"
+                        (click)="buscarApoderado()"
+                        [disabled]="cargandoApoderado || apoderadoForm.get('numeroDocumento')?.value?.length !== 8"
+                        matTooltip="Buscar en RENIEC">
+                  <mat-icon *ngIf="!cargandoApoderado">search</mat-icon>
+                  <mat-spinner *ngIf="cargandoApoderado" diameter="20"></mat-spinner>
+                </button>
+                <mat-error>Debe ingresar 8 dígitos</mat-error>
               </mat-form-field>
             </div>
 
-            <!-- Apellido Paterno -->
-            <mat-form-field appearance="outline" class="field-full">
-              <mat-label>Apellido Paterno</mat-label>
-              <input matInput 
-                     formControlName="apellidoPaterno"
-                     maxlength="50"
-                     (keypress)="soloLetras($event)">
-              <mat-error *ngIf="apoderadoForm.get('apellidoPaterno')?.hasError('required')">
-                Ingrese el apellido paterno
-              </mat-error>
-            </mat-form-field>
-
-            <!-- Apellido Materno -->
-            <mat-form-field appearance="outline" class="field-full">
-              <mat-label>Apellido Materno</mat-label>
-              <input matInput 
-                     formControlName="apellidoMaterno"
-                     maxlength="50"
-                     (keypress)="soloLetras($event)">
-              <mat-error *ngIf="apoderadoForm.get('apellidoMaterno')?.hasError('required')">
-                Ingrese el apellido materno
-              </mat-error>
-            </mat-form-field>
-
-            <!-- Nombres -->
-            <mat-form-field appearance="outline" class="field-full">
-              <mat-label>Nombres</mat-label>
-              <input matInput 
-                     formControlName="nombres"
-                     maxlength="50"
-                     (keypress)="soloLetras($event)">
-              <mat-error *ngIf="apoderadoForm.get('nombres')?.hasError('required')">
-                Ingrese los nombres
-              </mat-error>
-            </mat-form-field>
-
+            <!-- Fila 2: Apellidos y Nombres -->
             <div class="form-row">
-              <!-- Fecha de Nacimiento -->
+              <mat-form-field appearance="outline" class="field-third">
+                <mat-label>Apellido Paterno</mat-label>
+                <input matInput 
+                       formControlName="apellidoPaterno"
+                       (keypress)="soloLetras($event)">
+                <mat-error>Campo obligatorio</mat-error>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="field-third">
+                <mat-label>Apellido Materno</mat-label>
+                <input matInput 
+                       formControlName="apellidoMaterno"
+                       (keypress)="soloLetras($event)">
+                <mat-error>Campo obligatorio</mat-error>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="field-third">
+                <mat-label>Nombres</mat-label>
+                <input matInput 
+                       formControlName="nombres"
+                       (keypress)="soloLetras($event)">
+                <mat-error>Campo obligatorio</mat-error>
+              </mat-form-field>
+            </div>
+
+            <!-- Fila 3: Fecha de Nacimiento y Sexo -->
+            <div class="form-row">
               <mat-form-field appearance="outline" class="field-half">
                 <mat-label>Fecha de Nacimiento</mat-label>
                 <input matInput 
-                       [matDatepicker]="pickerApoderado" 
+                       [matDatepicker]="pickerApoderado"
                        formControlName="fechaNacimiento">
                 <mat-datepicker-toggle matSuffix [for]="pickerApoderado"></mat-datepicker-toggle>
                 <mat-datepicker #pickerApoderado></mat-datepicker>
-                <mat-error *ngIf="apoderadoForm.get('fechaNacimiento')?.hasError('required')">
-                  Seleccione la fecha de nacimiento
-                </mat-error>
+                <mat-error>Campo obligatorio</mat-error>
               </mat-form-field>
 
-              <!-- Sexo -->
               <mat-form-field appearance="outline" class="field-half">
                 <mat-label>Sexo</mat-label>
                 <mat-select formControlName="sexo">
                   <mat-option *ngFor="let sexo of sexos" [value]="sexo.value">
-                    {{sexo.label}}
+                    {{ sexo.label }}
                   </mat-option>
                 </mat-select>
-                <mat-error *ngIf="apoderadoForm.get('sexo')?.hasError('required')">
-                  Seleccione el sexo
-                </mat-error>
+                <mat-error>Campo obligatorio</mat-error>
               </mat-form-field>
             </div>
 
-          </mat-card-content>
-        </mat-card>
-
-        <div class="button-row">
-          <button mat-raised-button color="primary" matStepperNext>
-            Continuar
-            <mat-icon>arrow_forward</mat-icon>
-          </button>
-        </div>
-      </form>
-    </mat-step>
-
-    <!-- PASO 2: DIRECCIÓN -->
-    <mat-step [stepControl]="direccionForm">
-      <form [formGroup]="direccionForm">
-        <ng-template matStepLabel>Dirección</ng-template>
-        
-        <mat-card class="form-card">
-          <mat-card-header>
-            <mat-card-title>DIRECCIÓN</mat-card-title>
-          </mat-card-header>
-          
-          <mat-card-content>
-            <!-- Departamento -->
-            <mat-form-field appearance="outline" class="field-full">
-              <mat-label>Departamento</mat-label>
-              <mat-select formControlName="departamento" (selectionChange)="onDepartamentoChange()">
-                <mat-option *ngFor="let dep of departamentos" [value]="dep.value">
-                  {{dep.label}}
-                </mat-option>
-              </mat-select>
-              <mat-error *ngIf="direccionForm.get('departamento')?.hasError('required')">
-                Seleccione un departamento
-              </mat-error>
-            </mat-form-field>
-
-            <!-- Provincia -->
-            <mat-form-field appearance="outline" class="field-full">
-              <mat-label>Provincia</mat-label>
-              <mat-select formControlName="provincia" (selectionChange)="onProvinciaChange()">
-                <mat-option *ngFor="let prov of provincias" [value]="prov.value">
-                  {{prov.label}}
-                </mat-option>
-              </mat-select>
-              <mat-error *ngIf="direccionForm.get('provincia')?.hasError('required')">
-                Seleccione una provincia
-              </mat-error>
-            </mat-form-field>
-
-            <!-- Distrito -->
-            <mat-form-field appearance="outline" class="field-full">
-              <mat-label>Distrito</mat-label>
-              <mat-select formControlName="distrito">
-                <mat-option *ngFor="let dist of distritos" [value]="dist.value">
-                  {{dist.label}}
-                </mat-option>
-              </mat-select>
-              <mat-error *ngIf="direccionForm.get('distrito')?.hasError('required')">
-                Seleccione un distrito
-              </mat-error>
-            </mat-form-field>
-
-            <!-- Dirección -->
-            <mat-form-field appearance="outline" class="field-full">
-              <mat-label>Dirección</mat-label>
-              <input matInput formControlName="direccion" maxlength="200">
-              <mat-error *ngIf="direccionForm.get('direccion')?.hasError('required')">
-                Ingrese la dirección
-              </mat-error>
-            </mat-form-field>
-
-            <!-- Referencia -->
-            <mat-form-field appearance="outline" class="field-full">
-              <mat-label>Referencia (Opcional)</mat-label>
-              <input matInput formControlName="referencia" maxlength="200">
-            </mat-form-field>
-
-          </mat-card-content>
-        </mat-card>
-
-        <div class="button-row">
-          <button mat-raised-button matStepperPrevious>
-            <mat-icon>arrow_back</mat-icon>
-            Anterior
-          </button>
-          <button mat-raised-button color="primary" matStepperNext>
-            Continuar
-            <mat-icon>arrow_forward</mat-icon>
-          </button>
-        </div>
-      </form>
-    </mat-step>
-
-    <!-- PASO 3: DATOS DEL PARTICIPANTE -->
-    <mat-step [stepControl]="participanteForm">
-      <form [formGroup]="participanteForm">
-        <ng-template matStepLabel>Datos del Alumno</ng-template>
-        
-        <mat-card class="form-card">
-          <mat-card-header>
-            <mat-card-title>DATOS DEL PARTICIPANTE / ALUMNO(A)</mat-card-title>
-          </mat-card-header>
-          
-          <mat-card-content>
+            <!-- Fila 4: Ubicación -->
             <div class="form-row">
-              <!-- Tipo de Documento -->
+              <mat-form-field appearance="outline" class="field-third">
+                <mat-label>Departamento</mat-label>
+                <mat-select formControlName="departamento" (selectionChange)="onDepartamentoChange()">
+                  <mat-option *ngFor="let dep of departamentos" [value]="dep.value">
+                    {{ dep.label }}
+                  </mat-option>
+                </mat-select>
+                <mat-error>Campo obligatorio</mat-error>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="field-third">
+                <mat-label>Provincia</mat-label>
+                <mat-select formControlName="provincia" (selectionChange)="onProvinciaChange()">
+                  <mat-option *ngFor="let prov of provincias" [value]="prov.value">
+                    {{ prov.label }}
+                  </mat-option>
+                </mat-select>
+                <mat-error>Campo obligatorio</mat-error>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="field-third">
+                <mat-label>Distrito</mat-label>
+                <mat-select formControlName="distrito">
+                  <mat-option *ngFor="let dist of distritos" [value]="dist.value">
+                    {{ dist.label }}
+                  </mat-option>
+                </mat-select>
+                <mat-error>Campo obligatorio</mat-error>
+              </mat-form-field>
+            </div>
+
+            <!-- Fila 5: Dirección y Referencia -->
+            <div class="form-row">
+              <mat-form-field appearance="outline" class="field-half">
+                <mat-label>Dirección</mat-label>
+                <input matInput formControlName="direccion">
+                <mat-error>Campo obligatorio</mat-error>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="field-half">
+                <mat-label>Referencia (Opcional)</mat-label>
+                <input matInput formControlName="referencia">
+              </mat-form-field>
+            </div>
+
+          </form>
+        </mat-card-content>
+      </mat-card>
+
+      <div class="button-row">
+        <button mat-raised-button color="primary" matStepperNext [disabled]="!apoderadoForm.valid">
+          Continuar
+          <mat-icon>arrow_forward</mat-icon>
+        </button>
+      </div>
+    </mat-step>
+
+    <!-- ========================================== -->
+    <!-- PASO 2: DATOS DEL ALUMNO -->
+    <!-- ========================================== -->
+    <mat-step [stepControl]="alumnoForm">
+      <ng-template matStepLabel>Datos del Alumno</ng-template>
+      
+      <mat-card class="form-card">
+        <mat-card-header>
+          <mat-card-title>DATOS DEL ALUMNO</mat-card-title>
+        </mat-card-header>
+
+        <mat-card-content>
+          <form [formGroup]="alumnoForm">
+            
+            <!-- Fila 1: Tipo de Documento y Número de Documento -->
+            <div class="form-row">
               <mat-form-field appearance="outline" class="field-half">
                 <mat-label>Tipo de Documento</mat-label>
                 <mat-select formControlName="tipoDocumento">
                   <mat-option *ngFor="let tipo of tiposDocumento" [value]="tipo.value">
-                    {{tipo.label}}
+                    {{ tipo.label }}
                   </mat-option>
                 </mat-select>
-                <mat-error *ngIf="participanteForm.get('tipoDocumento')?.hasError('required')">
-                  Seleccione un tipo de documento
-                </mat-error>
+                <mat-error>Campo obligatorio</mat-error>
               </mat-form-field>
 
-              <!-- Número de Documento -->
               <mat-form-field appearance="outline" class="field-half">
                 <mat-label>Número de Documento</mat-label>
                 <input matInput 
-                       formControlName="numeroDocumento" 
-                       maxlength="8"
-                       (blur)="buscarParticipante()"
-                       (keypress)="soloNumeros($event)">
-                <mat-hint *ngIf="cargandoParticipante">Buscando...</mat-hint>
-                <mat-error *ngIf="participanteForm.get('numeroDocumento')?.hasError('required')">
-                  Ingrese el número de documento
-                </mat-error>
+                       formControlName="numeroDocumento"
+                       (keypress)="soloNumeros($event)"
+                       maxlength="8">
+                <button mat-icon-button matSuffix 
+                        type="button"
+                        (click)="buscarAlumno()"
+                        [disabled]="cargandoAlumno || alumnoForm.get('numeroDocumento')?.value?.length !== 8"
+                        matTooltip="Buscar en RENIEC">
+                  <mat-icon *ngIf="!cargandoAlumno">search</mat-icon>
+                  <mat-spinner *ngIf="cargandoAlumno" diameter="20"></mat-spinner>
+                </button>
+                <mat-error>Debe ingresar 8 dígitos</mat-error>
               </mat-form-field>
             </div>
 
-            <!-- Apellido Paterno -->
-            <mat-form-field appearance="outline" class="field-full">
-              <mat-label>Apellido Paterno</mat-label>
-              <input matInput 
-                     formControlName="apellidoPaterno"
-                     maxlength="50"
-                     (keypress)="soloLetras($event)">
-              <mat-error *ngIf="participanteForm.get('apellidoPaterno')?.hasError('required')">
-                Ingrese el apellido paterno
-              </mat-error>
-            </mat-form-field>
-
-            <!-- Apellido Materno -->
-            <mat-form-field appearance="outline" class="field-full">
-              <mat-label>Apellido Materno</mat-label>
-              <input matInput 
-                     formControlName="apellidoMaterno"
-                     maxlength="50"
-                     (keypress)="soloLetras($event)">
-              <mat-error *ngIf="participanteForm.get('apellidoMaterno')?.hasError('required')">
-                Ingrese el apellido materno
-              </mat-error>
-            </mat-form-field>
-
-            <!-- Nombres -->
-            <mat-form-field appearance="outline" class="field-full">
-              <mat-label>Nombres</mat-label>
-              <input matInput 
-                     formControlName="nombres"
-                     maxlength="50"
-                     (keypress)="soloLetras($event)">
-              <mat-error *ngIf="participanteForm.get('nombres')?.hasError('required')">
-                Ingrese los nombres
-              </mat-error>
-            </mat-form-field>
-
+            <!-- Fila 2: Apellidos y Nombres -->
             <div class="form-row">
-              <!-- Fecha de Nacimiento -->
+              <mat-form-field appearance="outline" class="field-third">
+                <mat-label>Apellido Paterno</mat-label>
+                <input matInput 
+                       formControlName="apellidoPaterno"
+                       (keypress)="soloLetras($event)">
+                <mat-error>Campo obligatorio</mat-error>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="field-third">
+                <mat-label>Apellido Materno</mat-label>
+                <input matInput 
+                       formControlName="apellidoMaterno"
+                       (keypress)="soloLetras($event)">
+                <mat-error>Campo obligatorio</mat-error>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="field-third">
+                <mat-label>Nombres</mat-label>
+                <input matInput 
+                       formControlName="nombres"
+                       (keypress)="soloLetras($event)">
+                <mat-error>Campo obligatorio</mat-error>
+              </mat-form-field>
+            </div>
+
+            <!-- Fila 3: Fecha de Nacimiento y Sexo -->
+            <div class="form-row">
               <mat-form-field appearance="outline" class="field-half">
                 <mat-label>Fecha de Nacimiento</mat-label>
                 <input matInput 
-                       [matDatepicker]="pickerParticipante" 
+                       [matDatepicker]="pickerAlumno"
                        formControlName="fechaNacimiento">
-                <mat-datepicker-toggle matSuffix [for]="pickerParticipante"></mat-datepicker-toggle>
-                <mat-datepicker #pickerParticipante></mat-datepicker>
-                <mat-error *ngIf="participanteForm.get('fechaNacimiento')?.hasError('required')">
-                  Seleccione la fecha de nacimiento
-                </mat-error>
+                <mat-datepicker-toggle matSuffix [for]="pickerAlumno"></mat-datepicker-toggle>
+                <mat-datepicker #pickerAlumno></mat-datepicker>
+                <mat-error>Campo obligatorio</mat-error>
               </mat-form-field>
 
-              <!-- Sexo -->
               <mat-form-field appearance="outline" class="field-half">
                 <mat-label>Sexo</mat-label>
                 <mat-select formControlName="sexo">
                   <mat-option *ngFor="let sexo of sexos" [value]="sexo.value">
-                    {{sexo.label}}
+                    {{ sexo.label }}
                   </mat-option>
                 </mat-select>
-                <mat-error *ngIf="participanteForm.get('sexo')?.hasError('required')">
-                  Seleccione el sexo
-                </mat-error>
+                <mat-error>Campo obligatorio</mat-error>
               </mat-form-field>
             </div>
 
+            <!-- Fila 4: Parentesco y Tipo de Seguro -->
             <div class="form-row">
-              <!-- Parentesco -->
               <mat-form-field appearance="outline" class="field-half">
                 <mat-label>Parentesco</mat-label>
                 <mat-select formControlName="parentesco">
-                  <mat-option *ngFor="let par of parentescos" [value]="par.value">
-                    {{par.label}}
+                  <mat-option *ngFor="let parent of parentescos" [value]="parent.value">
+                    {{ parent.label }}
                   </mat-option>
                 </mat-select>
-                <mat-error *ngIf="participanteForm.get('parentesco')?.hasError('required')">
-                  Seleccione el parentesco
-                </mat-error>
+                <mat-error>Campo obligatorio</mat-error>
               </mat-form-field>
 
-              <!-- Tipo de Seguro -->
               <mat-form-field appearance="outline" class="field-half">
                 <mat-label>Tipo de Seguro</mat-label>
                 <mat-select formControlName="tipoSeguro">
-                  <mat-option *ngFor="let seg of tiposSeguro" [value]="seg.value">
-                    {{seg.label}}
+                  <mat-option *ngFor="let seguro of tiposSeguro" [value]="seguro.value">
+                    {{ seguro.label }}
                   </mat-option>
                 </mat-select>
-                <mat-error *ngIf="participanteForm.get('tipoSeguro')?.hasError('required')">
-                  Seleccione el tipo de seguro
-                </mat-error>
+                <mat-error>Campo obligatorio</mat-error>
               </mat-form-field>
             </div>
 
-          </mat-card-content>
-        </mat-card>
+            <!-- Sección de Discapacidad -->
+            <div class="discapacidad-section">
+              <p class="discapacidad-pregunta">¿El participante presenta algún tipo de discapacidad física o intelectual?</p>
+              <mat-checkbox formControlName="tieneDiscapacidad" (change)="onDiscapacidadChange($event)">
+                Sí
+              </mat-checkbox>
+              <div class="discapacidad-mensaje" *ngIf="tieneDiscapacidad">
+                <mat-icon>info</mat-icon>
+                <span>Sólo se mostrarán horarios dirigidos a personas con discapacidad.</span>
+              </div>
+            </div>
 
-        <div class="button-row">
-          <button mat-raised-button matStepperPrevious>
-            <mat-icon>arrow_back</mat-icon>
-            Anterior
-          </button>
-          <button mat-raised-button color="primary" matStepperNext>
-            Continuar
-            <mat-icon>arrow_forward</mat-icon>
-          </button>
-        </div>
-      </form>
+          </form>
+        </mat-card-content>
+      </mat-card>
+
+      <div class="button-row">
+        <button mat-raised-button matStepperPrevious>
+          <mat-icon>arrow_back</mat-icon>
+          Anterior
+        </button>
+        <button mat-raised-button color="primary" matStepperNext [disabled]="!alumnoForm.valid">
+          Continuar
+          <mat-icon>arrow_forward</mat-icon>
+        </button>
+      </div>
     </mat-step>
 
-    <!-- PASO 4: SEDE Y DISCIPLINA -->
-    <mat-step [stepControl]="sedeForm">
-      <form [formGroup]="sedeForm">
-        <ng-template matStepLabel>Sede y Disciplina</ng-template>
+    <!-- ========================================== -->
+    <!-- PASO 3: COMPLEJO DEPORTIVO Y DEPORTES -->
+    <!-- ========================================== -->
+    <mat-step [stepControl]="sedeDeporteForm">
+      <ng-template matStepLabel>Complejo Deportivo, Deportes y Horarios</ng-template>
+      
+      <div class="paso3-horizontal">
         
-        <mat-card class="form-card">
+        <!-- COLUMNA IZQUIERDA: ELIGE UN COMPLEJO DEPORTIVO -->
+        <mat-card class="form-card card-complejo">
           <mat-card-header>
-            <mat-card-title>SELECCIÓN DE SEDE Y DISCIPLINA</mat-card-title>
+            <mat-card-title>ELIGE UN COMPLEJO DEPORTIVO</mat-card-title>
           </mat-card-header>
-          
+
           <mat-card-content>
-            <!-- Sede -->
-            <mat-form-field appearance="outline" class="field-full">
-              <mat-label>Sede</mat-label>
-              <mat-select formControlName="sede" (selectionChange)="onSedeChange()">
-                <mat-option *ngFor="let sede of sedes" [value]="sede.value">
-                  {{sede.label}}
-                </mat-option>
-              </mat-select>
-              <mat-error *ngIf="sedeForm.get('sede')?.hasError('required')">
-                Seleccione una sede
-              </mat-error>
-            </mat-form-field>
+            <form [formGroup]="sedeDeporteForm">
+              
+              <mat-form-field appearance="outline" class="field-full">
+                <mat-label>Departamento</mat-label>
+                <mat-select formControlName="departamento" (selectionChange)="onDepartamentoSedeChange()">
+                  <mat-option value="">--Seleccionar--</mat-option>
+                  <mat-option *ngFor="let dep of departamentosSede" [value]="dep.value">
+                    {{ dep.label }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
 
-            <!-- Temporada -->
-            <mat-form-field appearance="outline" class="field-full">
-              <mat-label>Temporada</mat-label>
-              <mat-select formControlName="temporada">
-                <mat-option *ngFor="let temp of temporadas" [value]="temp.value">
-                  {{temp.label}}
-                </mat-option>
-              </mat-select>
-              <mat-error *ngIf="sedeForm.get('temporada')?.hasError('required')">
-                Seleccione una temporada
-              </mat-error>
-            </mat-form-field>
+              <mat-form-field appearance="outline" class="field-full">
+                <mat-label>Provincia</mat-label>
+                <mat-select formControlName="provincia" (selectionChange)="onProvinciaSedeChange()">
+                  <mat-option value="">--Seleccionar--</mat-option>
+                  <mat-option *ngFor="let prov of provinciasSede" [value]="prov.value">
+                    {{ prov.label }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
 
-            <!-- Disciplina -->
-            <mat-form-field appearance="outline" class="field-full">
-              <mat-label>Disciplina</mat-label>
-              <mat-select formControlName="disciplina" (selectionChange)="onDisciplinaChange()">
-                <mat-option *ngFor="let disc of disciplinas" [value]="disc.value">
-                  {{disc.label}}
-                </mat-option>
-              </mat-select>
-              <mat-error *ngIf="sedeForm.get('disciplina')?.hasError('required')">
-                Seleccione una disciplina
-              </mat-error>
-            </mat-form-field>
+              <mat-form-field appearance="outline" class="field-full">
+                <mat-label>Distrito</mat-label>
+                <mat-select formControlName="distrito" (selectionChange)="onDistritoSedeChange()">
+                  <mat-option value="">--Seleccionar--</mat-option>
+                  <mat-option *ngFor="let dist of distritosSede" [value]="dist.value">
+                    {{ dist.label }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
 
+              <mat-form-field appearance="outline" class="field-full">
+                <mat-label>Complejo Deportivo</mat-label>
+                <mat-select formControlName="complejoDeportivo" (selectionChange)="onComplejoDeportivoChange()">
+                  <mat-option value="">--Seleccionar--</mat-option>
+                  <mat-option *ngFor="let complejo of complejosDeportivos" [value]="complejo.value">
+                    {{ complejo.label }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+
+              <!-- Mapa -->
+              <div class="mapa-container" *ngIf="mapaVisible">
+                <div class="mapa-info">
+                  <mat-icon>location_on</mat-icon>
+                  <strong>{{ ubicacionComplejo?.nombre }}</strong>
+                </div>
+                <div class="mapa-iframe">
+                  <iframe 
+                    width="100%" 
+                    height="250" 
+                    frameborder="0" 
+                    style="border:0"
+                    [src]="getMapaUrl()"
+                    allowfullscreen>
+                  </iframe>
+                </div>
+              </div>
+
+            </form>
           </mat-card-content>
         </mat-card>
 
-        <div class="button-row">
-          <button mat-raised-button matStepperPrevious>
-            <mat-icon>arrow_back</mat-icon>
-            Anterior
-          </button>
-          <button mat-raised-button color="primary" matStepperNext>
-            Continuar
-            <mat-icon>arrow_forward</mat-icon>
-          </button>
-        </div>
-      </form>
-    </mat-step>
-
-    <!-- PASO 5: HORARIO Y TURNO -->
-    <mat-step [stepControl]="horarioForm">
-      <form [formGroup]="horarioForm">
-        <ng-template matStepLabel>Horario y Turno</ng-template>
-        
-        <mat-card class="form-card">
+        <!-- COLUMNA DERECHA: DEPORTES Y HORARIOS -->
+        <mat-card class="form-card card-deportes" *ngIf="sedeDeporteForm.get('complejoDeportivo')?.value">
           <mat-card-header>
-            <mat-card-title>SELECCIÓN DE HORARIO Y TURNO</mat-card-title>
+            <mat-card-title>DEPORTES Y HORARIOS</mat-card-title>
           </mat-card-header>
-          
+
           <mat-card-content>
-            <!-- Horario -->
-            <mat-form-field appearance="outline" class="field-full">
-              <mat-label>Horario</mat-label>
-              <mat-select formControlName="horario">
-                <mat-option *ngFor="let hor of horarios" [value]="hor.value">
-                  {{hor.label}}
-                </mat-option>
-              </mat-select>
-              <mat-error *ngIf="horarioForm.get('horario')?.hasError('required')">
-                Seleccione un horario
-              </mat-error>
-            </mat-form-field>
+            <form [formGroup]="sedeDeporteForm">
+              
+              <mat-form-field appearance="outline" class="field-full">
+                <mat-label>Deporte</mat-label>
+                <mat-select formControlName="deporte" (selectionChange)="onDeporteChange()">
+                  <mat-option value="">--Seleccionar--</mat-option>
+                  <mat-option *ngFor="let deporte of deportes" [value]="deporte.value">
+                    {{ deporte.label }}
+                  </mat-option>
+                </mat-select>
+                <mat-error>Campo obligatorio</mat-error>
+              </mat-form-field>
 
-            <!-- Turno -->
-            <mat-form-field appearance="outline" class="field-full">
-              <mat-label>Turno</mat-label>
-              <mat-select formControlName="turno">
-                <mat-option *ngFor="let turno of turnos" [value]="turno.value">
-                  {{turno.label}}
-                </mat-option>
-              </mat-select>
-              <mat-error *ngIf="horarioForm.get('turno')?.hasError('required')">
-                Seleccione un turno
-              </mat-error>
-            </mat-form-field>
+              <!-- Tabla de Horarios -->
+              <div class="horarios-tabla-container" *ngIf="horarios.length > 0">
+                <p class="horarios-titulo">Horarios según la edad del participante con vacantes disponibles:</p>
+                
+                <table class="horarios-tabla">
+                  <thead>
+                    <tr>
+                      <th>EDAD</th>
+                      <th>ETAPA</th>
+                      <th>DÍAS</th>
+                      <th>HORAS</th>
+                      <th>ESCOGER</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let horario of horarios" 
+                        [class.selected]="esHorarioSeleccionado(horario)">
+                      <td>{{ horario.edad }}</td>
+                      <td>{{ horario.etapa }}</td>
+                      <td>{{ horario.dias }}</td>
+                      <td>{{ horario.horas }}</td>
+                      <td class="td-check">
+                        <mat-checkbox 
+                          [checked]="esHorarioSeleccionado(horario)"
+                          (change)="seleccionarHorario(horario, $event)">
+                        </mat-checkbox>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
 
-            <!-- Observaciones -->
-            <mat-form-field appearance="outline" class="field-full">
-              <mat-label>Observaciones (Opcional)</mat-label>
-              <textarea matInput 
-                        formControlName="observaciones" 
-                        rows="4"
-                        maxlength="500"></textarea>
-              <mat-hint align="end">{{horarioForm.get('observaciones')?.value?.length || 0}}/500</mat-hint>
-            </mat-form-field>
-
+            </form>
           </mat-card-content>
         </mat-card>
 
-        <div class="button-row">
-          <button mat-raised-button matStepperPrevious>
-            <mat-icon>arrow_back</mat-icon>
-            Anterior
-          </button>
-          <button mat-raised-button color="accent" (click)="enviarInscripcion()">
-            <mat-icon>check_circle</mat-icon>
-            Enviar Pre-Inscripción
-          </button>
-        </div>
-      </form>
+      </div>
+
+      <div class="button-row">
+        <button mat-raised-button matStepperPrevious>
+          <mat-icon>arrow_back</mat-icon>
+          Anterior
+        </button>
+        <button mat-raised-button 
+                color="accent" 
+                (click)="finalizarPreInscripcion()"
+                [disabled]="!sedeDeporteForm.valid || !tieneHorarioSeleccionado()">
+          Finalizar Pre-Inscripción
+          <mat-icon>check_circle</mat-icon>
+        </button>
+      </div>
     </mat-step>
 
   </mat-stepper>
+
+  <!-- ========================================== -->
+  <!-- MODAL INFORMATIVO -->
+  <!-- ========================================== -->
+  <div class="modal-overlay" *ngIf="mostrarModalInformativo" (click)="$event.stopPropagation()">
+    <div class="modal-contenido">
+      <button class="modal-cerrar" (click)="cerrarModalInformativo()">
+        <mat-icon>close</mat-icon>
+      </button>
+      
+      <div class="modal-icono">
+        <mat-icon>check_circle</mat-icon>
+      </div>
+      
+      <h2 class="modal-titulo">¡Importante!</h2>
+      
+      <div class="modal-mensaje">
+        <p><strong>Su pre-inscripción ha sido registrada exitosamente.</strong></p>
+        <div class="modal-seccion">
+          <p><strong>A continuación podrá:</strong></p>
+          <ul>
+            <li>Descargar su <strong>Ficha de Pre-inscripción</strong> y <strong>Declaración Jurada</strong></li>
+            <li><strong>Enviar sus documentos digitalmente</strong> (nueva opción disponible)</li>
+          </ul>
+        </div>
+
+        <div class="modal-info">
+          <mat-icon>info_outline</mat-icon>
+          <p>Recuerde que la validación del programa <strong>"Academia IPD Deporte para Todos"</strong> se realiza de manera <strong>presencial o digital</strong>. Deberá cumplir con todos los requisitos obligatorios para completar su inscripción.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- PASO 4: CONFIRMACIÓN -->
+  <!-- ========================================== -->
+  <div class="confirmacion-container" *ngIf="datosInscripcion && !mostrarPasoDocumentos">
+    
+    <div class="confirmacion-grid">
+      
+      <!-- Lado Izquierdo -->
+      <mat-card class="confirmacion-card">
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon class="icon-check">check_circle</mat-icon>
+            PRE-INSCRIPCIÓN CONFIRMADA
+          </mat-card-title>
+        </mat-card-header>
+
+        <mat-card-content>
+          <p class="mensaje-principal">
+            Acaba de realizar una preinscripción en el programa "Academia IPD Deporte para Todos". 
+            Para descargar su ficha de preinscripción y declaración jurada, haga clic en los siguientes botones:
+          </p>
+
+          <div class="botones-descarga">
+            <button mat-raised-button color="primary" (click)="descargarFichaPreinscripcion()">
+              <mat-icon>description</mat-icon>
+              Ficha de Preinscripción
+            </button>
+
+            <button mat-raised-button color="primary" (click)="descargarDeclaracionJurada()">
+              <mat-icon>description</mat-icon>
+              Declaración Jurada
+            </button>
+          </div>
+
+          <div class="obligatorio-section">
+            <h3>OBLIGATORIO</h3>
+            <ol>
+              <li>Copia de DNI del menor de edad.</li>
+              <li>Copia de DNI del padre/madre o apoderado.</li>
+              <li>Copia de Carné de Conadis (si aplica).</li>
+              <li>Copia de Constancia del seguro médico.</li>
+              <li>Ficha de preinscripción.</li>
+              <li>Declaración jurada firmada y escaneada.</li>
+            </ol>
+            <p class="obligatorio-nota">Todos los documentos son obligatorios.</p>
+          </div>
+
+          <div class="boton-enviar-digital">
+            <button mat-raised-button color="accent" (click)="abrirPasoDocumentos()">
+              <mat-icon>cloud_upload</mat-icon>
+              Enviar Documentos Digitalmente
+            </button>
+          </div>
+
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Lado Derecho -->
+      <mat-card class="ficha-card">
+        <mat-card-header>
+          <mat-card-title>FICHA DE INSCRIPCIÓN</mat-card-title>
+          <mat-card-subtitle>ACADEMIA IPD VERANO 2024</mat-card-subtitle>
+        </mat-card-header>
+
+        <mat-card-content>
+          <div class="ficha-datos">
+            <div class="ficha-item">
+              <strong>Código:</strong>
+              <span>{{ datosInscripcion.codigo }}</span>
+            </div>
+            <div class="ficha-item">
+              <strong>Nombre:</strong>
+              <span>{{ datosInscripcion.nombre }}</span>
+            </div>
+            <div class="ficha-item">
+              <strong>Ape. Paterno:</strong>
+              <span>{{ datosInscripcion.apellidoPaterno }}</span>
+            </div>
+            <div class="ficha-item">
+              <strong>Ape. Materno:</strong>
+              <span>{{ datosInscripcion.apellidoMaterno }}</span>
+            </div>
+            <div class="ficha-item">
+              <strong>Distrito:</strong>
+              <span>{{ datosInscripcion.distrito }}</span>
+            </div>
+            <div class="ficha-item">
+              <strong>Domicilio:</strong>
+              <span>{{ datosInscripcion.domicilio }}</span>
+            </div>
+            <div class="ficha-item">
+              <strong>F.Nacimiento:</strong>
+              <span>{{ datosInscripcion.fechaNacimiento | date:'yyyy-MM-dd' }}</span>
+            </div>
+            <div class="ficha-item">
+              <strong>DNI:</strong>
+              <span>{{ datosInscripcion.dni }}</span>
+            </div>
+            <div class="ficha-item">
+              <strong>Edad:</strong>
+              <span>{{ datosInscripcion.edad }}</span>
+            </div>
+            <div class="ficha-item">
+              <strong>Deporte:</strong>
+              <span>{{ datosInscripcion.deporte }}</span>
+            </div>
+            <div class="ficha-item">
+              <strong>Etapa:</strong>
+              <span>{{ datosInscripcion.etapa }}</span>
+            </div>
+            <div class="ficha-item">
+              <strong>Complejo:</strong>
+              <span>{{ datosInscripcion.complejo }}</span>
+            </div>
+            <div class="ficha-item">
+              <strong>Horario:</strong>
+              <span>{{ datosInscripcion.horario }}</span>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+    </div>
+
+  </div>
+
+  <!-- ========================================== -->
+  <!-- PASO 5: SUBIR DOCUMENTOS - GRID 2 COLUMNAS -->
+  <!-- ========================================== -->
+  <div class="documentos-container" *ngIf="mostrarPasoDocumentos">
+    
+    <mat-card class="documentos-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>cloud_upload</mat-icon>
+          ENVIAR DOCUMENTOS DIGITALMENTE
+        </mat-card-title>
+      </mat-card-header>
+
+      <mat-card-content>
+        <p class="documentos-intro">
+          Sube los siguientes documentos obligatorios para completar tu inscripción:
+        </p>
+
+        <form [formGroup]="documentosForm" class="documentos-form">
+          
+          <!-- Grid 2 columnas -->
+          <div class="documentos-grid">
+            
+            <!-- Documento 1 -->
+            <div class="documento-item">
+              <label class="documento-label">
+                <span class="numero">1</span>
+                <span class="titulo">Copia de DNI del menor de edad</span>
+                <span class="obligatorio">*</span>
+              </label>
+              <div class="documento-upload">
+                <input type="file" 
+                       id="dniMenor"
+                       accept=".pdf,.jpg,.jpeg,.png"
+                       (change)="onFileSelect($event, 'dniMenor')"
+                       hidden
+                       #fileDniMenor>
+                <button mat-raised-button type="button" (click)="fileDniMenor.click()">
+                  <mat-icon>attach_file</mat-icon>
+                  Seleccionar
+                </button>
+                <span class="archivo-nombre">{{ getNombreArchivo('dniMenor') }}</span>
+              </div>
+            </div>
+
+            <!-- Documento 2 -->
+            <div class="documento-item">
+              <label class="documento-label">
+                <span class="numero">2</span>
+                <span class="titulo">Copia de DNI del padre/madre o apoderado</span>
+                <span class="obligatorio">*</span>
+              </label>
+              <div class="documento-upload">
+                <input type="file" 
+                       id="dniApoderado"
+                       accept=".pdf,.jpg,.jpeg,.png"
+                       (change)="onFileSelect($event, 'dniApoderado')"
+                       hidden
+                       #fileDniApoderado>
+                <button mat-raised-button type="button" (click)="fileDniApoderado.click()">
+                  <mat-icon>attach_file</mat-icon>
+                  Seleccionar
+                </button>
+                <span class="archivo-nombre">{{ getNombreArchivo('dniApoderado') }}</span>
+              </div>
+            </div>
+
+            <!-- Documento 3 (condicional) -->
+            <div class="documento-item" *ngIf="tieneDiscapacidad">
+              <label class="documento-label">
+                <span class="numero">3</span>
+                <span class="titulo">Copia de Carné de Conadis</span>
+                <span class="obligatorio">*</span>
+              </label>
+              <div class="documento-upload">
+                <input type="file" 
+                       id="conadis"
+                       accept=".pdf,.jpg,.jpeg,.png"
+                       (change)="onFileSelect($event, 'conadis')"
+                       hidden
+                       #fileConadis>
+                <button mat-raised-button type="button" (click)="fileConadis.click()">
+                  <mat-icon>attach_file</mat-icon>
+                  Seleccionar
+                </button>
+                <span class="archivo-nombre">{{ getNombreArchivo('conadis') }}</span>
+              </div>
+            </div>
+
+            <!-- Documento 4 -->
+            <div class="documento-item">
+              <label class="documento-label">
+                <span class="numero">{{ tieneDiscapacidad ? '4' : '3' }}</span>
+                <span class="titulo">Copia de Constancia del seguro médico</span>
+                <span class="obligatorio">*</span>
+              </label>
+              <div class="documento-upload">
+                <input type="file" 
+                       id="seguroMedico"
+                       accept=".pdf,.jpg,.jpeg,.png"
+                       (change)="onFileSelect($event, 'seguroMedico')"
+                       hidden
+                       #fileSeguro>
+                <button mat-raised-button type="button" (click)="fileSeguro.click()">
+                  <mat-icon>attach_file</mat-icon>
+                  Seleccionar
+                </button>
+                <span class="archivo-nombre">{{ getNombreArchivo('seguroMedico') }}</span>
+              </div>
+            </div>
+
+            <!-- Documento 5 -->
+            <div class="documento-item">
+              <label class="documento-label">
+                <span class="numero">{{ tieneDiscapacidad ? '5' : '4' }}</span>
+                <span class="titulo">Ficha de preinscripción</span>
+                <span class="obligatorio">*</span>
+              </label>
+              <div class="documento-upload">
+                <input type="file" 
+                       id="fichaPreinscripcion"
+                       accept=".pdf"
+                       (change)="onFileSelect($event, 'fichaPreinscripcion')"
+                       hidden
+                       #fileFicha>
+                <button mat-raised-button type="button" (click)="fileFicha.click()">
+                  <mat-icon>attach_file</mat-icon>
+                  Seleccionar
+                </button>
+                <span class="archivo-nombre">{{ getNombreArchivo('fichaPreinscripcion') }}</span>
+              </div>
+            </div>
+
+            <!-- Documento 6 -->
+            <div class="documento-item">
+              <label class="documento-label">
+                <span class="numero">{{ tieneDiscapacidad ? '6' : '5' }}</span>
+                <span class="titulo">Declaración jurada firmada y escaneada</span>
+                <span class="obligatorio">*</span>
+              </label>
+              <div class="documento-upload">
+                <input type="file" 
+                       id="declaracionJurada"
+                       accept=".pdf"
+                       (change)="onFileSelect($event, 'declaracionJurada')"
+                       hidden
+                       #fileDeclaracion>
+                <button mat-raised-button type="button" (click)="fileDeclaracion.click()">
+                  <mat-icon>attach_file</mat-icon>
+                  Seleccionar
+                </button>
+                <span class="archivo-nombre">{{ getNombreArchivo('declaracionJurada') }}</span>
+              </div>
+            </div>
+
+          </div>
+
+        </form>
+
+        <p class="documentos-nota">
+          <mat-icon>info</mat-icon>
+          Solo se permiten archivos PDF, JPG o PNG. Tamaño máximo: 5MB.
+        </p>
+
+      </mat-card-content>
+
+      <mat-card-actions class="documentos-actions">
+        <button mat-raised-button (click)="volverConfirmacion()">
+          <mat-icon>arrow_back</mat-icon>
+          Volver
+        </button>
+        <button mat-raised-button color="accent" (click)="enviarDocumentos()">
+          <mat-icon>send</mat-icon>
+          Enviar Documentos
+        </button>
+      </mat-card-actions>
+
+    </mat-card>
+
+  </div>
 
 </div>
