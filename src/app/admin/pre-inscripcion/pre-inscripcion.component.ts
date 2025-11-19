@@ -73,7 +73,7 @@ export class PreInscripcionComponent implements OnInit {
     { value: '1', label: 'SIS' },
     { value: '2', label: 'EsSalud' },
     { value: '3', label: 'Privado' },
-    { value: '4', label: 'Ninguno' }
+    { value: '4', label: 'Otros' }
   ];
 
   // Datos para ubicación
