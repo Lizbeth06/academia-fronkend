@@ -105,7 +105,45 @@ swiper-slide {
 }
 
 .color-ch {
-  background: linear-gradient(135deg, #cb532e 0%, #542394 100%);
+  /* Gradiente brillante con colores corporativos */
+  background: linear-gradient(
+    135deg,
+    #ff704a 0%,     /* naranja brillante */
+    #cb532e 25%,    /* color base naranja */
+    #542394 75%,    /* color base morado */
+    #7b4bf0 100%    /* morado brillante para glow */
+  );
+
+  /* Halo extremo con sombra difusa */
+  box-shadow: 
+    0 0 150px rgba(255, 255, 255, 0.6),
+    0 0 300px rgba(255, 255, 255, 0.35),
+    0 4px 25px rgba(0, 0, 0, 0.15);
+
+  /* Animación de luz viva */
+  background-size: 200% 200%;
+  animation: cinematicShine 4.5s ease-in-out infinite, pulseGlow 6s ease-in-out infinite;
+}
+
+/* Movimiento de gradiente para efecto de luz dinámica */
+@keyframes cinematicShine {
+  0% { background-position: 0% 50%; }
+  25% { background-position: 50% 50%; }
+  50% { background-position: 100% 50%; }
+  75% { background-position: 50% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Pulso de brillo sutil para efecto cinematográfico */
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 
+    0 0 150px rgba(255, 255, 255, 0.6),
+    0 0 300px rgba(255, 255, 255, 0.35),
+    0 4px 25px rgba(0, 0, 0, 0.15); }
+  50% { box-shadow: 
+    0 0 180px rgba(255, 255, 255, 0.8),
+    0 0 350px rgba(255, 255, 255, 0.5),
+    0 4px 25px rgba(0, 0, 0, 0.15); }
 }
 
 .card {

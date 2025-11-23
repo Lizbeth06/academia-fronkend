@@ -1,25 +1,65 @@
 /* ========================================== */
-/* CONTENEDOR PRINCIPAL */
+/* CONTENEDOR PRINCIPAL - MAX-WIDTH 1200PX */
 /* ========================================== */
 .convocatoria-container {
   padding: 20px;
-  max-width: 1400px;
+  max-width: 1200px; /* ⭐ AJUSTADO A 1200PX */
   margin: 0 auto;
   background-color: #f5f5f5;
   min-height: 100vh;
 }
 
 /* ========================================== */
-/* HEADER COMPACTO - NUEVOS COLORES */
+/* HEADER COMPACTO - COLORES ACTUALIZADOS */
 /* ========================================== */
 .header-section {
   text-align: center;
   margin-bottom: 30px;
   padding: 20px 15px;
-  background: linear-gradient(135deg, #cb532e 0%, #542394 100%);
   border-radius: 12px;
   color: white;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12);
+  position: relative;
+  overflow: hidden;
+
+  /* Gradiente brillante con colores corporativos */
+  background: linear-gradient(
+    135deg,
+    #ff704a 0%,     /* naranja brillante */
+    #cb532e 25%,    /* color base naranja */
+    #542394 75%,    /* color base morado */
+    #7b4bf0 100%    /* morado brillante para glow */
+  );
+
+  /* Halo extremo con sombra difusa */
+  box-shadow: 
+    0 0 150px rgba(255, 255, 255, 0.6),
+    0 0 300px rgba(255, 255, 255, 0.35),
+    0 4px 25px rgba(0, 0, 0, 0.15);
+
+  /* Animación de luz viva */
+  background-size: 200% 200%;
+  animation: cinematicShine 4.5s ease-in-out infinite, pulseGlow 6s ease-in-out infinite;
+}
+
+/* Movimiento de gradiente para efecto de luz dinámica */
+@keyframes cinematicShine {
+  0% { background-position: 0% 50%; }
+  25% { background-position: 50% 50%; }
+  50% { background-position: 100% 50%; }
+  75% { background-position: 50% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Pulso de brillo sutil para efecto cinematográfico */
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 
+    0 0 150px rgba(255, 255, 255, 0.6),
+    0 0 300px rgba(255, 255, 255, 0.35),
+    0 4px 25px rgba(0, 0, 0, 0.15); }
+  50% { box-shadow: 
+    0 0 180px rgba(255, 255, 255, 0.8),
+    0 0 350px rgba(255, 255, 255, 0.5),
+    0 4px 25px rgba(0, 0, 0, 0.15); }
 }
 
 .titulo-principal {
@@ -109,7 +149,7 @@
 }
 
 .resultados-info strong {
-  color: #667eea;
+  color: #8e298c;
   font-size: 16px;
 }
 
@@ -130,239 +170,396 @@
 
 .loader-container p {
   margin-top: 15px;
-  color: #667eea;
+  color: #8e298c;
   font-size: 15px;
 }
 
 /* ========================================== */
 /* GRID DE CONVOCATORIAS - 3 POR FILA */
+/* ⭐ AJUSTADO PARA 3 CARDS POR FILA */
 /* ========================================== */
-.convocatorias-grid {
+.convocatorias-home-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
-  gap: 20px;
-  margin-bottom: 25px;
+  grid-template-columns: repeat(3, 1fr); /* ⭐ EXACTAMENTE 3 COLUMNAS */
+  gap: 24px;
+  margin-bottom: 2rem;
 }
 
 /* ========================================== */
-/* TARJETA DE CONVOCATORIA */
+/* CARDS CON OVERLAY - DISEÑO DE CONVOCATORIA-LISTA */
 /* ========================================== */
-.convocatoria-card {
+.convocatoria-card-home {
+  border-radius: 20px;
+  overflow: hidden;
+  background: white;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  transition: all 0.4s cubic-bezier(0.35, 0, 0.25, 1);
+  border: none;
+  position: relative;
   display: flex;
   flex-direction: column;
-  height: 100%;
-  border-radius: 10px;
-  overflow: hidden;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
 }
 
-.convocatoria-card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+/* Borde gradiente superior (visible al hover) */
+.convocatoria-card-home::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #8e298c, #cb532e);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 10;
 }
 
-/* Imagen */
+.convocatoria-card-home:hover {
+  transform: translateY(-12px);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.15);
+}
+
+.convocatoria-card-home:hover::before {
+  opacity: 1;
+}
+
+.convocatoria-card-home:hover .card-overlay {
+  opacity: 1;
+}
+
+.convocatoria-card-home:hover .card-image-container img {
+  transform: scale(1.1);
+}
+
+/* Imagen con overlay */
 .card-image-container {
   position: relative;
-  width: 100%;
-  height: 180px;
+  height: 200px;
   overflow: hidden;
+  background: linear-gradient(135deg, rgba(142, 41, 140, 0.05), rgba(203, 83, 46, 0.05));
 }
 
 .card-image-container img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.3s ease;
+  transition: transform 0.6s cubic-bezier(0.35, 0, 0.25, 1);
 }
 
-.convocatoria-card:hover .card-image-container img {
-  transform: scale(1.05);
+/* Overlay con acciones (aparece al hover) */
+.card-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 3;
 }
 
-/* Badge de estado */
+.card-overlay button {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  transition: transform 0.2s ease;
+}
+
+.card-overlay button:hover {
+  transform: scale(1.1);
+}
+
+/* Badges */
 .estado-badge {
   position: absolute;
-  top: 10px;
-  right: 10px;
-  padding: 5px 14px;
-  border-radius: 16px;
-  font-size: 11px;
-  font-weight: 600;
+  top: 12px;
+  right: 12px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.4px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  backdrop-filter: blur(8px);
+  z-index: 2;
+}
+
+.estado-icon {
+  font-size: 1rem;
+  width: 16px;
+  height: 16px;
 }
 
 .estado-activa {
-  background-color: #4caf50;
+  background: rgba(76, 175, 80, 0.95);
   color: white;
 }
 
 .estado-cerrada {
-  background-color: #9e9e9e;
+  background: rgba(117, 117, 117, 0.95);
   color: white;
 }
 
-/* Contenido */
+/* Badge de tipo */
+.tipo-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: rgba(142, 41, 140, 0.95);
+  color: white;
+  backdrop-filter: blur(10px);
+  z-index: 2;
+}
+
+.tipo-badge.tipo-paradeporte {
+  background: rgba(203, 83, 46, 0.95);
+}
+
+.tipo-deporte {
+  background: rgba(142, 41, 140, 0.95);
+}
+
+/* Contenido del card */
 mat-card-content {
   flex: 1;
-  padding: 16px !important;
+  padding: 1.5rem !important;
+  display: flex;
+  flex-direction: column;
 }
 
 .card-title {
-  font-size: 18px;
-  font-weight: 600;
-  color: #333;
-  margin: 0 0 6px 0;
-  line-height: 1.3;
-  min-height: 46px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #262626;
+  margin: 0 0 0.75rem 0;
+  line-height: 1.4;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  min-height: 2.8em;
 }
 
-.card-subtitulo {
-  font-size: 13px;
-  color: #667eea;
-  font-weight: 500;
-  margin: 0 0 12px 0;
-  text-transform: uppercase;
-  letter-spacing: 0.4px;
-}
-
-/* Información con íconos */
-.card-info {
-  margin: 12px 0;
-}
-
-.info-item {
+.card-organizacion {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 6px;
-  margin-bottom: 8px;
-  color: #666;
-  font-size: 13px;
-  line-height: 1.4;
+  color: #8e298c;
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
 }
 
-.info-item mat-icon {
-  color: #667eea;
-  font-size: 18px;
+.org-icon {
+  font-size: 1rem;
   width: 18px;
   height: 18px;
-  flex-shrink: 0;
 }
 
-/* Cupos */
-.cupos-container {
-  margin: 12px 0;
-  padding: 10px;
-  background-color: #f8f9fa;
-  border-radius: 6px;
+/* Info Chips */
+.card-info-compact {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 1rem;
 }
 
-.cupos-info {
+.info-chip {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(142, 41, 140, 0.08);
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  color: #262626;
+  transition: all 0.2s ease;
+}
+
+.info-chip mat-icon {
+  font-size: 1rem;
+  width: 16px;
+  height: 16px;
+  color: #8e298c;
+}
+
+.info-chip span {
+  font-weight: 500;
+}
+
+.info-chip:hover {
+  background: rgba(142, 41, 140, 0.12);
+  transform: translateY(-2px);
+}
+
+/* Cupos Container Compact */
+.cupos-container-compact {
+  background: #f8f9fa;
+  padding: 1rem;
+  border-radius: 12px;
+  margin-bottom: 1rem;
+}
+
+.cupos-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 6px;
-  font-size: 13px;
+  margin-bottom: 0.5rem;
 }
 
-.cupos-info strong {
-  color: #333;
-  font-size: 14px;
-}
-
-.cupos-detalle {
+.cupos-label {
+  font-size: 0.85rem;
   color: #666;
-  font-size: 11px;
+  font-weight: 500;
+}
+
+.cupos-number {
+  font-size: 0.9rem;
+  color: #262626;
+}
+
+.cupos-number strong {
+  font-size: 1.1rem;
+  color: #8e298c;
+  font-weight: 700;
 }
 
 /* Barra de progreso */
 .progress-bar {
   width: 100%;
-  height: 6px;
-  background-color: #e0e0e0;
-  border-radius: 3px;
+  height: 8px;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
   overflow: hidden;
 }
 
 .progress-fill {
   height: 100%;
-  border-radius: 3px;
+  border-radius: 4px;
   transition: width 0.3s ease;
 }
 
 .progress-low {
-  background-color: #4caf50;
+  background: linear-gradient(90deg, #4caf50, #66bb6a);
 }
 
 .progress-medium {
-  background-color: #ff9800;
+  background: linear-gradient(90deg, #ff9800, #ffa726);
 }
 
 .progress-high {
-  background-color: #f44336;
+  background: linear-gradient(90deg, #f44336, #e57373);
 }
 
-/* Acciones */
-.card-actions {
-  display: flex;
-  gap: 8px;
-  padding: 12px !important;
-  border-top: 1px solid #e0e0e0;
-  background-color: #fafafa;
-}
-
-.btn-inscribirse {
-  flex: 1;
-  height: 40px;
-  font-weight: 600;
+/* Botón Inscribir */
+.btn-inscribir {
+  width: 100%;
+  height: 48px;
+  font-weight: 700;
+  font-size: 0.95rem;
   text-transform: uppercase;
-  letter-spacing: 0.4px;
-  background-color: #e74c3c !important;
+  letter-spacing: 0.5px;
+  background: #8e298c !important;
   color: white !important;
-  font-size: 13px;
+  box-shadow: 0 4px 12px rgba(142, 41, 140, 0.3);
+  transition: all 0.3s ease;
+  margin-top: auto;
 }
 
-.btn-inscribirse:not([disabled]):hover {
-  background-color: #c0392b !important;
-  box-shadow: 0 3px 10px rgba(231, 76, 60, 0.4);
+.btn-inscribir:not([disabled]):hover {
+  background: #6e1a6c !important;
+  box-shadow: 0 6px 16px rgba(142, 41, 140, 0.4);
+  transform: translateY(-2px);
 }
 
-.btn-inscribirse[disabled] {
-  background-color: #bdc3c7 !important;
+.btn-inscribir[disabled] {
+  background: #bdc3c7 !important;
   color: #7f8c8d !important;
+  box-shadow: none;
 }
 
-.btn-compartir {
-  flex: 1;
-  height: 40px;
-  font-weight: 500;
-  border: 2px solid #667eea;
-  color: #667eea;
-  font-size: 13px;
-}
-
-.btn-compartir:hover {
-  background-color: rgba(102, 126, 234, 0.1);
+.btn-inscribir mat-icon {
+  margin-right: 8px;
 }
 
 /* ========================================== */
-/* PAGINADOR */
+/* PAGINADOR MEJORADO */
 /* ========================================== */
 .paginador-container {
   background: white;
-  padding: 12px;
+  padding: 20px;
   border-radius: 10px;
   margin-bottom: 20px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
   display: flex;
   justify-content: center;
+}
+
+/* Estilos personalizados del paginador */
+::ng-deep .mat-mdc-paginator {
+  background: transparent;
+  color: #333;
+}
+
+::ng-deep .mat-mdc-paginator-container {
+  justify-content: center;
+  padding: 0;
+  min-height: 56px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+::ng-deep .mat-mdc-paginator-page-size {
+  align-items: center;
+  margin-right: 16px;
+}
+
+::ng-deep .mat-mdc-paginator-page-size-label {
+  font-size: 14px;
+  color: #666;
+  margin-right: 8px;
+}
+
+::ng-deep .mat-mdc-paginator-range-label {
+  font-size: 14px;
+  color: #666;
+  margin: 0 16px;
+}
+
+::ng-deep .mat-mdc-paginator-range-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+::ng-deep .mat-mdc-icon-button {
+  color: #8e298c !important;
+  width: 40px;
+  height: 40px;
+}
+
+::ng-deep .mat-mdc-icon-button:hover:not([disabled]) {
+  background-color: rgba(142, 41, 140, 0.08);
+}
+
+::ng-deep .mat-mdc-icon-button[disabled] {
+  color: #ccc !important;
+}
+
+::ng-deep .mat-mdc-select {
+  font-size: 14px;
+}
+
+::ng-deep .mat-mdc-select-value {
+  color: #333;
 }
 
 /* ========================================== */
@@ -412,7 +609,7 @@ mat-card-content {
   align-items: center;
   margin-bottom: 20px;
   padding-bottom: 15px;
-  border-bottom: 2px solid #667eea;
+  border-bottom: 2px solid #8e298c;
   flex-wrap: wrap;
   gap: 10px;
 }
@@ -442,7 +639,7 @@ mat-card-content {
 }
 
 .tabla-gestion th {
-  background-color: #667eea;
+  background-color: #8e298c;
   color: white;
   font-weight: 600;
   font-size: 13px;
@@ -491,13 +688,13 @@ mat-card-content {
 }
 
 /* ========================================== */
-/* MODAL FORMULARIO */
+/* MODAL FORMULARIO CON UPLOAD */
 /* ========================================== */
 .modal-formulario {
   background: white;
   border-radius: 10px;
   width: 100%;
-  max-width: 700px;
+  max-width: 600px;
   max-height: 90vh;
   overflow-y: auto;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
@@ -549,46 +746,90 @@ mat-card-content {
   width: calc(50% - 6px);
 }
 
-.field-third {
-  width: calc(33.333% - 8px);
-}
-
 /* Sección título */
 .seccion-titulo {
   font-size: 15px;
   font-weight: 600;
-  color: #667eea;
+  color: #8e298c;
   margin: 15px 0 10px 0;
   padding-bottom: 5px;
-  border-bottom: 2px solid #667eea;
+  border-bottom: 2px solid #8e298c;
 }
 
-/* Upload imagen */
+/* ========================================== */
+/* UPLOAD DE IMAGEN MEJORADO */
+/* ========================================== */
 .upload-container {
-  margin-bottom: 15px;
+  margin-bottom: 20px;
+  padding: 20px;
+  background: linear-gradient(135deg, rgba(142, 41, 140, 0.05), rgba(203, 83, 46, 0.05));
+  border-radius: 12px;
+  border: 2px dashed rgba(142, 41, 140, 0.3);
+  transition: all 0.3s ease;
+}
+
+.upload-container:hover {
+  border-color: rgba(142, 41, 140, 0.6);
+  background: linear-gradient(135deg, rgba(142, 41, 140, 0.08), rgba(203, 83, 46, 0.08));
 }
 
 .upload-label {
   display: block;
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 600;
   color: #333;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
+  text-align: center;
 }
 
-.imagen-preview {
+.btn-upload {
   width: 100%;
-  max-width: 300px;
-  border-radius: 8px;
+  height: 48px;
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.btn-upload mat-icon {
+  margin-right: 8px;
+}
+
+/* Preview de imagen */
+.imagen-preview {
+  position: relative;
+  width: 100%;
+  max-width: 400px;
+  margin: 20px auto 0;
+  border-radius: 12px;
   overflow: hidden;
-  border: 2px solid #e0e0e0;
-  margin-top: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .imagen-preview img {
   width: 100%;
   height: auto;
   display: block;
+}
+
+.btn-eliminar-imagen {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(244, 67, 54, 0.9);
+  color: white;
+  width: 32px;
+  height: 32px;
+  backdrop-filter: blur(4px);
+}
+
+.btn-eliminar-imagen:hover {
+  background: rgba(211, 47, 47, 1);
+  transform: scale(1.1);
+}
+
+.btn-eliminar-imagen mat-icon {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
 }
 
 .modal-footer {
@@ -657,7 +898,7 @@ mat-card-content {
   margin: 0 0 20px 0;
 }
 
-.modal-preview .convocatoria-card {
+.modal-preview .convocatoria-card-home {
   margin: 0;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
@@ -677,7 +918,7 @@ mat-card-content {
 }
 
 .confirmacion-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #8e298c 0%, #6e1a6c 100%);
   padding: 25px 20px;
   text-align: center;
   color: white;
@@ -765,7 +1006,7 @@ mat-card-content {
 }
 
 .mensaje-loading {
-  border-top: 5px solid #667eea;
+  border-top: 5px solid #8e298c;
 }
 
 .spinner-central {
@@ -796,7 +1037,7 @@ mat-card-content {
 
 /* ========================================== */
 /* Z-INDEX Y POINTER-EVENTS - SOLUCIÓN DEFINITIVA */
-/* ⭐ TU DESCUBRIMIENTO ⭐ */
+/* ⭐ SOLUCIÓN POINTER-EVENTS ⭐ */
 /* ========================================== */
 
 /* CRÍTICO: Backdrop fantasma - no captura eventos */
@@ -850,7 +1091,7 @@ mat-card-content {
 }
 
 ::ng-deep .mat-form-field-appearance-outline.mat-focused .mat-form-field-outline-thick {
-  color: #667eea;
+  color: #8e298c;
 }
 
 ::ng-deep .mat-form-field-appearance-outline .mat-form-field-label {
@@ -858,7 +1099,7 @@ mat-card-content {
 }
 
 ::ng-deep .mat-form-field-appearance-outline.mat-focused .mat-form-field-label {
-  color: #667eea;
+  color: #8e298c;
 }
 
 ::ng-deep .mat-error {
@@ -876,35 +1117,25 @@ mat-card-content {
 }
 
 ::ng-deep .mat-raised-button.mat-primary {
-  background-color: #667eea !important;
+  background-color: #8e298c !important;
   color: white !important;
 }
 
 ::ng-deep .mat-raised-button.mat-primary:hover {
-  background-color: #5568d3 !important;
-  box-shadow: 0 3px 10px rgba(102, 126, 234, 0.4);
+  background-color: #6e1a6c !important;
+  box-shadow: 0 3px 10px rgba(142, 41, 140, 0.4);
 }
 
 ::ng-deep .mat-select-arrow {
-  color: #667eea;
+  color: #8e298c;
 }
 
 ::ng-deep .mat-datepicker-toggle {
-  color: #667eea;
+  color: #8e298c;
 }
 
 ::ng-deep .mat-datepicker-toggle-active {
-  color: #667eea;
-}
-
-/* Paginador */
-::ng-deep .mat-paginator {
-  background: transparent;
-}
-
-::ng-deep .mat-paginator-container {
-  justify-content: center;
-  padding: 0;
+  color: #8e298c;
 }
 
 /* Tabla */
@@ -922,24 +1153,52 @@ mat-card-content {
 }
 
 /* ========================================== */
+/* ANIMACIONES */
+/* ========================================== */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ========================================== */
 /* RESPONSIVE */
 /* ========================================== */
 
-/* 3 cards en pantallas grandes */
-@media (max-width: 1400px) {
-  .convocatorias-grid {
-    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+/* Tablet: 2 cards por fila */
+@media (max-width: 992px) {
+  .convocatorias-home-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
   }
 }
 
-/* 2 cards en tablets */
-@media (max-width: 1024px) {
-  .convocatorias-grid {
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  }
-}
-
-/* 1 card en móviles */
+/* Mobile: 1 card por fila */
 @media (max-width: 768px) {
   .convocatoria-container {
     padding: 10px;
@@ -957,9 +1216,9 @@ mat-card-content {
     font-size: 14px;
   }
 
-  .convocatorias-grid {
+  .convocatorias-home-grid {
     grid-template-columns: 1fr;
-    gap: 15px;
+    gap: 16px;
   }
 
   .search-container {
@@ -985,17 +1244,7 @@ mat-card-content {
     grid-template-columns: 1fr;
   }
 
-  .card-actions {
-    flex-direction: column;
-  }
-
-  .btn-inscribirse,
-  .btn-compartir {
-    width: 100%;
-  }
-
-  .field-half,
-  .field-third {
+  .field-half {
     width: 100%;
   }
 
@@ -1057,59 +1306,25 @@ mat-card-content {
   .confirmacion-footer button {
     max-width: none;
   }
+
+  .convocatoria-card-home:hover {
+    transform: translateY(-4px);
+  }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 576px) {
   .titulo-principal {
     font-size: 20px;
   }
 
   .card-title {
-    font-size: 16px;
+    font-size: 1rem;
     min-height: auto;
   }
 
-  .info-item {
-    font-size: 12px;
+  .info-chip {
+    font-size: 0.8rem;
   }
-}
-
-/* ========================================== */
-/* ANIMACIONES */
-/* ========================================== */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateY(-30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes scaleIn {
-  from {
-    opacity: 0;
-    transform: scale(0.8);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-.convocatoria-card {
-  animation: fadeIn 0.4s ease-in-out;
 }
 
 /* ========================================== */
@@ -1118,7 +1333,7 @@ mat-card-content {
 .modal-formulario,
 .modal-preview {
   scrollbar-width: thin;
-  scrollbar-color: #667eea #f5f5f5;
+  scrollbar-color: #8e298c #f5f5f5;
 }
 
 .modal-formulario::-webkit-scrollbar,
@@ -1133,11 +1348,11 @@ mat-card-content {
 
 .modal-formulario::-webkit-scrollbar-thumb,
 .modal-preview::-webkit-scrollbar-thumb {
-  background: #667eea;
+  background: #8e298c;
   border-radius: 4px;
 }
 
 .modal-formulario::-webkit-scrollbar-thumb:hover,
 .modal-preview::-webkit-scrollbar-thumb:hover {
-  background: #5568d3;
+  background: #6e1a6c;
 }

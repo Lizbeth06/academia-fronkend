@@ -9,12 +9,52 @@
 /* Header Section - Más compacto */
 .header-section {
   text-align: center;
-  margin-bottom: 20px;
+  margin-bottom: 30px;
   padding: 20px 15px;
-  background: linear-gradient(135deg, #cb532e 0%, #542394 100%);
-  border-radius: 10px;
+  border-radius: 12px;
   color: white;
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow: hidden;
+
+  /* Gradiente brillante con colores corporativos */
+  background: linear-gradient(
+    135deg,
+    #ff704a 0%,     /* naranja brillante */
+    #cb532e 25%,    /* color base naranja */
+    #542394 75%,    /* color base morado */
+    #7b4bf0 100%    /* morado brillante para glow */
+  );
+
+  /* Halo extremo con sombra difusa */
+  box-shadow: 
+    0 0 150px rgba(255, 255, 255, 0.6),
+    0 0 300px rgba(255, 255, 255, 0.35),
+    0 4px 25px rgba(0, 0, 0, 0.15);
+
+  /* Animación de luz viva */
+  background-size: 200% 200%;
+  animation: cinematicShine 4.5s ease-in-out infinite, pulseGlow 6s ease-in-out infinite;
+}
+
+/* Movimiento de gradiente para efecto de luz dinámica */
+@keyframes cinematicShine {
+  0% { background-position: 0% 50%; }
+  25% { background-position: 50% 50%; }
+  50% { background-position: 100% 50%; }
+  75% { background-position: 50% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Pulso de brillo sutil para efecto cinematográfico */
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 
+    0 0 150px rgba(255, 255, 255, 0.6),
+    0 0 300px rgba(255, 255, 255, 0.35),
+    0 4px 25px rgba(0, 0, 0, 0.15); }
+  50% { box-shadow: 
+    0 0 180px rgba(255, 255, 255, 0.8),
+    0 0 350px rgba(255, 255, 255, 0.5),
+    0 4px 25px rgba(0, 0, 0, 0.15); }
 }
 
 .titulo-principal {
@@ -954,4 +994,386 @@ mat-card-content {
 button:disabled {
   cursor: not-allowed !important;
   opacity: 0.6;
+}
+/* ========================================== */
+/* ⭐ ESTILOS NUEVOS PARA REGISTRO MÚLTIPLE */
+/* ========================================== */
+
+/* Sección de participantes agregados */
+.participantes-agregados {
+  margin-bottom: 30px;
+  padding: 20px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.participantes-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #667eea;
+}
+
+.participantes-header h3 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 20px;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+.participantes-header h3 mat-icon {
+  color: #667eea;
+  font-size: 28px;
+  width: 28px;
+  height: 28px;
+}
+
+.participantes-hint {
+  font-size: 13px;
+  color: #666;
+  font-style: italic;
+}
+
+/* Accordion de participantes */
+.participantes-accordion {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.participante-panel {
+  border: 1px solid #e0e0e0 !important;
+  border-radius: 8px !important;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05) !important;
+  transition: all 0.3s ease;
+}
+
+.participante-panel:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+  border-color: #667eea !important;
+}
+
+.participante-resumen {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  width: 100%;
+}
+
+.participante-icon {
+  font-size: 32px;
+  width: 32px;
+  height: 32px;
+  color: #667eea;
+}
+
+.participante-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.participante-nombre {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+}
+
+.participante-datos {
+  font-size: 13px;
+  color: #666;
+}
+
+/* Detalles expandidos del participante */
+.participante-detalles {
+  padding: 20px;
+  background: #f8f9fa;
+}
+
+.detalle-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.detalle-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px;
+  background: white;
+  border-radius: 8px;
+  border-left: 3px solid #667eea;
+}
+
+.detalle-item mat-icon {
+  color: #667eea;
+  font-size: 22px;
+  width: 22px;
+  height: 22px;
+  margin-top: 2px;
+}
+
+.detalle-item div {
+  flex: 1;
+}
+
+.detalle-item strong {
+  display: block;
+  font-size: 12px;
+  color: #666;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.detalle-item span {
+  font-size: 14px;
+  color: #333;
+  font-weight: 500;
+}
+
+.tiene-discapacidad {
+  color: #ff9800 !important;
+  font-weight: 600 !important;
+}
+
+/* Acciones del participante */
+.participante-acciones {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.participante-acciones button {
+  font-weight: 500;
+}
+
+/* Subtítulo del formulario */
+.form-subtitle {
+  font-size: 14px;
+  color: #666;
+  font-weight: 400;
+  margin-top: 5px;
+}
+
+/* Acciones del formulario */
+.form-acciones {
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 2px solid #e0e0e0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.btn-agregar-participante {
+  height: 50px;
+  padding: 0 30px;
+  font-size: 15px;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  transition: all 0.3s ease;
+}
+
+.btn-agregar-participante:not([disabled]):hover {
+  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+  transform: translateY(-2px);
+}
+
+.btn-agregar-participante mat-icon {
+  margin-right: 8px;
+}
+
+/* Botones de edición */
+.botones-edicion {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.botones-edicion button {
+  height: 48px;
+  padding: 0 24px;
+  font-weight: 600;
+}
+
+.botones-edicion button mat-icon {
+  margin-right: 8px;
+}
+
+/* Info de participantes */
+.info-participantes {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 15px 20px;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+  border-left: 4px solid #667eea;
+  border-radius: 8px;
+  margin: 20px 0;
+}
+
+.info-participantes mat-icon {
+  color: #667eea;
+  font-size: 28px;
+  width: 28px;
+  height: 28px;
+}
+
+.info-participantes span {
+  font-size: 14px;
+  color: #333;
+  line-height: 1.5;
+}
+
+.info-participantes strong {
+  font-weight: 700;
+  color: #667eea;
+}
+
+/* Advertencia: sin participantes */
+.advertencia-participantes {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 15px 20px;
+  background: linear-gradient(135deg, rgba(255, 152, 0, 0.1), rgba(255, 193, 7, 0.1));
+  border-left: 4px solid #ff9800;
+  border-radius: 8px;
+  margin-top: 20px;
+}
+
+.advertencia-participantes mat-icon {
+  color: #ff9800;
+  font-size: 28px;
+  width: 28px;
+  height: 28px;
+}
+
+.advertencia-participantes span {
+  font-size: 14px;
+  color: #f57c00;
+  font-weight: 600;
+}
+
+/* Override de expansion panel */
+::ng-deep .participante-panel .mat-expansion-panel-header {
+  padding: 16px 20px !important;
+  background: white;
+  transition: background 0.3s ease;
+}
+
+::ng-deep .participante-panel.mat-expanded .mat-expansion-panel-header {
+  background: #f8f9fa;
+}
+
+::ng-deep .participante-panel .mat-expansion-panel-body {
+  padding: 0 !important;
+}
+
+::ng-deep .participante-panel .mat-expansion-indicator {
+  color: #667eea;
+}
+
+/* Ajuste para card-title con icono */
+::ng-deep .form-card mat-card-title mat-icon {
+  color: #667eea;
+  margin-right: 8px;
+}
+
+/* ========================================== */
+/* RESPONSIVE PARA REGISTRO MÚLTIPLE */
+/* ========================================== */
+
+@media (max-width: 768px) {
+  .participantes-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .participantes-header h3 {
+    font-size: 18px;
+  }
+
+  .participante-resumen {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .participante-icon {
+    font-size: 28px;
+    width: 28px;
+    height: 28px;
+  }
+
+  .participante-nombre {
+    font-size: 14px;
+  }
+
+  .participante-datos {
+    font-size: 12px;
+  }
+
+  .detalle-row {
+    grid-template-columns: 1fr;
+  }
+
+  .participante-acciones {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .participante-acciones button {
+    width: 100%;
+  }
+
+  .form-acciones {
+    flex-direction: column;
+  }
+
+  .btn-agregar-participante {
+    width: 100%;
+  }
+
+  .botones-edicion {
+    flex-direction: column;
+  }
+
+  .botones-edicion button {
+    width: 100%;
+  }
+
+  .info-participantes,
+  .advertencia-participantes {
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+  }
+}
+
+@media (max-width: 480px) {
+  .participantes-agregados {
+    padding: 15px;
+  }
+
+  .participante-detalles {
+    padding: 15px;
+  }
 }

@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { trigger, transition, style, animate } from '@angular/animations';
 
 // Angular Material Modules
 import { MatCardModule } from '@angular/material/card';
@@ -12,67 +13,30 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatNativeDateModule, NativeDateAdapter, DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule, MatPaginator } from '@angular/material/paginator';
 
 /**
- * Interface con campos exactos de la API
+ * Interface actualizada con deportes y tipo
  */
 export interface Convocatoria {
   id_convocatoria: number;
   titulo: string;
   subtitulo: string;
   descripcion: string;
-  fechainicioinscripcion: Date | null;
-  fechafininscripcion: Date | null;
-  fechainicioactividad: Date | null;
-  fechafinactividad: Date | null;
-  numdisponibles: number;
+  urlimagen: string;
+  deporte: string;
+  tipo: 'deporte' | 'paradeporte';
+  frecuencia?: string;
   numvacantes: number;
+  numdisponibles: number;
   numinscritos: number;
   estado: 'activa' | 'cerrada';
-  fechacreada?: Date | null;
-  urlimagen: string;
   region?: string;
   sede?: string;
+  fechacreada?: Date | null;
 }
-
-/**
- * Adapter personalizado para formato DD/MM/AAAA
- */
-export class CustomDateAdapter extends NativeDateAdapter {
-  override parse(value: any): Date | null {
-    if (!value) return null;
-    const parts = value.split('/');
-    if (parts.length === 3) {
-      const day = parseInt(parts[0], 10);
-      const month = parseInt(parts[1], 10) - 1;
-      const year = parseInt(parts[2], 10);
-      return new Date(year, month, day);
-    }
-    return null;
-  }
-
-  override format(date: Date, displayFormat: Object): string {
-    const day = date.getDate().toString().padStart(2, '0');
-    const month = (date.getMonth() + 1).toString().padStart(2, '0');
-    const year = date.getFullYear();
-    return `${day}/${month}/${year}`;
-  }
-}
-
-export const MY_DATE_FORMATS = {
-  parse: { dateInput: 'DD/MM/YYYY' },
-  display: {
-    dateInput: 'DD/MM/YYYY',
-    monthYearLabel: 'MMM YYYY',
-    dateA11yLabel: 'DD/MM/YYYY',
-    monthYearA11yLabel: 'MMMM YYYY',
-  },
-};
 
 @Component({
   selector: 'app-convocatoria',
@@ -89,51 +53,61 @@ export const MY_DATE_FORMATS = {
     MatChipsModule,
     MatBadgeModule,
     MatTooltipModule,
-    MatDatepickerModule,
-    MatNativeDateModule,
     MatProgressSpinnerModule,
     MatTableModule,
     MatPaginatorModule
   ],
-  providers: [
-    { provide: MAT_DATE_LOCALE, useValue: 'es-ES' },
-    { provide: DateAdapter, useClass: CustomDateAdapter },
-    { provide: MAT_DATE_FORMATS, useValue: MY_DATE_FORMATS }
-  ],
   templateUrl: './convocatoria.component.html',
-  styleUrls: ['./convocatoria.component.css']
+  styleUrls: ['./convocatoria.component.css'],
+  animations: [
+    trigger('fadeIn', [
+      transition(':enter', [
+        style({ opacity: 0, transform: 'translateY(20px)' }),
+        animate('400ms ease-out', style({ opacity: 1, transform: 'translateY(0)' }))
+      ])
+    ])
+  ]
 })
 export class ConvocatoriaComponent implements OnInit {
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   // =========================
-  // DATOS Y PAGINACIÓN
+  // DATOS Y PAGINACIÓN (6 por página = 2 filas × 3 cards)
   // =========================
   convocatorias: Convocatoria[] = [];
   convocatoriasFiltradas: Convocatoria[] = [];
   convocatoriasPaginadas: Convocatoria[] = [];
   
-  pageSize: number = 10;
-  pageSizeOptions: number[] = [5, 10, 30, 50, 100, 200];
+  pageSize: number = 6; // 2 filas × 3 cards
+  pageSizeOptions: number[] = [10, 20, 30, 50, 100, 200];
   pageIndex: number = 0;
   totalConvocatorias: number = 0;
 
   // =========================
-  // FILTROS
+  // FILTROS ACTUALIZADOS
   // =========================
   busqueda: string = '';
   regionSeleccionada: string = '';
   sedeSeleccionada: string = '';
-  estadoSeleccionado: string = '';
-  fechaInicioFiltro: Date | null = null;
-  fechaFinFiltro: Date | null = null;
+  deporteSeleccionado: string = '';
+  tipoSeleccionado: string = '';
 
   regiones: string[] = [];
   sedes: string[] = [];
-  estadosOptions = [
-    { value: 'activa', label: 'Activa' },
-    { value: 'cerrada', label: 'Cerrada' }
+  deportes: string[] = [
+    'Rugby',
+    'Tenis de campo',
+    'Judo',
+    'Voleibol',
+    'Futbol',
+    'Baloncesto',
+    'Atletismo',
+    'Pickleball'
+  ];
+  tiposConvocatoria = [
+    { value: 'deporte', label: 'Deporte' },
+    { value: 'paradeporte', label: 'Para Deporte' }
   ];
 
   // =========================
@@ -166,7 +140,7 @@ export class ConvocatoriaComponent implements OnInit {
   // =========================
   // FORMULARIO
   // =========================
-  columnasTabla: string[] = ['numero', 'titulo', 'subtitulo', 'region', 'sede', 'fechainicioinscripcion', 'fechafininscripcion', 'numdisponibles', 'estado', 'acciones'];
+  columnasTabla: string[] = ['numero', 'titulo', 'subtitulo', 'region', 'sede', 'deporte', 'numdisponibles', 'estado', 'acciones'];
   nuevaConvocatoria: Convocatoria = this.crearConvocatoriaVacia();
   imagenSeleccionada: File | null = null;
   imagenPreview: string = '';
@@ -176,7 +150,7 @@ export class ConvocatoriaComponent implements OnInit {
 
   ngOnInit(): void {
     this.cargarConvocatorias();
-    this.verificarEstadosPorFecha();
+    this.actualizarEstadosPorCupos();
   }
 
   // =========================
@@ -213,15 +187,10 @@ export class ConvocatoriaComponent implements OnInit {
 
       const matchRegion = this.regionSeleccionada === '' || conv.region === this.regionSeleccionada;
       const matchSede = this.sedeSeleccionada === '' || conv.sede === this.sedeSeleccionada;
-      const matchEstado = this.estadoSeleccionado === '' || conv.estado === this.estadoSeleccionado;
+      const matchDeporte = this.deporteSeleccionado === '' || conv.deporte === this.deporteSeleccionado;
+      const matchTipo = this.tipoSeleccionado === '' || conv.tipo === this.tipoSeleccionado;
 
-      const matchFechaInicio = !this.fechaInicioFiltro || !conv.fechainicioinscripcion ||
-        new Date(conv.fechainicioinscripcion) >= this.fechaInicioFiltro;
-
-      const matchFechaFin = !this.fechaFinFiltro || !conv.fechafininscripcion ||
-        new Date(conv.fechafininscripcion) <= this.fechaFinFiltro;
-
-      return matchBusqueda && matchRegion && matchSede && matchEstado && matchFechaInicio && matchFechaFin;
+      return matchBusqueda && matchRegion && matchSede && matchDeporte && matchTipo;
     });
 
     this.totalConvocatorias = this.convocatoriasFiltradas.length;
@@ -233,9 +202,8 @@ export class ConvocatoriaComponent implements OnInit {
     this.busqueda = '';
     this.regionSeleccionada = '';
     this.sedeSeleccionada = '';
-    this.estadoSeleccionado = '';
-    this.fechaInicioFiltro = null;
-    this.fechaFinFiltro = null;
+    this.deporteSeleccionado = '';
+    this.tipoSeleccionado = '';
     this.aplicarFiltros();
   }
 
@@ -300,6 +268,7 @@ export class ConvocatoriaComponent implements OnInit {
     this.modoEdicion = false;
     this.nuevaConvocatoria = this.crearConvocatoriaVacia();
     this.imagenPreview = '';
+    this.imagenSeleccionada = null;
     this.erroresFormulario = {};
   }
 
@@ -309,6 +278,7 @@ export class ConvocatoriaComponent implements OnInit {
     this.nuevaConvocatoria = { ...convocatoria };
     this.imagenPreview = convocatoria.urlimagen;
     this.mostrarFormulario = true;
+    this.imagenSeleccionada = null;
     this.erroresFormulario = {};
   }
 
@@ -327,16 +297,14 @@ export class ConvocatoriaComponent implements OnInit {
       titulo: '',
       subtitulo: '',
       descripcion: '',
-      fechainicioinscripcion: null,
-      fechafininscripcion: null,
-      fechainicioactividad: null,
-      fechafinactividad: null,
-      numdisponibles: 0,
+      urlimagen: '',
+      deporte: '',
+      tipo: 'deporte',
       numvacantes: 0,
+      numdisponibles: 0,
       numinscritos: 0,
       estado: 'activa',
       fechacreada: new Date(),
-      urlimagen: '',
       region: '',
       sede: ''
     };
@@ -358,36 +326,12 @@ export class ConvocatoriaComponent implements OnInit {
       this.erroresFormulario['descripcion'] = true;
       esValido = false;
     }
-    if (!this.nuevaConvocatoria.fechainicioinscripcion) {
-      this.erroresFormulario['fechainicioinscripcion'] = true;
-      esValido = false;
-    }
-    if (!this.nuevaConvocatoria.fechafininscripcion) {
-      this.erroresFormulario['fechafininscripcion'] = true;
-      esValido = false;
-    }
-    if (!this.nuevaConvocatoria.fechainicioactividad) {
-      this.erroresFormulario['fechainicioactividad'] = true;
-      esValido = false;
-    }
-    if (!this.nuevaConvocatoria.fechafinactividad) {
-      this.erroresFormulario['fechafinactividad'] = true;
-      esValido = false;
-    }
     if (!this.nuevaConvocatoria.numvacantes || this.nuevaConvocatoria.numvacantes <= 0) {
       this.erroresFormulario['numvacantes'] = true;
       esValido = false;
     }
     if (this.nuevaConvocatoria.numdisponibles < 0) {
       this.erroresFormulario['numdisponibles'] = true;
-      esValido = false;
-    }
-    if (this.nuevaConvocatoria.numinscritos < 0) {
-      this.erroresFormulario['numinscritos'] = true;
-      esValido = false;
-    }
-    if (!this.nuevaConvocatoria.estado) {
-      this.erroresFormulario['estado'] = true;
       esValido = false;
     }
 
@@ -403,6 +347,10 @@ export class ConvocatoriaComponent implements OnInit {
     this.mostrarMensajeLoading('Guardando convocatoria...');
 
     setTimeout(() => {
+      // Calcular inscritos y actualizar estado
+      this.nuevaConvocatoria.numinscritos = this.nuevaConvocatoria.numvacantes - this.nuevaConvocatoria.numdisponibles;
+      this.nuevaConvocatoria.estado = this.nuevaConvocatoria.numdisponibles === 0 ? 'cerrada' : 'activa';
+
       if (this.modoEdicion && this.convocatoriaEditando) {
         // Actualizar
         const index = this.convocatorias.findIndex(c => c.id_convocatoria === this.convocatoriaEditando!.id_convocatoria);
@@ -433,7 +381,6 @@ export class ConvocatoriaComponent implements OnInit {
   }
 
   eliminarConvocatoria(convocatoria: Convocatoria): void {
-    // Usar confirmación personalizada en lugar de confirm() nativo
     this.mostrarDialogoConfirmacion(
       'Eliminar Convocatoria',
       `¿Está seguro de eliminar la convocatoria "${convocatoria.titulo}"?`,
@@ -490,6 +437,7 @@ export class ConvocatoriaComponent implements OnInit {
       reader.readAsDataURL(file);
 
       // TODO: Subir a servidor
+      // this.subirImagenServidor(file);
     }
   }
 
@@ -549,17 +497,12 @@ export class ConvocatoriaComponent implements OnInit {
   // UTILIDADES
   // =========================
 
-  verificarEstadosPorFecha(): void {
-    const hoy = new Date();
-    hoy.setHours(0, 0, 0, 0);
-
+  actualizarEstadosPorCupos(): void {
     this.convocatorias.forEach(conv => {
-      if (conv.fechafininscripcion) {
-        const fechaFin = new Date(conv.fechafininscripcion);
-        fechaFin.setHours(0, 0, 0, 0);
-        if (fechaFin < hoy && conv.estado === 'activa') {
-          conv.estado = 'cerrada';
-        }
+      if (conv.numdisponibles === 0) {
+        conv.estado = 'cerrada';
+      } else {
+        conv.estado = 'activa';
       }
     });
   }
@@ -576,75 +519,130 @@ export class ConvocatoriaComponent implements OnInit {
     return Math.round((convocatoria.numinscritos / convocatoria.numvacantes) * 100);
   }
 
-  formatearFecha(fecha: Date | null): string {
-    if (!fecha) return '';
-    const d = new Date(fecha);
-    const day = d.getDate().toString().padStart(2, '0');
-    const month = (d.getMonth() + 1).toString().padStart(2, '0');
-    const year = d.getFullYear();
-    return `${day}/${month}/${year}`;
+  getTipoTexto(tipo: string): string {
+    return tipo === 'paradeporte' ? 'Para Deporte' : 'Deporte';
+  }
+
+  getTipoClass(tipo: string): string {
+    return tipo === 'paradeporte' ? 'tipo-paradeporte' : 'tipo-deporte';
   }
 
   // =========================
-  // DATOS DE EJEMPLO
+  // DATOS DE EJEMPLO - ESTADIO NACIONAL
   // =========================
 
   obtenerDatosEjemplo(): Convocatoria[] {
-    return [
-      {
-        id_convocatoria: 1,
-        titulo: 'Fútbol y Atletismo IPD',
+    const convocatorias: Convocatoria[] = [];
+    let id = 1;
+
+    // ESTADIO NACIONAL - 8 DEPORTES NORMALES - Frecuencia 1 (Lun-Mie-Vie)
+    const deportesNormales = ['Rugby', 'Tenis de campo', 'Judo', 'Voleibol', 'Futbol', 'Baloncesto', 'Atletismo', 'Pickleball'];
+    
+    deportesNormales.forEach(deporte => {
+      convocatorias.push({
+        id_convocatoria: id++,
+        titulo: `${deporte} - Estadio Nacional`,
         subtitulo: 'Academia IPD - Temporada 2025',
-        descripcion: 'Inscripciones abiertas para fútbol y atletismo. ¡Totalmente gratuito!',
-        fechainicioinscripcion: new Date('2025-03-01'),
-        fechafininscripcion: new Date('2025-03-26'),
-        fechainicioactividad: new Date('2025-04-01'),
-        fechafinactividad: new Date('2025-06-30'),
-        numdisponibles: 39,
-        numvacantes: 50,
-        numinscritos: 11,
-        estado: 'activa',
-        fechacreada: new Date('2025-02-01'),
+        descripcion: `Inscripciones abiertas para ${deporte}. ¡Totalmente gratuito! Horario: Lunes, Miércoles y Viernes de 3:00 PM a 6:00 PM.`,
         urlimagen: 'https://i.imgur.com/JELgLb5.png',
+        deporte: deporte,
+        tipo: 'deporte',
+        frecuencia: 'Lun-Mié-Vie: 3-6 PM',
+        numvacantes: 30,
+        numdisponibles: 20,
+        numinscritos: 10,
+        estado: 'activa',
         region: 'Lima',
-        sede: 'Estadio Nacional'
-      },
+        sede: 'Estadio Nacional',
+        fechacreada: new Date()
+      });
+    });
+
+    // ESTADIO NACIONAL - 8 DEPORTES NORMALES - Frecuencia 2 (Mar-Jue)
+    deportesNormales.forEach(deporte => {
+      convocatorias.push({
+        id_convocatoria: id++,
+        titulo: `${deporte} - Estadio Nacional (Turno 2)`,
+        subtitulo: 'Academia IPD - Temporada 2025',
+        descripcion: `Inscripciones abiertas para ${deporte}. ¡Totalmente gratuito! Horario: Martes y Jueves de 3:00 PM a 6:00 PM.`,
+        urlimagen: 'https://i.imgur.com/Vep18ZR.png',
+        deporte: deporte,
+        tipo: 'deporte',
+        frecuencia: 'Mar-Jue: 3-6 PM',
+        numvacantes: 30,
+        numdisponibles: 15,
+        numinscritos: 15,
+        estado: 'activa',
+        region: 'Lima',
+        sede: 'Estadio Nacional',
+        fechacreada: new Date()
+      });
+    });
+
+    // ESTADIO NACIONAL - PARA DEPORTES
+    const paraDeportes = [
+      { deporte: 'Atletismo', nombre: 'Para Atletismo (Atletismo Adaptado)' },
+      { deporte: 'Tenis de campo', nombre: 'Tenis de Campo para Discapacidad Intelectual' },
+      { deporte: 'Futbol', nombre: 'Futbol de Ciego' },
+      { deporte: 'Judo', nombre: 'Para Judo' }
+    ];
+
+    paraDeportes.forEach(pd => {
+      convocatorias.push({
+        id_convocatoria: id++,
+        titulo: pd.nombre,
+        subtitulo: 'Academia IPD Para Deporte - Temporada 2025',
+        descripcion: `Programa inclusivo de ${pd.nombre} para personas con discapacidad. Horario: Lunes, Miércoles y Viernes de 3:00 PM a 6:00 PM.`,
+        urlimagen: 'https://i.imgur.com/NyPGE4B.png',
+        deporte: pd.deporte,
+        tipo: 'paradeporte',
+        frecuencia: 'Lun-Mié-Vie: 3-6 PM',
+        numvacantes: 25,
+        numdisponibles: 18,
+        numinscritos: 7,
+        estado: 'activa',
+        region: 'Lima',
+        sede: 'Estadio Nacional',
+        fechacreada: new Date()
+      });
+    });
+
+    // OTRAS SEDES - Ejemplos adicionales
+    convocatorias.push(
       {
-        id_convocatoria: 2,
+        id_convocatoria: id++,
         titulo: 'Vóley IPD Chacapampa',
         subtitulo: 'ACADEMIA IPD',
         descripcion: 'Inscripciones abiertas para vóley.',
-        fechainicioinscripcion: new Date('2025-03-01'),
-        fechafininscripcion: new Date('2025-03-26'),
-        fechainicioactividad: new Date('2025-04-05'),
-        fechafinactividad: new Date('2025-07-15'),
-        numdisponibles: 42,
+        urlimagen: 'https://i.imgur.com/Vep18ZR.png',
+        deporte: 'Voleibol',
+        tipo: 'deporte',
         numvacantes: 60,
+        numdisponibles: 42,
         numinscritos: 18,
         estado: 'activa',
-        fechacreada: new Date('2025-02-05'),
-        urlimagen: 'https://i.imgur.com/Vep18ZR.png',
         region: 'Lima',
-        sede: 'Complejo Chacapampa'
+        sede: 'Complejo Chacapampa',
+        fechacreada: new Date()
       },
       {
-        id_convocatoria: 3,
+        id_convocatoria: id++,
         titulo: 'Cusco Multideporte 2024',
         subtitulo: 'ACADEMIA IPD',
         descripcion: 'Programa multideportivo.',
-        fechainicioinscripcion: new Date('2024-09-01'),
-        fechafininscripcion: new Date('2024-09-30'),
-        fechainicioactividad: new Date('2024-10-01'),
-        fechafinactividad: new Date('2024-12-15'),
-        numdisponibles: 0,
+        urlimagen: 'https://i.imgur.com/bYRBpjX.png',
+        deporte: 'Futbol',
+        tipo: 'deporte',
         numvacantes: 150,
+        numdisponibles: 0,
         numinscritos: 150,
         estado: 'cerrada',
-        fechacreada: new Date('2024-08-15'),
-        urlimagen: 'https://i.imgur.com/bYRBpjX.png',
         region: 'Cusco',
-        sede: 'Complejo Deportivo Cusco'
+        sede: 'Complejo Deportivo Cusco',
+        fechacreada: new Date()
       }
-    ];
+    );
+
+    return convocatorias;
   }
 }

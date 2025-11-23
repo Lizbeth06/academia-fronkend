@@ -163,14 +163,103 @@
     </mat-step>
 
     <!-- ========================================== -->
-    <!-- PASO 2: DATOS DEL ALUMNO -->
+    <!-- PASO 2: DATOS DEL ALUMNO (MÚLTIPLES) -->
     <!-- ========================================== -->
-    <mat-step [stepControl]="alumnoForm">
-      <ng-template matStepLabel>Datos del Alumno</ng-template>
+    <mat-step>
+      <ng-template matStepLabel>Datos de los Participantes</ng-template>
       
+      <!-- ⭐ PARTICIPANTES AGREGADOS (Cards colapsables arriba) -->
+      <div class="participantes-agregados" *ngIf="participantes.length > 0">
+        <div class="participantes-header">
+          <h3>
+            <mat-icon>group</mat-icon>
+            Participantes Agregados ({{ participantes.length }})
+          </h3>
+          <span class="participantes-hint">Haga clic para ver o editar los datos</span>
+        </div>
+
+        <mat-accordion class="participantes-accordion">
+          <mat-expansion-panel *ngFor="let participante of participantes" class="participante-panel">
+            <mat-expansion-panel-header>
+              <mat-panel-title>
+                <div class="participante-resumen">
+                  <mat-icon class="participante-icon">person</mat-icon>
+                  <div class="participante-info">
+                    <span class="participante-nombre">
+                      {{ participante.nombres }} {{ participante.apellidoPaterno }} {{ participante.apellidoMaterno }}
+                    </span>
+                    <span class="participante-datos">
+                      DNI: {{ participante.numeroDocumento }} | 
+                      {{ getLabelFromValue(sexos, participante.sexo) }} | 
+                      {{ getLabelFromValue(parentescos, participante.parentesco) }}
+                    </span>
+                  </div>
+                </div>
+              </mat-panel-title>
+            </mat-expansion-panel-header>
+
+            <div class="participante-detalles">
+              <div class="detalle-row">
+                <div class="detalle-item">
+                  <mat-icon>badge</mat-icon>
+                  <div>
+                    <strong>Documento:</strong>
+                    <span>{{ getLabelFromValue(tiposDocumento, participante.tipoDocumento) }} - {{ participante.numeroDocumento }}</span>
+                  </div>
+                </div>
+                <div class="detalle-item">
+                  <mat-icon>cake</mat-icon>
+                  <div>
+                    <strong>Fecha de Nacimiento:</strong>
+                    <span>{{ participante.fechaNacimiento | date:'dd/MM/yyyy' }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="detalle-row">
+                <div class="detalle-item">
+                  <mat-icon>local_hospital</mat-icon>
+                  <div>
+                    <strong>Seguro:</strong>
+                    <span>{{ getLabelFromValue(tiposSeguro, participante.tipoSeguro) }}</span>
+                  </div>
+                </div>
+                <div class="detalle-item">
+                  <mat-icon>accessible</mat-icon>
+                  <div>
+                    <strong>Discapacidad:</strong>
+                    <span [class.tiene-discapacidad]="participante.tieneDiscapacidad">
+                      {{ participante.tieneDiscapacidad ? 'Sí' : 'No' }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="participante-acciones">
+                <button mat-button color="primary" (click)="editarParticipante(participante)">
+                  <mat-icon>edit</mat-icon>
+                  Editar
+                </button>
+                <button mat-button color="warn" (click)="eliminarParticipante(participante)">
+                  <mat-icon>delete</mat-icon>
+                  Eliminar
+                </button>
+              </div>
+            </div>
+          </mat-expansion-panel>
+        </mat-accordion>
+      </div>
+
+      <!-- ⭐ FORMULARIO ACTUAL (Para agregar o editar) -->
       <mat-card class="form-card">
         <mat-card-header>
-          <mat-card-title>DATOS DEL ALUMNO</mat-card-title>
+          <mat-card-title>
+            <mat-icon>{{ editandoParticipante ? 'edit' : 'person_add' }}</mat-icon>
+            {{ editandoParticipante ? 'EDITAR PARTICIPANTE' : 'DATOS DEL PARTICIPANTE' }}
+          </mat-card-title>
+          <div class="form-subtitle" *ngIf="!editandoParticipante && participantes.length > 0">
+            Agregando participante #{{ participantes.length + 1 }}
+          </div>
         </mat-card-header>
 
         <mat-card-content>
@@ -291,20 +380,74 @@
               </div>
             </div>
 
+            <!-- ⭐ BOTONES DE ACCIÓN DEL FORMULARIO -->
+            <div class="form-acciones">
+              <!-- Botón Agregar Participante (solo si NO está editando) -->
+              <button mat-raised-button 
+                      color="accent"
+                      type="button"
+                      *ngIf="!editandoParticipante"
+                      (click)="agregarParticipante()"
+                      [disabled]="!alumnoForm.valid"
+                      class="btn-agregar-participante">
+                <mat-icon>person_add</mat-icon>
+                Agregar este participante
+              </button>
+
+              <!-- Botones Actualizar y Cancelar (solo si SÍ está editando) -->
+              <div class="botones-edicion" *ngIf="editandoParticipante">
+                <button mat-raised-button 
+                        color="primary"
+                        type="button"
+                        (click)="actualizarParticipante()"
+                        [disabled]="!alumnoForm.valid">
+                  <mat-icon>save</mat-icon>
+                  Actualizar Participante
+                </button>
+                <button mat-raised-button 
+                        type="button"
+                        (click)="cancelarEdicion()">
+                  <mat-icon>cancel</mat-icon>
+                  Cancelar
+                </button>
+              </div>
+            </div>
+
           </form>
         </mat-card-content>
       </mat-card>
 
+      <!-- ⭐ INFO: Cuántos participantes hay -->
+      <div class="info-participantes" *ngIf="participantes.length > 0">
+        <mat-icon>info</mat-icon>
+        <span>
+          Ha agregado <strong>{{ participantes.length }}</strong> 
+          {{ participantes.length === 1 ? 'participante' : 'participantes' }}.
+          {{ !editandoParticipante ? 'Puede agregar más o continuar al siguiente paso.' : '' }}
+        </span>
+      </div>
+
+      <!-- ⭐ BOTONES NAVEGACIÓN -->
       <div class="button-row">
         <button mat-raised-button matStepperPrevious>
           <mat-icon>arrow_back</mat-icon>
           Anterior
         </button>
-        <button mat-raised-button color="primary" matStepperNext [disabled]="!alumnoForm.valid">
+        <button mat-raised-button 
+                color="primary" 
+                matStepperNext 
+                [disabled]="!puedeAvanzarPaso2()">
           Continuar
           <mat-icon>arrow_forward</mat-icon>
         </button>
       </div>
+
+      <!-- ⭐ ADVERTENCIA: Debe agregar al menos 1 participante -->
+      <div class="advertencia-participantes" *ngIf="participantes.length === 0">
+        <mat-icon>warning</mat-icon>
+        <span>Debe agregar al menos un participante para continuar</span>
+      </div>
+
     </mat-step>
 
     <!-- ========================================== -->

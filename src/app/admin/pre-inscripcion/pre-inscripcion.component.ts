@@ -18,6 +18,22 @@ import { MatTableModule } from '@angular/material/table';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatDialogModule } from '@angular/material/dialog';
+import { MatExpansionModule } from '@angular/material/expansion';
+
+// Interface para participante
+export interface Participante {
+  id: number;
+  tipoDocumento: string;
+  numeroDocumento: string;
+  apellidoPaterno: string;
+  apellidoMaterno: string;
+  nombres: string;
+  fechaNacimiento: Date;
+  sexo: string;
+  parentesco: string;
+  tipoSeguro: string;
+  tieneDiscapacidad: boolean;
+}
 
 @Component({
   selector: 'app-pre-inscripcion',
@@ -38,7 +54,8 @@ import { MatDialogModule } from '@angular/material/dialog';
     MatTableModule,
     MatProgressSpinnerModule,
     MatRadioModule,
-    MatDialogModule
+    MatDialogModule,
+    MatExpansionModule
   ],
   templateUrl: './pre-inscripcion.component.html',
   styleUrls: ['./pre-inscripcion.component.css']
@@ -50,6 +67,11 @@ export class PreInscripcionComponent implements OnInit {
   alumnoForm!: FormGroup;
   sedeDeporteForm!: FormGroup;
   documentosForm!: FormGroup;
+
+  // ⭐ NUEVO: Array de participantes agregados
+  participantes: Participante[] = [];
+  participanteActualIndex: number = 0;
+  editandoParticipante: boolean = false;
 
   // Opciones para los dropdowns
   tiposDocumento = [
@@ -146,7 +168,7 @@ export class PreInscripcionComponent implements OnInit {
       referencia: ['']
     });
 
-    // PASO 2: Datos del Alumno
+    // PASO 2: Datos del Alumno (Participante actual)
     this.alumnoForm = this.fb.group({
       tipoDocumento: ['30', Validators.required],
       numeroDocumento: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(8)]],
@@ -206,7 +228,6 @@ export class PreInscripcionComponent implements OnInit {
       this.cargandoApoderado = true;
       
       // TODO: Reemplazar con llamada real a API RENIEC
-      // this.http.get(`api/reniec/${dni}`).subscribe(...)
       setTimeout(() => {
         this.apoderadoForm.patchValue({
           apellidoPaterno: 'ARIAS',
@@ -225,8 +246,6 @@ export class PreInscripcionComponent implements OnInit {
     this.distritos = [];
     this.apoderadoForm.patchValue({ provincia: '', distrito: '' });
 
-    // TODO: Reemplazar con llamada a API
-    // this.http.get(`api/provincias/${depId}`).subscribe(...)
     if (depId === '15') {
       this.provincias = [
         { value: '1501', label: 'LIMA' },
@@ -237,28 +256,29 @@ export class PreInscripcionComponent implements OnInit {
         { value: '0401', label: 'AREQUIPA' }
       ];
     }
-
   }
-
 
   onProvinciaChange(): void {
     const provId = this.apoderadoForm.get('provincia')?.value;
     this.distritos = [];
     this.apoderadoForm.patchValue({ distrito: '' });
 
-    // TODO: Reemplazar con llamada a API
-    // this.http.get(`api/distritos/${provId}`).subscribe(...)
     if (provId === '1501') {
       this.distritos = [
         { value: '150101', label: 'LIMA' },
         { value: '150103', label: 'ATE' },
         { value: '150106', label: 'CHORRILLOS' },
-        { value: '150110', label: 'VILLA EL SALVADOR' }
+        { value: '150114', label: 'LA MOLINA' },
+        { value: '150117', label: 'LINCE' }
+      ];
+    } else if (provId === '0401') {
+      this.distritos = [
+        { value: '040101', label: 'AREQUIPA' }
       ];
     }
   }
 
-  // ==================== PASO 2: ALUMNO ====================
+  // ==================== PASO 2: PARTICIPANTES (MÚLTIPLES) ====================
   
   buscarAlumno(): void {
     const dni = this.alumnoForm.get('numeroDocumento')?.value;
@@ -267,13 +287,12 @@ export class PreInscripcionComponent implements OnInit {
       this.cargandoAlumno = true;
       
       // TODO: Reemplazar con llamada real a API RENIEC
-      // this.http.get(`api/reniec/${dni}`).subscribe(...)
       setTimeout(() => {
         this.alumnoForm.patchValue({
-          apellidoPaterno: 'QUISPE',
-          apellidoMaterno: 'HUARANCCA',
-          nombres: 'EMILY IVET',
-          fechaNacimiento: new Date('2008-09-13')
+          apellidoPaterno: 'GARCÍA',
+          apellidoMaterno: 'LÓPEZ',
+          nombres: 'MARÍA FERNANDA',
+          fechaNacimiento: new Date('2010-05-20')
         });
         this.cargandoAlumno = false;
       }, 1000);
@@ -282,12 +301,105 @@ export class PreInscripcionComponent implements OnInit {
 
   onDiscapacidadChange(event: any): void {
     this.tieneDiscapacidad = event.checked;
-    if (this.sedeDeporteForm.get('deporte')?.value) {
-      this.onDeporteChange();
+  }
+
+  // ⭐ NUEVO: Agregar participante al array
+  agregarParticipante(): void {
+    if (this.alumnoForm.valid) {
+      const nuevoParticipante: Participante = {
+        id: this.participantes.length + 1,
+        ...this.alumnoForm.value
+      };
+
+      this.participantes.push(nuevoParticipante);
+      
+      // Limpiar formulario para el siguiente
+      this.limpiarFormularioAlumno();
+      
+      // Scroll suave hacia arriba para ver los participantes agregados
+      setTimeout(() => {
+        const elemento = document.querySelector('.participantes-agregados');
+        elemento?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
+    } else {
+      alert('Por favor complete todos los campos obligatorios del participante');
     }
   }
 
-  // ==================== PASO 3: SEDE Y DEPORTE ====================
+  // ⭐ NUEVO: Limpiar formulario de alumno
+  limpiarFormularioAlumno(): void {
+    this.alumnoForm.reset({
+      tipoDocumento: '30',
+      tieneDiscapacidad: false
+    });
+    this.tieneDiscapacidad = false;
+  }
+
+  // ⭐ NUEVO: Editar participante
+  editarParticipante(participante: Participante): void {
+    this.editandoParticipante = true;
+    this.participanteActualIndex = this.participantes.findIndex(p => p.id === participante.id);
+    
+    this.alumnoForm.patchValue({
+      tipoDocumento: participante.tipoDocumento,
+      numeroDocumento: participante.numeroDocumento,
+      apellidoPaterno: participante.apellidoPaterno,
+      apellidoMaterno: participante.apellidoMaterno,
+      nombres: participante.nombres,
+      fechaNacimiento: participante.fechaNacimiento,
+      sexo: participante.sexo,
+      parentesco: participante.parentesco,
+      tipoSeguro: participante.tipoSeguro,
+      tieneDiscapacidad: participante.tieneDiscapacidad
+    });
+    
+    this.tieneDiscapacidad = participante.tieneDiscapacidad;
+
+    // Scroll hacia el formulario
+    setTimeout(() => {
+      const elemento = document.querySelector('.form-card');
+      elemento?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
+  }
+
+  // ⭐ NUEVO: Actualizar participante editado
+  actualizarParticipante(): void {
+    if (this.alumnoForm.valid && this.editandoParticipante) {
+      this.participantes[this.participanteActualIndex] = {
+        id: this.participantes[this.participanteActualIndex].id,
+        ...this.alumnoForm.value
+      };
+      
+      this.editandoParticipante = false;
+      this.limpiarFormularioAlumno();
+    }
+  }
+
+  // ⭐ NUEVO: Cancelar edición
+  cancelarEdicion(): void {
+    this.editandoParticipante = false;
+    this.limpiarFormularioAlumno();
+  }
+
+  // ⭐ NUEVO: Eliminar participante
+  eliminarParticipante(participante: Participante): void {
+    if (confirm(`¿Está seguro de eliminar al participante ${participante.nombres} ${participante.apellidoPaterno}?`)) {
+      this.participantes = this.participantes.filter(p => p.id !== participante.id);
+    }
+  }
+
+  // ⭐ NUEVO: Validar que haya al menos 1 participante para continuar
+  puedeAvanzarPaso2(): boolean {
+    return this.participantes.length > 0 && !this.editandoParticipante;
+  }
+
+  // ⭐ NUEVO: Obtener etiqueta del dropdown
+  getLabelFromValue(array: any[], value: string): string {
+    const item = array.find(i => i.value === value);
+    return item ? item.label : value;
+  }
+
+  // ==================== PASO 3: COMPLEJO DEPORTIVO ====================
   
   onDepartamentoSedeChange(): void {
     const depId = this.sedeDeporteForm.get('departamento')?.value;
@@ -296,21 +408,16 @@ export class PreInscripcionComponent implements OnInit {
     this.complejosDeportivos = [];
     this.deportes = [];
     this.horarios = [];
-    this.horarioSeleccionado = null;
-    this.mapaVisible = false;
-    
-    this.sedeDeporteForm.patchValue({ 
-      provincia: '', 
-      distrito: '', 
-      complejoDeportivo: '',
-      deporte: ''
-    });
+    this.sedeDeporteForm.patchValue({ provincia: '', distrito: '', complejoDeportivo: '', deporte: '' });
 
-    // TODO: Reemplazar con llamada a API
     if (depId === '15') {
-      this.provinciasSede = [{ value: '1501', label: 'LIMA' }];
+      this.provinciasSede = [
+        { value: '1501', label: 'LIMA' }
+      ];
     } else if (depId === '04') {
-      this.provinciasSede = [{ value: '0401', label: 'AREQUIPA' }];
+      this.provinciasSede = [
+        { value: '0401', label: 'AREQUIPA' }
+      ];
     }
   }
 
@@ -320,20 +427,17 @@ export class PreInscripcionComponent implements OnInit {
     this.complejosDeportivos = [];
     this.deportes = [];
     this.horarios = [];
-    this.horarioSeleccionado = null;
-    this.mapaVisible = false;
-    
-    this.sedeDeporteForm.patchValue({ 
-      distrito: '', 
-      complejoDeportivo: '',
-      deporte: ''
-    });
+    this.sedeDeporteForm.patchValue({ distrito: '', complejoDeportivo: '', deporte: '' });
 
-    // TODO: Reemplazar con llamada a API
     if (provId === '1501') {
       this.distritosSede = [
-        { value: '150110', label: 'VILLA EL SALVADOR' },
-        { value: '150120', label: 'CHORRILLOS' }
+        { value: '150101', label: 'LIMA' },
+        { value: '150130', label: 'SAN LUIS' },
+        { value: '150132', label: 'SAN MARTÍN DE PORRES' }
+      ];
+    } else if (provId === '0401') {
+      this.distritosSede = [
+        { value: '040101', label: 'AREQUIPA' }
       ];
     }
   }
@@ -343,33 +447,15 @@ export class PreInscripcionComponent implements OnInit {
     this.complejosDeportivos = [];
     this.deportes = [];
     this.horarios = [];
-    this.horarioSeleccionado = null;
-    this.mapaVisible = false;
-    
-    this.sedeDeporteForm.patchValue({ 
-      complejoDeportivo: '',
-      deporte: ''
-    });
+    this.sedeDeporteForm.patchValue({ complejoDeportivo: '', deporte: '' });
 
-    // TODO: Reemplazar con llamada a API
-    // this.http.get(`api/complejos/${distId}`).subscribe(...)
-    if (distId === '150110') {
+    if (distId === '150101') {
       this.complejosDeportivos = [
-        { 
-          value: '1', 
-          label: 'Complejo Deportivo Villa El Salvador',
-          lat: -12.2050,
-          lng: -76.9350
-        }
+        { value: '1', label: 'Estadio Nacional', lat: -12.0682, lng: -77.0321 }
       ];
-    } else if (distId === '150120') {
+    } else if (distId === '150130') {
       this.complejosDeportivos = [
-        { 
-          value: '2', 
-          label: 'Complejo Panamericano Costa Verde',
-          lat: -12.1800,
-          lng: -77.0200
-        }
+        { value: '2', label: 'Polideportivo San Luis', lat: -12.0730, lng: -77.0055 }
       ];
     }
   }
@@ -394,11 +480,13 @@ export class PreInscripcionComponent implements OnInit {
     }
 
     // TODO: Reemplazar con llamada a API
-    // this.http.get(`api/deportes/${complejoId}`).subscribe(...)
     if (complejoId === '1') {
       this.deportes = [
         { value: '1', label: 'Fútbol' },
-        { value: '2', label: 'Básquet' }
+        { value: '2', label: 'Básquet' },
+        { value: '3', label: 'Natación' },
+        { value: '4', label: 'Voleibol' },
+        { value: '5', label: 'Atletismo' }
       ];
     } else if (complejoId === '2') {
       this.deportes = [
@@ -413,8 +501,6 @@ export class PreInscripcionComponent implements OnInit {
     this.horarios = [];
     this.horarioSeleccionado = null;
     
-    // TODO: Reemplazar con llamada a API
-    // this.http.get(`api/horarios/${deporteId}?discapacidad=${this.tieneDiscapacidad}`).subscribe(...)
     if (deporteId === '1') {
       this.horarios = [
         { 
@@ -480,7 +566,6 @@ export class PreInscripcionComponent implements OnInit {
     return this.horarioSeleccionado !== null;
   }
 
-  // Método para obtener URL segura del mapa
   getMapaUrl(): SafeResourceUrl {
     if (!this.ubicacionComplejo) {
       return this.sanitizer.bypassSecurityTrustResourceUrl('');
@@ -508,31 +593,31 @@ export class PreInscripcionComponent implements OnInit {
         d => d.value === this.sedeDeporteForm.value.deporte
       );
 
+      // ⭐ MODIFICADO: Usar primer participante para datos principales
+      const primerParticipante = this.participantes[0];
+
       this.datosInscripcion = {
         codigo: this.codigoRegistro,
-        nombre: this.alumnoForm.value.nombres,
-        apellidoPaterno: this.alumnoForm.value.apellidoPaterno,
-        apellidoMaterno: this.alumnoForm.value.apellidoMaterno,
+        nombre: primerParticipante.nombres,
+        apellidoPaterno: primerParticipante.apellidoPaterno,
+        apellidoMaterno: primerParticipante.apellidoMaterno,
         distrito: this.distritos.find(d => d.value === this.apoderadoForm.value.distrito)?.label || '',
         domicilio: this.apoderadoForm.value.direccion,
-        fechaNacimiento: this.alumnoForm.value.fechaNacimiento,
+        fechaNacimiento: primerParticipante.fechaNacimiento,
         telefono: '987654039',
-        dni: this.alumnoForm.value.numeroDocumento,
-        edad: this.calcularEdad(this.alumnoForm.value.fechaNacimiento),
+        dni: primerParticipante.numeroDocumento,
+        edad: this.calcularEdad(primerParticipante.fechaNacimiento),
         email: 'zluis.arias.01@gmail.com',
         complejo: complejoSeleccionado?.label || '',
         deporte: deporteSeleccionado?.label || '',
         modalidad: 'Convencional',
         etapa: this.horarioSeleccionado.etapa,
         horario: `${this.horarioSeleccionado.dias} de ${this.horarioSeleccionado.horas}`,
-        fecha: new Date()
+        fecha: new Date(),
+        participantes: this.participantes // ⭐ NUEVO: Lista completa de participantes
       };
 
-      // MOSTRAR MODAL INFORMATIVO
       this.mostrarModalInformativo = true;
-      
-      // TODO: Aquí harías el POST a tu API
-      // this.http.post('api/pre-inscripciones', this.datosInscripcion).subscribe(...)
     }
   }
 
@@ -559,13 +644,11 @@ export class PreInscripcionComponent implements OnInit {
 
   descargarFichaPreinscripcion(): void {
     console.log('Descargando Ficha de Pre-inscripción...');
-    // TODO: Generar PDF con los datos de this.datosInscripcion
     alert('Generando PDF de Ficha de Pre-inscripción...');
   }
 
   descargarDeclaracionJurada(): void {
     console.log('Descargando Declaración Jurada...');
-    // TODO: Generar PDF con declaración jurada
     alert('Generando PDF de Declaración Jurada...');
   }
 
@@ -612,16 +695,6 @@ export class PreInscripcionComponent implements OnInit {
     }
 
     console.log('Enviando documentos:', this.archivosSubidos);
-    
-    // TODO: Aquí harías el upload a tu API usando FormData
-    // const formData = new FormData();
-    // for (const key in this.archivosSubidos) {
-    //   if (this.archivosSubidos[key]) {
-    //     formData.append(key, this.archivosSubidos[key]);
-    //   }
-    // }
-    // this.http.post('api/documentos/' + this.codigoRegistro, formData).subscribe(...)
-    
     alert('Documentos enviados correctamente. Su inscripción será validada en breve.');
     this.mostrarPasoDocumentos = false;
   }
@@ -636,7 +709,6 @@ export class PreInscripcionComponent implements OnInit {
     const char = String.fromCharCode(event.keyCode);
     return /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/.test(char);
   }
-
 
   soloNumeros(event: KeyboardEvent): boolean {
     const char = String.fromCharCode(event.keyCode);
@@ -655,5 +727,7 @@ export class PreInscripcionComponent implements OnInit {
     this.mostrarPasoDocumentos = false;
     this.tieneDiscapacidad = false;
     this.mostrarModalInformativo = false;
+    this.participantes = [];
+    this.editandoParticipante = false;
   }
 }
