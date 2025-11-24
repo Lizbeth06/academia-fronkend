@@ -1,1 +1,1102 @@
-<p>preinscripcion-lista works!</p>
+<div class="pre-inscripcion-container">
+  
+  <!-- Header -->
+  <div class="header-section">
+    <h1 class="titulo-principal">PRE - INSCRIPCIÓN</h1>
+    <p class="subtitulo">Temporada 2026</p>
+  </div>
+
+  <!-- Stepper -->
+  <mat-stepper [linear]="true" #stepper *ngIf="!mostrarConfirmacion && !mostrarPasoDocumentos">
+    
+    <!-- ========================================== -->
+    <!-- PASO 1: DATOS DEL PADRE Y/O APODERADO(A) -->
+    <!-- ========================================== -->
+    <mat-step [stepControl]="apoderadoForm">
+      <ng-template matStepLabel>Datos del Padre y/o Apoderado(a)</ng-template>
+      
+      <mat-card class="form-card">
+        <mat-card-header>
+          <mat-card-title>DATOS DEL PADRE Y/O APODERADO(A)</mat-card-title>
+        </mat-card-header>
+
+        <mat-card-content>
+          <form [formGroup]="apoderadoForm">
+            
+            <!--  Fila 1: Tipo de Apoderado, Tipo Documento y Número (los 3 juntos) -->
+            <div class="form-row form-row-tres-campos">
+              <mat-form-field appearance="outline" class="field-third">
+                <mat-label>Tipo de Apoderado</mat-label>
+                <mat-select formControlName="tipoApoderado">
+                  <mat-option *ngFor="let tipo of tiposApoderado" [value]="tipo.value">
+                    {{ tipo.label }}
+                  </mat-option>
+                </mat-select>
+                <mat-error>Campo obligatorio</mat-error>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="field-third">
+                <mat-label>Tipo de Documento</mat-label>
+                <mat-select formControlName="tipoDocumento">
+                  <mat-option *ngFor="let tipo of tiposDocumento" [value]="tipo.value">
+                    {{ tipo.label }}
+                  </mat-option>
+                </mat-select>
+                <mat-error>Campo obligatorio</mat-error>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="field-third">
+                <mat-label>Número de Documento</mat-label>
+                <input matInput 
+                       formControlName="numeroDocumento"
+                       (keypress)="soloNumeros($event)"
+                       maxlength="8">
+                <button mat-icon-button matSuffix 
+                        type="button"
+                        (click)="buscarApoderado()"
+                        [disabled]="cargandoApoderado || apoderadoForm.get('numeroDocumento')?.value?.length !== 8"
+                        matTooltip="Buscar en RENIEC">
+                  <mat-icon *ngIf="!cargandoApoderado">search</mat-icon>
+                  <mat-spinner *ngIf="cargandoApoderado" diameter="20"></mat-spinner>
+                </button>
+                <mat-error>Debe ingresar 8 dígitos</mat-error>
+              </mat-form-field>
+            </div>
+
+            <!-- Fila 2: Apellidos y Nombres -->
+            <div class="form-row">
+              <mat-form-field appearance="outline" class="field-third">
+                <mat-label>Apellido Paterno</mat-label>
+                <input matInput 
+                       formControlName="apellidoPaterno"
+                       (keypress)="soloLetras($event)">
+                <mat-error>Campo obligatorio</mat-error>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="field-third">
+                <mat-label>Apellido Materno</mat-label>
+                <input matInput 
+                       formControlName="apellidoMaterno"
+                       (keypress)="soloLetras($event)">
+                <mat-error>Campo obligatorio</mat-error>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="field-third">
+                <mat-label>Nombres</mat-label>
+                <input matInput 
+                       formControlName="nombres"
+                       (keypress)="soloLetras($event)">
+                <mat-error>Campo obligatorio</mat-error>
+              </mat-form-field>
+            </div>
+
+            <!-- Fila 3: Fecha de Nacimiento y Sexo -->
+            <div class="form-row">
+              <mat-form-field appearance="outline" class="field-half">
+                <mat-label>Fecha de Nacimiento</mat-label>
+                <input matInput 
+                       [matDatepicker]="pickerApoderado"
+                       formControlName="fechaNacimiento">
+                <mat-datepicker-toggle matSuffix [for]="pickerApoderado"></mat-datepicker-toggle>
+                <mat-datepicker #pickerApoderado></mat-datepicker>
+                <!-- <mat-hint>Formato: DD/MM/YYYY</mat-hint> -->
+                <mat-error>Campo obligatorio</mat-error>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="field-half">
+                <mat-label>Sexo</mat-label>
+                <mat-select formControlName="sexo">
+                  <mat-option *ngFor="let sexo of sexos" [value]="sexo.value">
+                    {{ sexo.label }}
+                  </mat-option>
+                </mat-select>
+                <mat-error>Campo obligatorio</mat-error>
+              </mat-form-field>
+            </div>
+
+            <!-- Fila 4: Ubicación -->
+            <div class="form-row">
+              <mat-form-field appearance="outline" class="field-third">
+                <mat-label>Departamento</mat-label>
+                <mat-select formControlName="departamento" (selectionChange)="onDepartamentoChange()">
+                  <mat-option *ngFor="let dep of departamentos" [value]="dep.value">
+                    {{ dep.label }}
+                  </mat-option>
+                </mat-select>
+                <mat-error>Campo obligatorio</mat-error>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="field-third">
+                <mat-label>Provincia</mat-label>
+                <mat-select formControlName="provincia" (selectionChange)="onProvinciaChange()">
+                  <mat-option *ngFor="let prov of provincias" [value]="prov.value">
+                    {{ prov.label }}
+                  </mat-option>
+                </mat-select>
+                <mat-error>Campo obligatorio</mat-error>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="field-third">
+                <mat-label>Distrito</mat-label>
+                <mat-select formControlName="distrito">
+                  <mat-option *ngFor="let dist of distritos" [value]="dist.value">
+                    {{ dist.label }}
+                  </mat-option>
+                </mat-select>
+                <mat-error>Campo obligatorio</mat-error>
+              </mat-form-field>
+            </div>
+
+            <!-- Fila 5: Dirección y Referencia -->
+            <div class="form-row">
+              <mat-form-field appearance="outline" class="field-half">
+                <mat-label>Dirección</mat-label>
+                <input matInput formControlName="direccion">
+                <mat-error>Campo obligatorio</mat-error>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="field-half">
+                <mat-label>Referencia (Opcional)</mat-label>
+                <input matInput formControlName="referencia">
+              </mat-form-field>
+            </div>
+
+          </form>
+        </mat-card-content>
+      </mat-card>
+
+      <div class="button-row">
+        <button mat-raised-button color="primary" matStepperNext [disabled]="!apoderadoForm.valid">
+          Continuar
+          <mat-icon>arrow_forward</mat-icon>
+        </button>
+      </div>
+    </mat-step>
+
+    <!-- ========================================== -->
+    <!-- PASO 2: DATOS DE LOS PARTICIPANTES -->
+    <!-- ========================================== -->
+    <mat-step>
+      <ng-template matStepLabel>Datos de los Participantes</ng-template>
+      
+      <!-- Participantes Agregados (Cards colapsables arriba) -->
+      <div class="participantes-agregados" *ngIf="participantes.length > 0">
+        <div class="participantes-header">
+          <h3>
+            Participantes Agregados: {{participantes.length}}
+          </h3>
+          <span class="participantes-hint">Haga clic para ver o editar los datos</span>
+        </div>
+
+        <mat-accordion class="participantes-accordion">
+          <mat-expansion-panel *ngFor="let participante of participantes" class="participante-panel">
+            <mat-expansion-panel-header>
+              <mat-panel-title>
+                <div class="participante-resumen">
+                  <div class="participante-info">
+                    <span class="participante-nombre">
+                      {{ participante.nombres }} {{ participante.apellidoPaterno }} {{ participante.apellidoMaterno }}
+                    </span>
+                    <span class="participante-datos">
+                      DNI: {{ participante.numeroDocumento }} | 
+                      {{ getLabelFromValue(sexos, participante.sexo) }} | 
+                      {{ getLabelFromValue(parentescos, participante.parentesco) }} |
+                      <span [class.modalidad-digital]="participante.modalidadEnvio === 'digital'"
+                            [class.modalidad-presencial]="participante.modalidadEnvio === 'presencial'">
+                        {{ participante.modalidadEnvio === 'digital' ? 'Digital' : 'Presencial' }}
+                      </span>
+                    </span>
+                  </div>
+                </div>
+              </mat-panel-title>
+            </mat-expansion-panel-header>
+
+            <div class="participante-detalles">
+              <div class="detalle-row">
+                <div class="detalle-item">
+                  <mat-icon>badge</mat-icon>
+                  <div>
+                    <strong>Documento:</strong>
+                    <span>{{ getLabelFromValue(tiposDocumento, participante.tipoDocumento) }} - {{ participante.numeroDocumento }}</span>
+                  </div>
+                </div>
+                <div class="detalle-item">
+                  <mat-icon>cake</mat-icon>
+                  <div>
+                    <strong>Fecha de Nacimiento:</strong>
+                    <span>{{ formatearFecha(participante.fechaNacimiento) }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="detalle-row">
+                <div class="detalle-item">
+                  <mat-icon>local_hospital</mat-icon>
+                  <div>
+                    <strong>Seguro:</strong>
+                    <span>{{ getLabelFromValue(tiposSeguro, participante.tipoSeguro) }}</span>
+                  </div>
+                </div>
+                <div class="detalle-item">
+                  <mat-icon>accessible</mat-icon>
+                  <div>
+                    <strong>Discapacidad:</strong>
+                    <span [class.tiene-discapacidad]="participante.tieneDiscapacidad">
+                      {{ participante.tieneDiscapacidad ? 'Sí' : 'No' }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="detalle-row">
+                <div class="detalle-item">
+                  <mat-icon>{{ participante.modalidadEnvio === 'digital' ? 'cloud_upload' : 'location_on' }}</mat-icon>
+                  <div>
+                    <strong>Modalidad de Envío:</strong>
+                    <span>{{ participante.modalidadEnvio === 'digital' ? 'Digital' : 'Presencial' }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="participante-acciones">
+                <button mat-button color="primary" (click)="editarParticipante(participante)">
+                  <mat-icon>edit</mat-icon>
+                  Editar
+                </button>
+                <button mat-button color="warn" (click)="eliminarParticipante(participante)">
+                  <mat-icon>delete</mat-icon>
+                  Eliminar
+                </button>
+              </div>
+            </div>
+          </mat-expansion-panel>
+        </mat-accordion>
+      </div>
+
+      <!-- Formulario Actual (Para agregar o editar) -->
+      <mat-card class="form-card">
+        <mat-card-header>
+          <mat-card-title>
+            {{ editandoParticipante ? 'EDITAR PARTICIPANTE' : 'DATOS DEL PARTICIPANTE' }}
+          </mat-card-title>
+          <div class="form-subtitle" *ngIf="!editandoParticipante && participantes.length > 0">
+            Agregando participante #{{ participantes.length + 1 }}
+          </div>
+        </mat-card-header>
+
+        <mat-card-content>
+          <form [formGroup]="alumnoForm">
+            
+            <!-- Fila 1: Tipo de Documento y Número de Documento -->
+            <div class="form-row">
+              <mat-form-field appearance="outline" class="field-half">
+                <mat-label>Tipo de Documento</mat-label>
+                <mat-select formControlName="tipoDocumento">
+                  <mat-option *ngFor="let tipo of tiposDocumento" [value]="tipo.value">
+                    {{ tipo.label }}
+                  </mat-option>
+                </mat-select>
+                <mat-error>Campo obligatorio</mat-error>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="field-half">
+                <mat-label>Número de Documento</mat-label>
+                <input matInput 
+                       formControlName="numeroDocumento"
+                       (keypress)="soloNumeros($event)"
+                       maxlength="8">
+                <button mat-icon-button matSuffix 
+                        type="button"
+                        (click)="buscarAlumno()"
+                        [disabled]="cargandoAlumno || alumnoForm.get('numeroDocumento')?.value?.length !== 8"
+                        matTooltip="Buscar en RENIEC">
+                  <mat-icon *ngIf="!cargandoAlumno">search</mat-icon>
+                  <mat-spinner *ngIf="cargandoAlumno" diameter="20"></mat-spinner>
+                </button>
+                <mat-error>Debe ingresar 8 dígitos</mat-error>
+              </mat-form-field>
+            </div>
+
+            <!-- Fila 2: Apellidos y Nombres -->
+            <div class="form-row">
+              <mat-form-field appearance="outline" class="field-third">
+                <mat-label>Apellido Paterno</mat-label>
+                <input matInput 
+                       formControlName="apellidoPaterno"
+                       (keypress)="soloLetras($event)">
+                <mat-error>Campo obligatorio</mat-error>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="field-third">
+                <mat-label>Apellido Materno</mat-label>
+                <input matInput 
+                       formControlName="apellidoMaterno"
+                       (keypress)="soloLetras($event)">
+                <mat-error>Campo obligatorio</mat-error>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="field-third">
+                <mat-label>Nombres</mat-label>
+                <input matInput 
+                       formControlName="nombres"
+                       (keypress)="soloLetras($event)">
+                <mat-error>Campo obligatorio</mat-error>
+              </mat-form-field>
+            </div>
+
+            <!-- Fila 3: Fecha de Nacimiento y Sexo -->
+            <div class="form-row">
+              <mat-form-field appearance="outline" class="field-half">
+                <mat-label>Fecha de Nacimiento</mat-label>
+                <input matInput 
+                       [matDatepicker]="pickerAlumno"
+                       formControlName="fechaNacimiento">
+                <mat-datepicker-toggle matSuffix [for]="pickerAlumno"></mat-datepicker-toggle>
+                <mat-datepicker #pickerAlumno></mat-datepicker>
+                <!-- <mat-hint>Formato: DD/MM/YYYY</mat-hint> -->
+                <mat-error>Campo obligatorio</mat-error>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="field-half">
+                <mat-label>Sexo</mat-label>
+                <mat-select formControlName="sexo">
+                  <mat-option *ngFor="let sexo of sexos" [value]="sexo.value">
+                    {{ sexo.label }}
+                  </mat-option>
+                </mat-select>
+                <mat-error>Campo obligatorio</mat-error>
+              </mat-form-field>
+            </div>
+
+            <!-- Fila 4: Parentesco y Tipo de Seguro -->
+            <div class="form-row">
+              <mat-form-field appearance="outline" class="field-half">
+                <mat-label>Parentesco</mat-label>
+                <mat-select formControlName="parentesco">
+                  <mat-option *ngFor="let parent of parentescos" [value]="parent.value">
+                    {{ parent.label }}
+                  </mat-option>
+                </mat-select>
+                <mat-error>Campo obligatorio</mat-error>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="field-half">
+                <mat-label>Tipo de Seguro</mat-label>
+                <mat-select formControlName="tipoSeguro">
+                  <mat-option *ngFor="let seguro of tiposSeguro" [value]="seguro.value">
+                    {{ seguro.label }}
+                  </mat-option>
+                </mat-select>
+                <mat-error>Campo obligatorio</mat-error>
+              </mat-form-field>
+            </div>
+
+            <!-- Sección de Discapacidad -->
+            <div class="discapacidad-section">
+              <p class="discapacidad-pregunta">¿El participante presenta algún tipo de discapacidad física o intelectual?</p>
+              <mat-checkbox formControlName="tieneDiscapacidad" (change)="onDiscapacidadChange($event)">
+                Sí
+              </mat-checkbox>
+              <div class="discapacidad-mensaje" *ngIf="tieneDiscapacidad">
+                <mat-icon>info</mat-icon>
+                <span>Sólo se mostrarán horarios dirigidos a personas con discapacidad.</span>
+              </div>
+            </div>
+
+            <!--  NUEVO: Modalidad de Envío de Documentos -->
+            <div class="modalidad-envio-section" [class.disabled-section]="!formularioBasicoCompleto()">
+              <p class="modalidad-pregunta">
+                ¿Cómo desea enviar sus requisitos? *
+                <span class="modalidad-hint" *ngIf="!formularioBasicoCompleto()">(Complete todos los campos para habilitar esta opción)</span>
+              </p>
+              <div class="modalidad-opciones">
+                <mat-checkbox 
+                  [checked]="modalidadEnvioActual === 'digital'"
+                  (change)="onModalidadEnvioChange('digital')"
+                  [disabled]="!formularioBasicoCompleto()">
+                  <mat-icon>cloud_upload</mat-icon>
+                  <span>Digital</span>
+                </mat-checkbox>
+                <mat-checkbox 
+                  [checked]="modalidadEnvioActual === 'presencial'"
+                  (change)="onModalidadEnvioChange('presencial')"
+                  [disabled]="!formularioBasicoCompleto()">
+                  <mat-icon>location_on</mat-icon>
+                  <span>Presencial</span>
+                </mat-checkbox>
+              </div>
+
+              <!-- Mensaje Presencial -->
+              <div class="modalidad-mensaje-presencial" *ngIf="modalidadEnvioActual === 'presencial'">
+                <mat-icon>info</mat-icon>
+                <p>Deberá presentar los documentos requeridos de manera presencial en el complejo deportivo seleccionado en los horarios de atención de lunes a viernes de 8:00 AM a 5:00 PM.</p>
+              </div>
+
+              <!-- Archivos Digitales -->
+              <div class="archivos-digitales-section" *ngIf="modalidadEnvioActual === 'digital'">
+                <h4>Documentos a Adjuntar</h4>
+                <p class="archivos-info">Suba los siguientes documentos obligatorios (formato PDF, JPG o PNG - máx. 5MB):</p>
+
+                <div class="documentos-grid-participante">
+                  <!-- DNI del menor -->
+                  <div class="documento-item-participante">
+                    <label class="documento-label">
+                      <span class="numero">1</span>
+                      <span class="titulo">Copia de DNI del menor</span>
+                      <span class="obligatorio">*</span>
+                    </label>
+                    <div class="documento-upload">
+                      <input type="file" 
+                             accept=".pdf,.jpg,.jpeg,.png"
+                             hidden
+                             (change)="onFileSelectTemp($event, 'dniMenor')"
+                             #fileDniMenorTemp>
+                      <button mat-raised-button type="button" (click)="fileDniMenorTemp.click()">
+                        <mat-icon>attach_file</mat-icon>
+                        Seleccionar
+                      </button>
+                      <span class="archivo-nombre">{{ getNombreArchivoTemp('dniMenor') }}</span>
+                    </div>
+                  </div>
+
+                  <!-- DNI del apoderado -->
+                  <div class="documento-item-participante">
+                    <label class="documento-label">
+                      <span class="numero">2</span>
+                      <span class="titulo">Copia de DNI del apoderado</span>
+                      <span class="obligatorio">*</span>
+                    </label>
+                    <div class="documento-upload">
+                      <input type="file" 
+                             accept=".pdf,.jpg,.jpeg,.png"
+                             hidden
+                             (change)="onFileSelectTemp($event, 'dniApoderado')"
+                             #fileDniApoderadoTemp>
+                      <button mat-raised-button type="button" (click)="fileDniApoderadoTemp.click()">
+                        <mat-icon>attach_file</mat-icon>
+                        Seleccionar
+                      </button>
+                      <span class="archivo-nombre">{{ getNombreArchivoTemp('dniApoderado') }}</span>
+                    </div>
+                  </div>
+
+                  <!-- CONADIS (solo si tiene discapacidad) -->
+                  <div class="documento-item-participante" *ngIf="tieneDiscapacidad">
+                    <label class="documento-label">
+                      <span class="numero">3</span>
+                      <span class="titulo">Copia de Carné CONADIS</span>
+                      <span class="obligatorio">*</span>
+                    </label>
+                    <div class="documento-upload">
+                      <input type="file" 
+                             accept=".pdf,.jpg,.jpeg,.png"
+                             hidden
+                             (change)="onFileSelectTemp($event, 'conadis')"
+                             #fileConadisTemp>
+                      <button mat-raised-button type="button" (click)="fileConadisTemp.click()">
+                        <mat-icon>attach_file</mat-icon>
+                        Seleccionar
+                      </button>
+                      <span class="archivo-nombre">{{ getNombreArchivoTemp('conadis') }}</span>
+                    </div>
+                  </div>
+
+                  <!-- Seguro médico -->
+                  <div class="documento-item-participante">
+                    <label class="documento-label">
+                      <span class="numero">{{ tieneDiscapacidad ? '4' : '3' }}</span>
+                      <span class="titulo">Copia de seguro médico</span>
+                      <span class="obligatorio">*</span>
+                    </label>
+                    <div class="documento-upload">
+                      <input type="file" 
+                             accept=".pdf,.jpg,.jpeg,.png"
+                             hidden
+                             (change)="onFileSelectTemp($event, 'seguroMedico')"
+                             #fileSeguroTemp>
+                      <button mat-raised-button type="button" (click)="fileSeguroTemp.click()">
+                        <mat-icon>attach_file</mat-icon>
+                        Seleccionar
+                      </button>
+                      <span class="archivo-nombre">{{ getNombreArchivoTemp('seguroMedico') }}</span>
+                    </div>
+                  </div>
+
+                  <!-- Declaración Jurada -->
+                  <div class="documento-item-participante">
+                    <label class="documento-label">
+                      <span class="numero">{{ tieneDiscapacidad ? '5' : '4' }}</span>
+                      <span class="titulo">Declaración Jurada firmada</span>
+                      <span class="obligatorio">*</span>
+                    </label>
+                    <div class="documento-upload-especial">
+                      <button mat-raised-button 
+                              color="accent"
+                              type="button"
+                              (click)="generarDeclaracionJuradaFormulario()"
+                              [disabled]="!alumnoForm.get('nombres')?.value || !alumnoForm.get('numeroDocumento')?.value">
+                        <mat-icon>download</mat-icon>
+                        Descargar Plantilla
+                      </button>
+                      <input type="file" 
+                             accept=".pdf"
+                             hidden
+                             (change)="onFileSelectTemp($event, 'declaracionJurada')"
+                             #fileDeclaracionTemp>
+                      <button mat-raised-button type="button" (click)="fileDeclaracionTemp.click()">
+                        <mat-icon>attach_file</mat-icon>
+                        Adjuntar Firmada
+                      </button>
+                      <span class="archivo-nombre">{{ getNombreArchivoTemp('declaracionJurada') }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Botones de Acción del Formulario -->
+            <div class="form-acciones">
+              <!-- Botón Agregar Participante -->
+              <button mat-raised-button 
+                      color="accent"
+                      type="button"
+                      *ngIf="!editandoParticipante"
+                      (click)="agregarParticipante()"
+                      [disabled]="!alumnoForm.valid || modalidadEnvioActual === null || !formularioTieneArchivosDigitalesCompletos()"
+                      class="btn-agregar-participante">
+                Agregar este participante
+              </button>
+
+              <!-- Botones Actualizar y Cancelar -->
+              <div class="botones-edicion" *ngIf="editandoParticipante">
+                <button mat-raised-button 
+                        color="primary"
+                        type="button"
+                        (click)="actualizarParticipante()"
+                        [disabled]="!alumnoForm.valid">
+                  <mat-icon>save</mat-icon>
+                  Actualizar Participante
+                </button>
+                <button mat-raised-button 
+                        type="button"
+                        (click)="cancelarEdicion()">
+                  <mat-icon>cancel</mat-icon>
+                  Cancelar
+                </button>
+              </div>
+            </div>
+
+          </form>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Info: Cuántos participantes hay -->
+      <div class="info-participantes" *ngIf="participantes.length > 0">
+        <mat-icon>info</mat-icon>
+        <span>
+          Ha agregado <strong>{{ participantes.length }}</strong> 
+          {{ participantes.length === 1 ? 'participante' : 'participantes' }}.
+          {{ !editandoParticipante ? 'Puede agregar más o continuar al siguiente paso.' : '' }}
+        </span>
+      </div>
+
+      <!-- Botones Navegación -->
+      <div class="button-row">
+        <button mat-raised-button matStepperPrevious>
+          <mat-icon>arrow_back</mat-icon>
+          Anterior
+        </button>
+        <button mat-raised-button 
+                color="primary" 
+                matStepperNext 
+                [disabled]="!puedeAvanzarPaso2()">
+          Continuar
+          <mat-icon>arrow_forward</mat-icon>
+        </button>
+      </div>
+
+      <!-- Advertencia: Debe agregar al menos 1 participante -->
+      <div class="advertencia-participantes" *ngIf="participantes.length === 0">
+        <mat-icon>warning</mat-icon>
+        <span>Debe agregar al menos un participante para continuar</span>
+      </div>
+
+    </mat-step>
+
+    <!-- ========================================== -->
+    <!-- PASO 3: HORARIOS POR PARTICIPANTE -->
+    <!-- ========================================== -->
+    <mat-step>
+      <ng-template matStepLabel>Asignación de Horarios</ng-template>
+      
+      <!--  HORARIOS AGREGADOS (Cards colapsables arriba) -->
+      <div class="horarios-agregados" *ngIf="horariosAsignados.length > 0">
+        <div class="horarios-header">
+          <h3>
+            Horarios Asignados ({{ horariosAsignados.length }})
+          </h3>
+          <span class="horarios-hint">Haga clic para ver los detalles</span>
+        </div>
+
+        <mat-accordion class="horarios-accordion">
+          <mat-expansion-panel *ngFor="let horario of horariosAsignados" class="horario-panel">
+            <mat-expansion-panel-header>
+              <mat-panel-title>
+                <div class="horario-resumen">
+                  <div class="horario-info">
+                    <span class="horario-participante">{{ horario.participanteNombre }}</span>
+                    <span class="horario-datos">
+                      {{ horario.deporteNombre }} - {{ horario.complejoDeportivoNombre }}
+                    </span>
+                  </div>
+                </div>
+              </mat-panel-title>
+            </mat-expansion-panel-header>
+
+            <div class="horario-detalles">
+              <div class="detalle-row">
+                <div class="detalle-item">
+                  <mat-icon>location_on</mat-icon>
+                  <div>
+                    <strong>Complejo Deportivo:</strong>
+                    <span>{{ horario.complejoDeportivoNombre }}</span>
+                  </div>
+                </div>
+                <div class="detalle-item">
+                  <mat-icon>sports_soccer</mat-icon>
+                  <div>
+                    <strong>Deporte:</strong>
+                    <span>{{ horario.deporteNombre }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="detalle-row">
+                <div class="detalle-item">
+                  <mat-icon>calendar_today</mat-icon>
+                  <div>
+                    <strong>Días:</strong>
+                    <span>{{ horario.horario.dias }}</span>
+                  </div>
+                </div>
+                <div class="detalle-item">
+                  <mat-icon>access_time</mat-icon>
+                  <div>
+                    <strong>Horario:</strong>
+                    <span>{{ horario.horario.horas }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="detalle-row">
+                <div class="detalle-item">
+                  <mat-icon>child_care</mat-icon>
+                  <div>
+                    <strong>Edad:</strong>
+                    <span>{{ horario.horario.edad }}</span>
+                  </div>
+                </div>
+                <div class="detalle-item">
+                  <mat-icon>trending_up</mat-icon>
+                  <div>
+                    <strong>Etapa:</strong>
+                    <span>{{ horario.horario.etapa }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="horario-acciones">
+                <button mat-button color="warn" (click)="eliminarHorario(horario)">
+                  <mat-icon>delete</mat-icon>
+                  Eliminar
+                </button>
+              </div>
+            </div>
+          </mat-expansion-panel>
+        </mat-accordion>
+      </div>
+
+      <div class="paso3-horizontal">
+        
+        <!-- COLUMNA IZQUIERDA: ELIGE UN COMPLEJO DEPORTIVO -->
+        <mat-card class="form-card card-complejo">
+          <mat-card-header>
+            <mat-card-title>ASIGNAR HORARIO A PARTICIPANTE</mat-card-title>
+          </mat-card-header>
+
+          <mat-card-content>
+            <form [formGroup]="sedeDeporteForm">
+              
+              <!--  NUEVO: Selector de Participante -->
+              <mat-form-field appearance="outline" class="field-full">
+                <mat-label>Seleccionar Participante</mat-label>
+                <mat-select formControlName="participante" (selectionChange)="onParticipanteChange()">
+                  <mat-option value="">--Seleccionar--</mat-option>
+                  <mat-option *ngFor="let p of participantes" [value]="p.id">
+                    {{ p.nombres }} {{ p.apellidoPaterno }} {{ p.apellidoMaterno }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+
+              <!--  Los demás campos solo se muestran si hay participante seleccionado -->
+              <div *ngIf="participanteSeleccionadoId">
+                <mat-form-field appearance="outline" class="field-full">
+                  <mat-label>Departamento</mat-label>
+                  <mat-select formControlName="departamento" (selectionChange)="onDepartamentoSedeChange()">
+                    <mat-option value="">--Seleccionar--</mat-option>
+                    <mat-option *ngFor="let dep of departamentosSede" [value]="dep.value">
+                      {{ dep.label }}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="field-full">
+                  <mat-label>Provincia</mat-label>
+                  <mat-select formControlName="provincia" (selectionChange)="onProvinciaSedeChange()">
+                    <mat-option value="">--Seleccionar--</mat-option>
+                    <mat-option *ngFor="let prov of provinciasSede" [value]="prov.value">
+                      {{ prov.label }}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="field-full">
+                  <mat-label>Distrito</mat-label>
+                  <mat-select formControlName="distrito" (selectionChange)="onDistritoSedeChange()">
+                    <mat-option value="">--Seleccionar--</mat-option>
+                    <mat-option *ngFor="let dist of distritosSede" [value]="dist.value">
+                      {{ dist.label }}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="field-full">
+                  <mat-label>Complejo Deportivo</mat-label>
+                  <mat-select formControlName="complejoDeportivo" (selectionChange)="onComplejoDeportivoChange()">
+                    <mat-option value="">--Seleccionar--</mat-option>
+                    <mat-option *ngFor="let complejo of complejosDeportivos" [value]="complejo.value">
+                      {{ complejo.label }}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+
+                <!-- Mapa -->
+                <div class="mapa-container" *ngIf="mapaVisible">
+                  <div class="mapa-info">
+                    <mat-icon>location_on</mat-icon>
+                    <strong>{{ ubicacionComplejo?.nombre }}</strong>
+                  </div>
+                  <div class="mapa-iframe">
+                    <iframe 
+                      width="100%" 
+                      height="250" 
+                      frameborder="0" 
+                      style="border:0"
+                      [src]="getMapaUrl()"
+                      allowfullscreen>
+                    </iframe>
+                  </div>
+                </div>
+              </div>
+
+            </form>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- COLUMNA DERECHA: DEPORTES Y HORARIOS (solo si hay participante seleccionado) -->
+        <mat-card class="form-card card-deportes" *ngIf="participanteSeleccionadoId && sedeDeporteForm.get('complejoDeportivo')?.value">
+          <mat-card-header>
+            <mat-card-title>DEPORTES Y HORARIOS</mat-card-title>
+          </mat-card-header>
+
+          <mat-card-content>
+            <form [formGroup]="sedeDeporteForm">
+              
+              <mat-form-field appearance="outline" class="field-full">
+                <mat-label>Deporte</mat-label>
+                <mat-select formControlName="deporte" (selectionChange)="onDeporteChange()">
+                  <mat-option value="">--Seleccionar--</mat-option>
+                  <mat-option *ngFor="let deporte of deportes" [value]="deporte.value">
+                    {{ deporte.label }}
+                  </mat-option>
+                </mat-select>
+                <mat-error>Campo obligatorio</mat-error>
+              </mat-form-field>
+
+              <!-- Tabla de Horarios -->
+              <div class="horarios-tabla-container" *ngIf="horarios.length > 0">
+                <p class="horarios-titulo">Horarios según la edad del participante con vacantes disponibles:</p>
+                
+                <table class="horarios-tabla">
+                  <thead>
+                    <tr>
+                      <th>EDAD</th>
+                      <th>ETAPA</th>
+                      <th>DÍAS</th>
+                      <th>HORAS</th>
+                      <th>ESCOGER</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let horario of horarios" 
+                        [class.selected]="esHorarioSeleccionado(horario)">
+                      <td>{{ horario.edad }}</td>
+                      <td>{{ horario.etapa }}</td>
+                      <td>{{ horario.dias }}</td>
+                      <td>{{ horario.horas }}</td>
+                      <td class="td-check">
+                        <mat-checkbox 
+                          [checked]="esHorarioSeleccionado(horario)"
+                          (change)="seleccionarHorario(horario, $event)">
+                        </mat-checkbox>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <!--  NUEVO: Botón Agregar Horario -->
+                <div class="btn-agregar-horario-container" *ngIf="tieneHorarioSeleccionado()">
+                  <button mat-raised-button 
+                          color="accent" 
+                          (click)="agregarHorario()"
+                          [disabled]="!sedeDeporteForm.valid || !tieneHorarioSeleccionado()">
+                    <mat-icon>add_circle</mat-icon>
+                    Agregar Horario
+                  </button>
+                </div>
+              </div>
+
+            </form>
+          </mat-card-content>
+        </mat-card>
+
+      </div>
+
+      <div class="button-row">
+        <button mat-raised-button matStepperPrevious>
+          <mat-icon>arrow_back</mat-icon>
+          Anterior
+        </button>
+        <button mat-raised-button 
+                color="accent" 
+                (click)="finalizarPreInscripcion()"
+                [disabled]="!puedeFinalizarInscripcion()">
+          Finalizar Pre-Inscripción
+          <mat-icon>check_circle</mat-icon>
+        </button>
+      </div>
+
+      <!--  Advertencia: Debe asignar horarios -->
+      <div class="advertencia-participantes" *ngIf="horariosAsignados.length === 0">
+        <mat-icon>warning</mat-icon>
+        <span>Debe asignar al menos un horario a un participante para finalizar</span>
+      </div>
+
+    </mat-step>
+
+  </mat-stepper>
+
+  <!-- ========================================== -->
+  <!--  MODALES INFORMATIVOS (UNO POR PARTICIPANTE) -->
+  <!-- ========================================== -->
+  <div class="modal-overlay" *ngIf="mostrarModalInformativo && modalInformativoActual" (click)="$event.stopPropagation()">
+    <div class="modal-contenido">
+      <button class="modal-cerrar" (click)="cerrarModalInformativo()">
+        <mat-icon>close</mat-icon>
+      </button>
+      
+      <div class="modal-icono">
+        <mat-icon>check_circle</mat-icon>
+      </div>
+      
+      <h2 class="modal-titulo">¡Importante!</h2>
+      
+      <div class="modal-mensaje">
+        <p><strong>Su pre-inscripción ha sido registrada exitosamente para {{ modalInformativoActual.modalidad === 'digital' ? 'la' : 'el' }} participante:</strong></p>
+        <p class="participante-nombre-modal">{{ modalInformativoActual.participante.nombres }} {{ modalInformativoActual.participante.apellidoPaterno }} {{ modalInformativoActual.participante.apellidoMaterno }}</p>
+        
+        <div class="modal-seccion">
+          <p><strong>A continuación podrá:</strong></p>
+          
+          <!-- Contenido DIGITAL -->
+          <ul *ngIf="modalInformativoActual.modalidad === 'digital'">
+            <li>Descargar su <strong>Ficha de Pre-inscripción</strong></li>
+          </ul>
+          <p *ngIf="modalInformativoActual.modalidad === 'digital'" class="nota-carnet">
+            <mat-icon>info_outline</mat-icon>
+            Recuerde que para descargar su carnet digital puede realizarlo pasada las 72 horas de haber realizado su Pre-inscripción.
+          </p>
+
+          <!-- Contenido PRESENCIAL -->
+          <ul *ngIf="modalInformativoActual.modalidad === 'presencial'">
+            <li>Descargar su <strong>Ficha de Pre-inscripción</strong> y <strong>Declaración Jurada</strong></li>
+          </ul>
+          <p *ngIf="modalInformativoActual.modalidad === 'presencial'" class="nota-presencial">
+            <mat-icon>info_outline</mat-icon>
+            Recuerde que la validación presencial del programa "Academia IPD Deporte para Todos", debe llevar los documentos requeridos en su sede en los horarios de 8:00 AM a 5:00 PM de lunes a viernes.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!--  CONFIRMACIÓN CON CAROUSEL -->
+  <!-- ========================================== -->
+  <div class="confirmacion-container" *ngIf="mostrarConfirmacion">
+    
+    <div class="confirmacion-grid">
+      
+      <!-- Lado Izquierdo -->
+      <mat-card class="confirmacion-card">
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon class="icon-check">check_circle</mat-icon>
+            PRE-INSCRIPCIÓN CONFIRMADA
+          </mat-card-title>
+        </mat-card-header>
+
+        <mat-card-content>
+          <p class="mensaje-principal">
+            Acaba de realizar <strong>{{ participantes.length }}</strong> 
+            {{ participantes.length === 1 ? 'pre-inscripción' : 'pre-inscripciones' }} 
+            en el programa "Academia IPD Deporte para Todos". 
+            Para descargar su ficha de pre-inscripción y/o declaración jurada, haga clic en los siguientes iconos de cada participante:
+          </p>
+
+          <!--  Lista de participantes con iconos PDF -->
+          <div class="lista-participantes-pdf">
+            <div *ngFor="let participante of participantes; let i = index" class="participante-pdf-item">
+              <div class="participante-pdf-header">
+                <span class="participante-numero">Participante {{ i + 1 }}:</span>
+                <span class="participante-nombre-pdf">{{ participante.nombres }} {{ participante.apellidoPaterno }} {{ participante.apellidoMaterno }}</span>
+              </div>
+              
+              <div class="participante-pdf-cards">
+                <!-- Ficha de Pre-inscripción (TODOS) -->
+                <div class="pdf-card" (click)="generarFichaPreinscripcion(participante)">
+                  <div class="pdf-card-icon">
+                    <mat-icon class="pdf-icon-large">picture_as_pdf</mat-icon>
+                  </div>
+                  <div class="pdf-card-title">Ficha de Pre-inscripción</div>
+                  <div class="pdf-card-subtitle">{{ participante.nombres }} {{ participante.apellidoPaterno }}</div>
+                </div>
+
+                <!-- Declaración Jurada (solo PRESENCIAL) -->
+                <div class="pdf-card" 
+                     *ngIf="participante.modalidadEnvio === 'presencial'"
+                     (click)="generarDeclaracionJurada(participante)">
+                  <div class="pdf-card-icon">
+                    <mat-icon class="pdf-icon-large">picture_as_pdf</mat-icon>
+                  </div>
+                  <div class="pdf-card-title">Declaración Jurada</div>
+                  <div class="pdf-card-subtitle">{{ participante.nombres }} {{ participante.apellidoPaterno }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </mat-card-content>
+      </mat-card>
+
+      <!--  Lado Derecho: CAROUSEL DE FICHAS -->
+      <mat-card class="ficha-card">
+        <mat-card-header>
+          <mat-card-title>
+            FICHA DE PRE-INSCRIPCIÓN
+            <span class="ficha-contador" *ngIf="participantes.length > 1">
+              ({{ fichaActual + 1 }} de {{ participantes.length }})
+            </span>
+          </mat-card-title>
+          <mat-card-subtitle>ACADEMIA IPD TEMPORADA 2026</mat-card-subtitle>
+        </mat-card-header>
+
+        <mat-card-content>
+          <!--  Flechas de navegación -->
+          <div class="carousel-navigation" *ngIf="participantes.length > 1">
+            <button mat-icon-button 
+                    class="carousel-btn carousel-prev" 
+                    (click)="anteriorFicha()"
+                    [disabled]="fichaActual === 0">
+              <mat-icon>chevron_left</mat-icon>
+            </button>
+            <button mat-icon-button 
+                    class="carousel-btn carousel-next" 
+                    (click)="siguienteFicha()"
+                    [disabled]="fichaActual === participantes.length - 1">
+              <mat-icon>chevron_right</mat-icon>
+            </button>
+          </div>
+
+          <!--  Datos de la ficha actual -->
+          <div class="ficha-datos" *ngIf="participantes[fichaActual] as participante">
+            <div class="ficha-item">
+              <strong>Código:</strong>
+              <span>{{ modalesInformativos[fichaActual]?.codigoRegistro || '------' }}</span>
+            </div>
+            <div class="ficha-item">
+              <strong>Nombre:</strong>
+              <span>{{ participante.nombres }}</span>
+            </div>
+            <div class="ficha-item">
+              <strong>Ape. Paterno:</strong>
+              <span>{{ participante.apellidoPaterno }}</span>
+            </div>
+            <div class="ficha-item">
+              <strong>Ape. Materno:</strong>
+              <span>{{ participante.apellidoMaterno }}</span>
+            </div>
+            <div class="ficha-item">
+              <strong>Distrito:</strong>
+              <span>{{ getLabelFromValue(distritos, apoderadoForm.value.distrito) }}</span>
+            </div>
+            <div class="ficha-item">
+              <strong>Domicilio:</strong>
+              <span>{{ apoderadoForm.value.direccion }}</span>
+            </div>
+            <div class="ficha-item">
+              <strong>F.Nacimiento:</strong>
+              <span>{{ formatearFecha(participante.fechaNacimiento) }}</span>
+            </div>
+            <div class="ficha-item">
+              <strong>DNI:</strong>
+              <span>{{ participante.numeroDocumento }}</span>
+            </div>
+            <div class="ficha-item">
+              <strong>Edad:</strong>
+              <span>{{ calcularEdad(participante.fechaNacimiento) }}</span>
+            </div>
+            <div class="ficha-item">
+              <strong>Deporte:</strong>
+              <span>{{ participante.horarioAsignado?.deporteNombre || '-' }}</span>
+            </div>
+            <div class="ficha-item">
+              <strong>Etapa:</strong>
+              <span>{{ participante.horarioAsignado?.horario.etapa || '-' }}</span>
+            </div>
+            <div class="ficha-item">
+              <strong>Complejo:</strong>
+              <span>{{ participante.horarioAsignado?.complejoDeportivoNombre || '-' }}</span>
+            </div>
+            <div class="ficha-item">
+              <strong>Horario:</strong>
+              <span>{{ participante.horarioAsignado?.horario.dias }} de {{ participante.horarioAsignado?.horario.horas }}</span>
+            </div>
+          </div>
+
+          <!-- Indicadores de posición -->
+          <div class="carousel-indicators" *ngIf="participantes.length > 1">
+            <span *ngFor="let p of participantes; let i = index" 
+                  class="indicator" 
+                  [class.active]="i === fichaActual"
+                  (click)="fichaActual = i">
+            </span>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+    </div>
+
+  </div>
+
+</div>

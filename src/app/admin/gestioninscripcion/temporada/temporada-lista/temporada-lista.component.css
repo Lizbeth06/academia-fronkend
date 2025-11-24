@@ -1,0 +1,176 @@
+.page-container {
+  max-width: 1200px;
+  margin: 0 auto 32px;
+  padding: 0 16px;
+}
+
+.title {
+  text-align: center;
+  margin: 24px 0;
+  font-size: 22px;
+  font-weight: 600;
+}
+
+/* Header Section */
+.header-section {
+  text-align: center;
+  margin-bottom: 30px;
+  padding: 20px 15px;
+  border-radius: 12px;
+  color: white;
+  position: relative;
+  overflow: hidden;
+
+  /* Gradiente brillante con colores corporativos */
+  background: linear-gradient(
+    135deg,
+    #ff704a 0%,     /* naranja brillante */
+    #cb532e 25%,    /* color base naranja */
+    #542394 75%,    /* color base morado */
+    #7b4bf0 100%    /* morado brillante para glow */
+  );
+
+  /* Halo extremo con sombra difusa */
+  box-shadow: 
+    0 0 150px rgba(255, 255, 255, 0.6),
+    0 0 300px rgba(255, 255, 255, 0.35),
+    0 4px 25px rgba(0, 0, 0, 0.15);
+
+  /* Animación de luz viva */
+  background-size: 200% 200%;
+  animation: cinematicShine 4.5s ease-in-out infinite, pulseGlow 6s ease-in-out infinite;
+}
+
+/* Movimiento de gradiente para efecto de luz dinámica */
+@keyframes cinematicShine {
+  0% { background-position: 0% 50%; }
+  25% { background-position: 50% 50%; }
+  50% { background-position: 100% 50%; }
+  75% { background-position: 50% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Pulso de brillo sutil para efecto cinematográfico */
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 
+    0 0 150px rgba(255, 255, 255, 0.6),
+    0 0 300px rgba(255, 255, 255, 0.35),
+    0 4px 25px rgba(0, 0, 0, 0.15); }
+  50% { box-shadow: 
+    0 0 180px rgba(255, 255, 255, 0.8),
+    0 0 350px rgba(255, 255, 255, 0.5),
+    0 4px 25px rgba(0, 0, 0, 0.15); }
+}
+
+/* Tarjeta informativa moderna */
+.info-banner {
+  background: #fff4c7; /* Amarillo cálido suave */
+  padding: 12px 18px;
+  margin: 15px auto 25px auto;
+  max-width: 900px;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+
+/* Cards */
+.card {
+  background: #ffffff;
+  padding: 16px 20px 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  margin-bottom: 24px;
+}
+
+/* Grid del formulario */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+mat-form-field {
+  width: 100%;
+}
+
+/* Botones */
+.actions {
+  margin-top: 16px;
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.subtitle {
+  margin: 0 0 12px 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+/* Tabla */
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.subtitle-1 {
+  font-size: 18px; 
+  font-weight: 600;
+  text-align: center;
+  margin: 0 0 10px 0;
+  color: #333;
+}
+.subtitle {
+  font-size: 18px;
+  font-weight: 600;
+  text-align: center;
+  margin: 0 0 15px 0;
+  color: #333;
+}
+
+.tabla thead {
+  background: #f5f5f5;
+}
+
+.tabla th,
+.tabla td {
+  padding: 8px 10px;
+  border-bottom: 1px solid #e0e0e0;
+  text-align: left;
+}
+
+.tabla tr:last-child td {
+  border-bottom: none;
+}
+
+.acciones-col {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  align-items: center;
+}
+
+
+/* Responsive */
+@media (max-width: 900px) {
+  .form-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .actions button {
+    width: 100%;
+  }
+}

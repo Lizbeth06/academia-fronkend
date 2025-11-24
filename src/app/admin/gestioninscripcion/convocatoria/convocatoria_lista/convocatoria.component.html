@@ -1,233 +1,540 @@
 <div class="convocatoria-container">
   
-  <!-- Header -->
+  <!-- Header Compacto -->
   <div class="header-section">
     <h1 class="titulo-principal">CONVOCATORIAS ABIERTAS</h1>
     <p class="subtitulo">Encuentra oportunidades para formar parte de nuestra comunidad deportiva</p>
   </div>
 
-  <!-- Barra de búsqueda y filtros -->
-  <div class="search-filter-section">
-    
-    <!-- Buscador principal -->
-    <div class="search-container">
-      <mat-form-field appearance="outline" class="search-field">
-        <mat-label>Buscar convocatorias</mat-label>
-        <input matInput 
-               [(ngModel)]="busqueda" 
-               (ngModelChange)="aplicarFiltros()"
-               placeholder="Título, organización, descripción...">
-        <mat-icon matPrefix>search</mat-icon>
-        <button mat-icon-button matSuffix *ngIf="busqueda" (click)="busqueda=''; aplicarFiltros()">
-          <mat-icon>close</mat-icon>
-        </button>
-      </mat-form-field>
+  <!-- ========================================== -->
+  <!-- MODO USUARIO: Vista de convocatorias -->
+  <!-- ========================================== -->
+  <div *ngIf="!modoGestion">
 
-      <!-- Botón toggle filtros -->
-      <button mat-raised-button 
-              color="primary" 
-              class="btn-filtros"
-              (click)="toggleFiltros()">
-        <mat-icon>filter_list</mat-icon>
-        {{ mostrarFiltros ? 'Ocultar Filtros' : 'Mostrar Filtros' }}
+    <!-- Barra de búsqueda y filtros -->
+    <div class="search-filter-section">
+      
+      <!-- Buscador principal -->
+      <div class="search-container">
+        <mat-form-field appearance="outline" class="search-field">
+          <mat-label>Buscar convocatorias</mat-label>
+          <input matInput 
+                 [(ngModel)]="busqueda" 
+                 (ngModelChange)="aplicarFiltros()"
+                 placeholder="Título, organización, descripción...">
+          <mat-icon matPrefix>search</mat-icon>
+          <button mat-icon-button matSuffix *ngIf="busqueda" (click)="busqueda=''; aplicarFiltros()">
+            <mat-icon>close</mat-icon>
+          </button>
+        </mat-form-field>
+
+        <!-- Botón toggle filtros -->
+        <button mat-raised-button 
+                color="primary" 
+                class="btn-filtros"
+                (click)="toggleFiltros()">
+          <mat-icon>filter_list</mat-icon>
+          {{ mostrarFiltros ? 'Ocultar Filtros' : 'Mostrar Filtros' }}
+        </button>
+      </div>
+
+      <!-- Panel de filtros ACTUALIZADO -->
+      <div class="filtros-panel" [class.expanded]="mostrarFiltros">
+        <div class="filtros-grid">
+          
+          <!-- Filtro Región -->
+          <mat-form-field appearance="outline">
+            <mat-label>Región</mat-label>
+            <mat-select [(ngModel)]="regionSeleccionada" (ngModelChange)="aplicarFiltros()">
+              <mat-option value="">Todas las regiones</mat-option>
+              <mat-option *ngFor="let region of regiones" [value]="region">
+                {{ region }}
+              </mat-option>
+            </mat-select>
+            <mat-icon matPrefix>location_on</mat-icon>
+          </mat-form-field>
+
+          <!-- Filtro Sede -->
+          <mat-form-field appearance="outline">
+            <mat-label>Sede</mat-label>
+            <mat-select [(ngModel)]="sedeSeleccionada" (ngModelChange)="aplicarFiltros()">
+              <mat-option value="">Todas las sedes</mat-option>
+              <mat-option *ngFor="let sede of sedes" [value]="sede">
+                {{ sede }}
+              </mat-option>
+            </mat-select>
+            <mat-icon matPrefix>stadium</mat-icon>
+          </mat-form-field>
+
+          <!-- Filtro Deporte (NUEVO) -->
+          <mat-form-field appearance="outline">
+            <mat-label>Deporte</mat-label>
+            <mat-select [(ngModel)]="deporteSeleccionado" (ngModelChange)="aplicarFiltros()">
+              <mat-option value="">Todos los deportes</mat-option>
+              <mat-option *ngFor="let deporte of deportes" [value]="deporte">
+                {{ deporte }}
+              </mat-option>
+            </mat-select>
+            <mat-icon matPrefix>sports_soccer</mat-icon>
+          </mat-form-field>
+
+          <!-- Filtro Tipo Convocatoria (NUEVO) -->
+          <mat-form-field appearance="outline">
+            <mat-label>Tipo Convocatoria</mat-label>
+            <mat-select [(ngModel)]="tipoSeleccionado" (ngModelChange)="aplicarFiltros()">
+              <mat-option value="">Todos los tipos</mat-option>
+              <mat-option *ngFor="let tipo of tiposConvocatoria" [value]="tipo.value">
+                {{ tipo.label }}
+              </mat-option>
+            </mat-select>
+            <mat-icon matPrefix>category</mat-icon>
+          </mat-form-field>
+
+          <!-- Botón limpiar -->
+          <button mat-raised-button 
+                  class="btn-limpiar"
+                  (click)="limpiarFiltros()">
+            <mat-icon>clear_all</mat-icon>
+            Limpiar Filtros
+          </button>
+        </div>
+      </div>
+
+      <!-- Resultados y Gestionar -->
+      <div class="resultados-row">
+        <div class="resultados-info">
+          <strong>{{ totalConvocatorias }}</strong> 
+          {{ totalConvocatorias === 1 ? 'convocatoria encontrada' : 'convocatorias encontradas' }}
+        </div>
+        <button mat-raised-button 
+                color="primary"
+                class="btn-gestionar"
+                (click)="toggleModoGestion()">
+          <mat-icon>settings</mat-icon>
+          Gestionar Convocatorias
+        </button>
+      </div>
+    </div>
+
+    <!-- Loader -->
+    <div *ngIf="cargando" class="loader-container">
+      <mat-spinner diameter="50"></mat-spinner>
+      <p>Cargando convocatorias...</p>
+    </div>
+
+    <!-- Grid de Convocatorias - 3 POR FILA -->
+    <div *ngIf="!cargando && totalConvocatorias > 0" class="convocatorias-home-grid">
+      
+      <mat-card 
+        *ngFor="let conv of convocatoriasPaginadas" 
+        class="convocatoria-card-home"
+        [@fadeIn]>
+        
+        <!-- Imagen de cabecera CON OVERLAY -->
+        <div class="card-image-container">
+          <img 
+            mat-card-image 
+            [src]="conv.urlimagen" 
+            [alt]="conv.titulo"
+            onerror="this.src='assets/images/placeholder-convocatoria.jpg'">
+          
+          <!-- Badge de estado -->
+          <div class="estado-badge" [ngClass]="getEstadoClass(conv.estado)">
+            <mat-icon class="estado-icon">
+              {{ conv.estado === 'activa' ? 'check_circle' : 'cancel' }}
+            </mat-icon>
+            {{ getEstadoTexto(conv.estado) }}
+          </div>
+
+          <!-- Badge de tipo -->
+          <div class="tipo-badge" [ngClass]="getTipoClass(conv.tipo)">
+            {{ getTipoTexto(conv.tipo) }}
+          </div>
+
+          <!-- Overlay con acciones (aparece al hover) -->
+          <div class="card-overlay">
+            <button mat-mini-fab color="primary" (click)="verPreview(conv)"
+                    matTooltip="Ver detalles">
+              <mat-icon>visibility</mat-icon>
+            </button>
+            <button mat-mini-fab color="accent" (click)="compartir(conv)"
+                    matTooltip="Compartir">
+              <mat-icon>share</mat-icon>
+            </button>
+          </div>
+        </div>
+
+        <!-- Contenido -->
+        <mat-card-content>
+          <h3 class="card-title">{{ conv.titulo }}</h3>
+          <p class="card-organizacion">
+            <mat-icon class="org-icon">business</mat-icon>
+            {{ conv.subtitulo }}
+          </p>
+
+          <!-- Información básica con chips -->
+          <div class="card-info-compact">
+            <div class="info-chip">
+              <mat-icon>place</mat-icon>
+              <span>{{ conv.sede }}</span>
+            </div>
+            <div class="info-chip">
+              <mat-icon>sports_soccer</mat-icon>
+              <span>{{ conv.deporte }}</span>
+            </div>
+            <div class="info-chip" *ngIf="conv.frecuencia">
+              <mat-icon>schedule</mat-icon>
+              <span>{{ conv.frecuencia }}</span>
+            </div>
+          </div>
+
+          <!-- Cupos con barra de progreso -->
+          <div class="cupos-container-compact">
+            <div class="cupos-header">
+              <span class="cupos-label">Cupos disponibles</span>
+              <span class="cupos-number">
+                <strong>{{ conv.numdisponibles }}</strong> / {{ conv.numvacantes }}
+              </span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill" 
+                   [style.width.%]="getPorcentajeCupos(conv)"
+                   [ngClass]="{
+                     'progress-low': getPorcentajeCupos(conv) < 50,
+                     'progress-medium': getPorcentajeCupos(conv) >= 50 && getPorcentajeCupos(conv) < 80,
+                     'progress-high': getPorcentajeCupos(conv) >= 80
+                   }">
+              </div>
+            </div>
+          </div>
+
+          <!-- Botón de inscripción -->
+          <button mat-raised-button 
+                  color="primary" 
+                  class="btn-inscribir"
+                  (click)="inscribirse(conv)"
+                  [disabled]="conv.estado !== 'activa' || conv.numdisponibles === 0">
+            <mat-icon>how_to_reg</mat-icon>
+            {{ conv.estado === 'activa' && conv.numdisponibles > 0 ? 'Inscribirse Ahora' : 'No disponible' }}
+          </button>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Paginador EN ESPAÑOL -->
+    <div *ngIf="!cargando && totalConvocatorias > 0" class="paginador-container">
+      <mat-paginator 
+        [length]="totalConvocatorias"
+        [pageSize]="pageSize"
+        [pageSizeOptions]="pageSizeOptions"
+        [pageIndex]="pageIndex"
+        (page)="onPageChange($event)"
+        [showFirstLastButtons]="true">
+      </mat-paginator>
+    </div>
+
+    <!-- Sin resultados -->
+    <div *ngIf="!cargando && totalConvocatorias === 0" class="no-results">
+      <mat-icon>search_off</mat-icon>
+      <h3>No se encontraron convocatorias</h3>
+      <p>Intenta ajustar los filtros de búsqueda</p>
+      <button mat-raised-button color="primary" (click)="limpiarFiltros()">
+        Limpiar filtros
       </button>
     </div>
 
-    <!-- Panel de filtros -->
-    <div class="filtros-panel" [class.expanded]="mostrarFiltros">
-      <div class="filtros-grid">
-        
-        <!-- Filtro por Región -->
-        <mat-form-field appearance="outline">
-          <mat-label>Región</mat-label>
-          <mat-select [(ngModel)]="regionSeleccionada" (ngModelChange)="aplicarFiltros()">
-            <mat-option value="">Todas las regiones</mat-option>
-            <mat-option *ngFor="let region of regiones" [value]="region">
-              {{ region }}
-            </mat-option>
-          </mat-select>
-          <mat-icon matPrefix>location_on</mat-icon>
-        </mat-form-field>
+  </div>
 
-        <!-- Filtro por Sede -->
-        <mat-form-field appearance="outline">
-          <mat-label>Sede</mat-label>
-          <mat-select [(ngModel)]="sedeSeleccionada" (ngModelChange)="aplicarFiltros()">
-            <mat-option value="">Todas las sedes</mat-option>
-            <mat-option *ngFor="let sede of sedes" [value]="sede">
-              {{ sede }}
-            </mat-option>
-          </mat-select>
-          <mat-icon matPrefix>stadium</mat-icon>
-        </mat-form-field>
+  <!-- ========================================== -->
+  <!-- MODO GESTIÓN -->
+  <!-- ========================================== -->
+  <div *ngIf="modoGestion" class="gestion-container">
 
-        <!-- Filtro por Estado -->
-        <mat-form-field appearance="outline">
-          <mat-label>Estado</mat-label>
-          <mat-select [(ngModel)]="estadoSeleccionado" (ngModelChange)="aplicarFiltros()">
-            <mat-option value="">Todos los estados</mat-option>
-            <mat-option *ngFor="let estado of estados" [value]="estado.value">
-              {{ estado.label }}
-            </mat-option>
-          </mat-select>
-          <mat-icon matPrefix>info</mat-icon>
-        </mat-form-field>
-
-        <!-- Filtro fecha desde -->
-        <mat-form-field appearance="outline">
-          <mat-label>Fecha inicio desde</mat-label>
-          <input matInput 
-                 [matDatepicker]="pickerInicio" 
-                 [(ngModel)]="fechaInicioFiltro"
-                 (ngModelChange)="aplicarFiltros()">
-          <mat-datepicker-toggle matSuffix [for]="pickerInicio"></mat-datepicker-toggle>
-          <mat-datepicker #pickerInicio></mat-datepicker>
-        </mat-form-field>
-
-        <!-- Filtro fecha hasta -->
-        <mat-form-field appearance="outline">
-          <mat-label>Fecha fin hasta</mat-label>
-          <input matInput 
-                 [matDatepicker]="pickerFin" 
-                 [(ngModel)]="fechaFinFiltro"
-                 (ngModelChange)="aplicarFiltros()">
-          <mat-datepicker-toggle matSuffix [for]="pickerFin"></mat-datepicker-toggle>
-          <mat-datepicker #pickerFin></mat-datepicker>
-        </mat-form-field>
-
-        <!-- Botón limpiar filtros -->
+    <div class="gestion-header">
+      <h2>Gestión de Convocatorias</h2>
+      <div class="gestion-buttons">
         <button mat-raised-button 
-                class="btn-limpiar"
-                (click)="limpiarFiltros()">
-          <mat-icon>clear_all</mat-icon>
-          Limpiar Filtros
+                color="accent"
+                (click)="toggleModoGestion()">
+          <mat-icon>visibility</mat-icon>
+          Ver Convocatorias
+        </button>
+        <button mat-raised-button 
+                color="primary"
+                (click)="abrirFormularioNueva()">
+          <mat-icon>add</mat-icon>
+          Nueva Convocatoria
         </button>
       </div>
     </div>
 
-    <!-- Resultados encontrados -->
-    <div class="resultados-info">
-      <p>
-        <strong>{{ convocatoriasFiltradas.length }}</strong> 
-        {{ convocatoriasFiltradas.length === 1 ? 'convocatoria encontrada' : 'convocatorias encontradas' }}
-      </p>
+    <div class="tabla-gestion">
+      <table mat-table [dataSource]="convocatorias" class="mat-elevation-z2">
+
+        <ng-container matColumnDef="numero">
+          <th mat-header-cell *matHeaderCellDef>N°</th>
+          <td mat-cell *matCellDef="let conv; let i = index">{{ i + 1 }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="titulo">
+          <th mat-header-cell *matHeaderCellDef>Título</th>
+          <td mat-cell *matCellDef="let conv">{{ conv.titulo }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="subtitulo">
+          <th mat-header-cell *matHeaderCellDef>Subtítulo</th>
+          <td mat-cell *matCellDef="let conv">{{ conv.subtitulo }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="region">
+          <th mat-header-cell *matHeaderCellDef>Región</th>
+          <td mat-cell *matCellDef="let conv">{{ conv.region }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="sede">
+          <th mat-header-cell *matHeaderCellDef>Sede</th>
+          <td mat-cell *matCellDef="let conv">{{ conv.sede }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="deporte">
+          <th mat-header-cell *matHeaderCellDef>Deporte</th>
+          <td mat-cell *matCellDef="let conv">{{ conv.deporte }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="numdisponibles">
+          <th mat-header-cell *matHeaderCellDef>Disponibles</th>
+          <td mat-cell *matCellDef="let conv">{{ conv.numdisponibles }}/{{ conv.numvacantes }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="estado">
+          <th mat-header-cell *matHeaderCellDef>Estado</th>
+          <td mat-cell *matCellDef="let conv">
+            <span class="badge-estado" [ngClass]="getEstadoClass(conv.estado)">
+              {{ getEstadoTexto(conv.estado) }}
+            </span>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="acciones">
+          <th mat-header-cell *matHeaderCellDef>Acciones</th>
+          <td mat-cell *matCellDef="let conv">
+            <button mat-icon-button matTooltip="Ver preview" (click)="verPreview(conv)">
+              <mat-icon>visibility</mat-icon>
+            </button>
+            <button mat-icon-button color="primary" matTooltip="Editar" (click)="editarConvocatoria(conv)">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button mat-icon-button color="warn" matTooltip="Eliminar" (click)="eliminarConvocatoria(conv)">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="columnasTabla"></tr>
+        <tr mat-row *matRowDef="let row; columns: columnasTabla;"></tr>
+      </table>
     </div>
   </div>
 
-  <!-- Loader -->
-  <div *ngIf="cargando" class="loader-container">
-    <mat-spinner></mat-spinner>
-    <p>Cargando convocatorias...</p>
-  </div>
-
-  <!-- Grid de Convocatorias -->
-  <div *ngIf="!cargando" class="convocatorias-grid">
-    
-    <!-- Tarjeta de convocatoria -->
-    <mat-card *ngFor="let conv of convocatoriasFiltradas" class="convocatoria-card">
-      
-      <!-- Imagen de cabecera -->
-      <div class="card-image-container">
-        <img mat-card-image 
-             [src]="conv.imagen" 
-             [alt]="conv.titulo"
-             onerror="this.src='assets/images/placeholder-convocatoria.jpg'">
-        
-        <!-- Badge de estado -->
-        <div class="estado-badge" [ngClass]="getEstadoClass(conv.estado)">
-          {{ getEstadoTexto(conv.estado) }}
-        </div>
+  <!-- ========================================== -->
+  <!-- MODAL FORMULARIO CON UPLOAD DE IMAGEN -->
+  <!-- ========================================== -->
+  <div class="modal-overlay-fullscreen" *ngIf="mostrarFormulario" (click)="cerrarFormulario()">
+    <div class="modal-formulario" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>{{ modoEdicion ? 'Editar Convocatoria' : 'Nueva Convocatoria' }}</h2>
+        <button mat-icon-button (click)="cerrarFormulario()">
+          <mat-icon>close</mat-icon>
+        </button>
       </div>
 
-      <!-- Contenido de la tarjeta -->
-      <mat-card-content>
-        
-        <!-- Título -->
-        <h3 class="card-title">{{ conv.titulo }}</h3>
-        
-        <!-- Organización -->
-        <p class="card-organizacion">{{ conv.organizacion }}</p>
+      <div class="modal-body">
+        <form class="formulario-convocatoria">
 
-        <!-- Información con íconos -->
-        <div class="card-info">
-          
-          <!-- Fechas -->
-          <div class="info-item">
-            <mat-icon>event</mat-icon>
-            <span>Del {{ conv.fechaInicio | date:'dd \'de\' MMMM' }} al {{ conv.fechaFin | date:'dd \'de\' MMMM' }}</span>
-          </div>
+          <!-- Título -->
+          <mat-form-field appearance="outline" class="field-full">
+            <mat-label>Título *</mat-label>
+            <input matInput [(ngModel)]="nuevaConvocatoria.titulo" name="titulo" required>
+            <mat-error *ngIf="erroresFormulario['titulo']">El título es obligatorio</mat-error>
+          </mat-form-field>
 
-          <!-- Horario -->
-          <div class="info-item">
-            <mat-icon>schedule</mat-icon>
-            <span>{{ conv.horario }}</span>
-          </div>
+          <!-- Subtítulo -->
+          <mat-form-field appearance="outline" class="field-full">
+            <mat-label>Subtítulo *</mat-label>
+            <input matInput [(ngModel)]="nuevaConvocatoria.subtitulo" name="subtitulo" required>
+            <mat-error *ngIf="erroresFormulario['subtitulo']">El subtítulo es obligatorio</mat-error>
+          </mat-form-field>
 
-          <!-- Ubicación -->
-          <div class="info-item">
-            <mat-icon>place</mat-icon>
-            <span>{{ conv.ubicacion }}</span>
-          </div>
-        </div>
+          <!-- Descripción -->
+          <mat-form-field appearance="outline" class="field-full">
+            <mat-label>Descripción *</mat-label>
+            <textarea matInput [(ngModel)]="nuevaConvocatoria.descripcion" name="descripcion" rows="3" required></textarea>
+            <mat-error *ngIf="erroresFormulario['descripcion']">La descripción es obligatoria</mat-error>
+          </mat-form-field>
 
-        <!-- Cupos disponibles -->
-        <div class="cupos-container">
-          <div class="cupos-info">
-            <strong>Cupos disponibles: {{ conv.cuposDisponibles }}</strong>
-            <span class="cupos-total">de {{ conv.cuposTotales }}</span>
-          </div>
-          
-          <!-- Barra de progreso -->
-          <div class="progress-bar">
-            <div class="progress-fill" 
-                 [style.width.%]="getPorcentajeCupos(conv)"
-                 [ngClass]="{
-                   'progress-low': getPorcentajeCupos(conv) < 50,
-                   'progress-medium': getPorcentajeCupos(conv) >= 50 && getPorcentajeCupos(conv) < 80,
-                   'progress-high': getPorcentajeCupos(conv) >= 80
-                 }">
+          <!-- Upload de Imagen -->
+          <div class="upload-container">
+            <label class="upload-label">Imagen de la Convocatoria</label>
+            <input type="file" 
+                   id="fileUpload" 
+                   accept="image/*" 
+                   (change)="onImagenSeleccionada($event)" 
+                   hidden 
+                   #fileInput>
+            <button mat-raised-button 
+                    type="button" 
+                    color="primary"
+                    (click)="fileInput.click()"
+                    class="btn-upload">
+              <mat-icon>cloud_upload</mat-icon>
+              {{ imagenPreview ? 'Cambiar Imagen' : 'Seleccionar Imagen' }}
+            </button>
+            
+            <!-- Preview de imagen -->
+            <div class="imagen-preview" *ngIf="imagenPreview">
+              <img [src]="imagenPreview" alt="Preview">
+              <button mat-icon-button 
+                      class="btn-eliminar-imagen"
+                      (click)="imagenPreview = ''; imagenSeleccionada = null; nuevaConvocatoria.urlimagen = ''"
+                      matTooltip="Eliminar imagen">
+                <mat-icon>close</mat-icon>
+              </button>
             </div>
           </div>
-        </div>
 
-      </mat-card-content>
+          <!-- Cupos -->
+          <div class="seccion-titulo">Cupos</div>
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="field-half">
+              <mat-label>Vacantes *</mat-label>
+              <input matInput type="number" [(ngModel)]="nuevaConvocatoria.numvacantes" name="numvacantes" min="1" required>
+              <mat-error *ngIf="erroresFormulario['numvacantes']">Debe ser mayor a 0</mat-error>
+            </mat-form-field>
 
-      <!-- Acciones -->
-      <mat-card-actions class="card-actions">
-        
-        <!-- Botón principal: Inscribirme -->
-        <button mat-raised-button 
-                color="accent" 
-                class="btn-inscribirse"
-                [disabled]="conv.estado !== 'activa' || conv.cuposDisponibles === 0"
-                (click)="inscribirse(conv)">
-          <mat-icon>how_to_reg</mat-icon>
-          {{ conv.estado === 'activa' ? 'Inscribirme' : 'No disponible' }}
+            <mat-form-field appearance="outline" class="field-half">
+              <mat-label>Disponibles *</mat-label>
+              <input matInput type="number" [(ngModel)]="nuevaConvocatoria.numdisponibles" name="numdisponibles" min="0" required>
+              <mat-error *ngIf="erroresFormulario['numdisponibles']">No puede ser negativo</mat-error>
+            </mat-form-field>
+          </div>
+
+        </form>
+      </div>
+
+      <div class="modal-footer">
+        <button mat-raised-button (click)="cerrarFormulario()">Cancelar</button>
+        <button mat-raised-button color="primary" (click)="guardarConvocatoria()">
+          {{ modoEdicion ? 'Actualizar' : 'Guardar' }}
         </button>
-
-        <!-- Botón secundario: Ver detalles -->
-        <button mat-stroked-button 
-                class="btn-compartir"
-                matTooltip="Compartir"
-                (click)="compartir(conv)">
-          <mat-icon>share</mat-icon>
-          Compartir
-        </button>
-
-      </mat-card-actions>
-
-    </mat-card>
-
+      </div>
+    </div>
   </div>
 
-  <!-- Mensaje cuando no hay resultados -->
-  <div *ngIf="!cargando && convocatoriasFiltradas.length === 0" class="no-results">
-    <mat-icon>search_off</mat-icon>
-    <h3>No se encontraron convocatorias</h3>
-    <p>Intenta ajustar los filtros de búsqueda</p>
-    <button mat-raised-button color="primary" (click)="limpiarFiltros()">
-      Limpiar filtros
-    </button>
+  <!-- ========================================== -->
+  <!-- MODAL PREVIEW -->
+  <!-- ========================================== -->
+  <div class="modal-overlay-fullscreen" *ngIf="mostrarPreview" (click)="cerrarPreview()">
+    <div class="modal-preview" (click)="$event.stopPropagation()">
+      <button class="btn-cerrar-preview" (click)="cerrarPreview()">
+        <mat-icon>close</mat-icon>
+      </button>
+
+      <h2 class="preview-titulo">Vista Previa</h2>
+
+      <mat-card class="convocatoria-card-home" *ngIf="convocatoriaPreview">
+        <div class="card-image-container">
+          <img mat-card-image [src]="convocatoriaPreview.urlimagen" [alt]="convocatoriaPreview.titulo">
+          <div class="estado-badge" [ngClass]="getEstadoClass(convocatoriaPreview.estado)">
+            <mat-icon class="estado-icon">
+              {{ convocatoriaPreview.estado === 'activa' ? 'check_circle' : 'cancel' }}
+            </mat-icon>
+            {{ getEstadoTexto(convocatoriaPreview.estado) }}
+          </div>
+          <div class="tipo-badge" [ngClass]="getTipoClass(convocatoriaPreview.tipo)">
+            {{ getTipoTexto(convocatoriaPreview.tipo) }}
+          </div>
+        </div>
+
+        <mat-card-content>
+          <h3 class="card-title">{{ convocatoriaPreview.titulo }}</h3>
+          <p class="card-organizacion">
+            <mat-icon class="org-icon">business</mat-icon>
+            {{ convocatoriaPreview.subtitulo }}
+          </p>
+
+          <div class="card-info-compact">
+            <div class="info-chip">
+              <mat-icon>place</mat-icon>
+              <span>{{ convocatoriaPreview.sede }}</span>
+            </div>
+            <div class="info-chip">
+              <mat-icon>sports_soccer</mat-icon>
+              <span>{{ convocatoriaPreview.deporte }}</span>
+            </div>
+            <div class="info-chip" *ngIf="convocatoriaPreview.frecuencia">
+              <mat-icon>schedule</mat-icon>
+              <span>{{ convocatoriaPreview.frecuencia }}</span>
+            </div>
+          </div>
+
+          <div class="cupos-container-compact">
+            <div class="cupos-header">
+              <span class="cupos-label">Cupos disponibles</span>
+              <span class="cupos-number">
+                <strong>{{ convocatoriaPreview.numdisponibles }}</strong> / {{ convocatoriaPreview.numvacantes }}
+              </span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill" 
+                   [style.width.%]="getPorcentajeCupos(convocatoriaPreview)"
+                   [ngClass]="{
+                     'progress-low': getPorcentajeCupos(convocatoriaPreview) < 50,
+                     'progress-medium': getPorcentajeCupos(convocatoriaPreview) >= 50 && getPorcentajeCupos(convocatoriaPreview) < 80,
+                     'progress-high': getPorcentajeCupos(convocatoriaPreview) >= 80
+                   }">
+              </div>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODAL CONFIRMACIÓN PERSONALIZADO -->
+  <!-- ========================================== -->
+  <div class="modal-overlay-fullscreen" *ngIf="mostrarConfirmacion">
+    <div class="modal-confirmacion">
+      <div class="confirmacion-header">
+        <mat-icon class="icono-confirmacion">help_outline</mat-icon>
+        <h2>{{ tituloConfirmacion }}</h2>
+      </div>
+      
+      <div class="confirmacion-body">
+        <p>{{ mensajeConfirmacion }}</p>
+      </div>
+      
+      <div class="confirmacion-footer">
+        <button mat-raised-button (click)="cancelarConfirmacion()">
+          Cancelar
+        </button>
+        <button mat-raised-button color="warn" (click)="confirmarAccion()">
+          Confirmar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MENSAJE CENTRAL (Success/Error/Loading) -->
+  <!-- ========================================== -->
+  <div class="mensaje-central-overlay" *ngIf="mostrarMensajeCentral">
+    <div class="mensaje-central" [ngClass]="'mensaje-' + tipoMensaje">
+      <mat-spinner *ngIf="tipoMensaje === 'loading'" diameter="40" class="spinner-central"></mat-spinner>
+      <mat-icon *ngIf="tipoMensaje === 'success'" class="icono-central">check_circle</mat-icon>
+      <mat-icon *ngIf="tipoMensaje === 'error'" class="icono-central">error</mat-icon>
+      <p class="texto-central">{{ textoMensaje }}</p>
+    </div>
   </div>
 
 </div>

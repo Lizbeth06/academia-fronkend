@@ -1,5 +1,4 @@
 import { Routes } from '@angular/router';
-import { PreInscripcionComponent } from './preinscripcion/pre-inscripcion/pre-inscripcion.component';
 import { ConvocatoriaComponent } from './convocatoria/convocatoria_lista/convocatoria.component';
 import { DisciplinasListaComponent } from './disciplinas/disciplinas-lista/disciplinas-lista.component';
 import { HorariosListaComponent } from './horarios/horarios-lista/horarios-lista.component';
@@ -7,7 +6,7 @@ import { SedesListaComponent } from './sedes/sedes-lista/sedes-lista.component';
 import { ValidacioninscripcionListaComponent } from './validacioninscripcion/validacioninscripcion-lista/validacioninscripcion-lista.component';
 import { TurnosListaComponent } from './turnos/turnos-lista/turnos-lista.component';
 import { TemporadaListaComponent } from './temporada/temporada-lista/temporada-lista.component';
-
+import { PreInscripcionComponent } from './preinscripcion/preinscripcion-lista/preinscripcion-lista.component';
 
 export const inscripcionRoutes: Routes = [
 
@@ -63,9 +62,6 @@ export const inscripcionRoutes: Routes = [
         component: TemporadaListaComponent, 
         title: 'temporada'
     },
-    
-
-
-
+  
 
  ]

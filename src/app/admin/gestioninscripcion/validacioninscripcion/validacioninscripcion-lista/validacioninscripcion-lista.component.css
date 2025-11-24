@@ -1,0 +1,321 @@
+:root {
+  --grad1: #cb532e;
+  --grad2: #542394;
+}
+
+/* Header Section */
+.header-section {
+  text-align: center;
+  margin-bottom: 30px;
+  padding: 20px 15px;
+  border-radius: 12px;
+  color: white;
+  position: relative;
+  overflow: hidden;
+
+  /* Gradiente brillante con colores corporativos */
+  background: linear-gradient(
+    135deg,
+    #ff704a 0%,     /* naranja brillante */
+    #cb532e 25%,    /* color base naranja */
+    #542394 75%,    /* color base morado */
+    #7b4bf0 100%    /* morado brillante para glow */
+  );
+
+  /* Halo extremo con sombra difusa */
+  box-shadow: 
+    0 0 150px rgba(255, 255, 255, 0.6),
+    0 0 300px rgba(255, 255, 255, 0.35),
+    0 4px 25px rgba(0, 0, 0, 0.15);
+
+  /* Animación de luz viva */
+  background-size: 200% 200%;
+  animation: cinematicShine 4.5s ease-in-out infinite, pulseGlow 6s ease-in-out infinite;
+}
+
+/* Movimiento de gradiente para efecto de luz dinámica */
+@keyframes cinematicShine {
+  0% { background-position: 0% 50%; }
+  25% { background-position: 50% 50%; }
+  50% { background-position: 100% 50%; }
+  75% { background-position: 50% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Pulso de brillo sutil para efecto cinematográfico */
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 
+    0 0 150px rgba(255, 255, 255, 0.6),
+    0 0 300px rgba(255, 255, 255, 0.35),
+    0 4px 25px rgba(0, 0, 0, 0.15); }
+  50% { box-shadow: 
+    0 0 180px rgba(255, 255, 255, 0.8),
+    0 0 350px rgba(255, 255, 255, 0.5),
+    0 4px 25px rgba(0, 0, 0, 0.15); }
+}
+
+/* Tarjeta informativa moderna */
+.info-banner {
+  background: #fff4c7; /* Amarillo cálido suave */
+  padding: 12px 18px;
+  margin: 15px auto 25px auto;
+  max-width: 900px;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+/* CARD COMPACTA */
+.card-modern {
+  background: white;
+  border-radius: 10px;
+  padding: 15px;
+  margin-bottom: 25px;
+  box-shadow: 0 2px 7px rgba(0,0,0,0.15);
+}
+
+/* BUSCADOR COMPACTO */
+.row-inline {
+  display: flex;
+  gap: 10px;
+}
+
+.row-inline input {
+  flex: 1;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.btn-search {
+  background: #167a7a;
+  color: white;
+  border: none;
+  padding: 0 25px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+/* RESPONSIVE SOLO PARA row-inline */
+@media (max-width: 600px) {
+  .row-inline {
+    flex-direction: column;   /* pasa los elementos debajo */
+  }
+
+  .row-inline input,
+  .row-inline button {
+    width: 100%;              /* ambos ocupan todo el ancho */
+  }
+
+  .row-inline button {
+    justify-content: center;  /* centra el contenido del botón */
+    height: 40px;
+  }
+}
+
+
+/*** CUADROS DE INFORMACIÓN ***/
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  margin-top: 15px;
+}
+
+.info-box div {
+  display: flex;
+  justify-content: space-between;
+  background: #f8f8f8;
+  padding: 6px 10px;
+  border-radius: 6px;
+  margin-bottom: 6px;
+  border: 1px solid #ddd;
+}
+
+.info-box label {
+  font-weight: 600;
+  color: #444;
+}
+
+.info-box span {
+  font-weight: 500;
+  color: #222;
+}
+
+
+
+
+.btn-blue {
+  background: #76c9ec;
+  padding: 8px 18px;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-green {
+  background: #8ed28e;
+  padding: 8px 18px;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* TABLA */
+.table-modern {
+  margin-top: 15px;
+  width: 100%;
+}
+
+.subtitle-1 {
+  font-size: 18px; 
+  font-weight: 600;
+  text-align: center;
+  margin: 0 0 10px 0;
+  color: #333;
+}
+.subtitle {
+  font-size: 18px;
+  font-weight: 600;
+  text-align: center;
+  margin: 0 0 15px 0;
+  color: #333;
+}
+
+.text-center {
+  display: block;
+  width: 100%;
+  text-align: center;
+}
+
+.btn-red{
+        background-color: #d32f2f !important; /* rojo */
+    color: #fff !important;
+}
+.btn-amarillo{
+        background-color: #fbc02d !important; /* amarillo */
+    color: #000 !important;
+}
+
+
+
+.tabla-4c {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.tabla-4c td {
+  padding: 10px 12px;
+  vertical-align: middle;
+}
+
+.pdf-img {
+  width: 45px;      /* tamaño más grande */
+  height: 45px;     /* proporción correcta */
+  cursor: pointer;
+  transition: .2s ease;
+}
+
+.pdf-img:hover {
+  transform: scale(1.15);
+}
+
+.table-container{
+    width: 100%;
+    overflow-x: auto;
+}
+
+/* Centrar subtítulos específicos: tarjeta y encabezado de tabla */
+.card-modern > .subtitle {
+  width: 100%;
+  text-align: center;
+  margin-bottom: 16px;
+  box-sizing: border-box;
+}
+
+.tabla-header > .subtitle {
+  flex-basis: 100%;
+  width: 100%;
+  text-align: center;
+  margin: 0 0 8px 0;
+  box-sizing: border-box;
+}
+
+/* Cabecera tabla + buscador: apilar y estirar para que el buscador ocupe todo el ancho del card */
+.tabla-header {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+/* Buscar: ocupar todo el ancho del card */
+.buscador {
+  width: 100%;
+  max-width: none;
+  align-self: stretch;
+}
+
+/* Si se usa Angular Material mat-form-field dentro, asegurar que se estire */
+.tabla-header .buscador .mat-form-field-flex,
+.tabla-header .buscador .mat-form-field-infix {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Eliminar líneas divisorias y sombras en mat-table dentro de .table-modern */
+::ng-deep .table-modern,
+::ng-deep .table-modern table {
+  border-collapse: collapse !important;
+  border-spacing: 0 !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* Quitar bordes y sombras en celdas, filas y encabezados */
+::ng-deep .table-modern th.mat-header-cell,
+::ng-deep .table-modern td.mat-cell,
+::ng-deep .table-modern tr.mat-row,
+::ng-deep .table-modern tr.mat-header-row {
+  border: none !important;
+  border-bottom: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  padding: 12px 16px !important;
+}
+
+/* Ocultar pseudo-elementos que puedan dibujar líneas */
+::ng-deep .table-modern th.mat-header-cell::before,
+::ng-deep .table-modern th.mat-header-cell::after,
+::ng-deep .table-modern td.mat-cell::before,
+::ng-deep .table-modern td.mat-cell::after {
+  content: none !important;
+  display: none !important;
+}
+
+/* Asegurar que filas y contenido queden centrados y sin separadores */
+::ng-deep .table-modern tr,
+::ng-deep .table-modern tr > td,
+::ng-deep .table-modern tr > th {
+  box-shadow: none !important;
+  border: none !important;
+}
+
+/* Si se usan filas con fondo alterno, mantener solo el fondo sin líneas */
+::ng-deep .table-modern tr.mat-row:nth-child(odd),
+::ng-deep .table-modern tr.mat-row:nth-child(even) {
+  background-clip: padding-box !important;
+  border: none !important;
+}
+
+

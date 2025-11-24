@@ -14,11 +14,16 @@ export const ADMIN_ROUTES: Routes = [
     loadChildren: () => import('./gestionusuario/usuario.routes').then((r) => r.usuarioRoutes),
   },
 
-
   //gestion de inscripcion
   {
     path: 'inscripcion',
     loadChildren: () => import('./gestioninscripcion/inscripcion.routes').then((r) => r.inscripcionRoutes),
+  },
+
+  //registro nacional de talentos deportivos
+  {
+    path: 'rntd',
+    loadChildren: () => import('./rntd/rntd.routes').then((r) => r.rntdRoutes),
   },
 
  {
