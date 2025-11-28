@@ -57,7 +57,7 @@ export interface Participante {
   horarioAsignado?: HorarioAsignado | null;
 }
 
-// Interface para horario asignado
+// Interface para horario asignado (ACTUALIZADO: incluye modalidadEnvio)
 export interface HorarioAsignado {
   participanteId: number;
   participanteNombre: string;
@@ -69,6 +69,7 @@ export interface HorarioAsignado {
   deporte: string;
   deporteNombre: string;
   horario: any;
+  modalidadEnvio: 'digital' | 'presencial';
 }
 
 // Interface para modal informativo
@@ -108,7 +109,7 @@ export interface ModalInformativo {
   styleUrls: ['./pre-inscripcion.component.css']
 })
 export class PreInscripcionComponent implements OnInit {
-  
+
   // Formularios para cada paso
   apoderadoForm!: FormGroup;
   alumnoForm!: FormGroup;
@@ -120,39 +121,43 @@ export class PreInscripcionComponent implements OnInit {
   participanteActualIndex: number = 0;
   editandoParticipante: boolean = false;
 
-  //  NUEVO: Horarios asignados
+  //  Horarios asignados
   horariosAsignados: HorarioAsignado[] = [];
   participanteSeleccionadoId: number | null = null;
   editandoHorario: boolean = false;
   horarioActualIndex: number = 0;
 
-  //  NUEVO: Modalidad envío
-  modalidadEnvioActual: 'digital' | 'presencial' | null = null;
-  
-  //  NUEVO: Archivos digitales temporales (mientras edita formulario)
-  archivosDigitalesTemp: {
+  //  NUEVO: Modalidad envío en Paso 3 (por participante seleccionado)
+  modalidadEnvioPaso3: 'digital' | 'presencial' | null = null;
+
+  //  Archivos digitales temporales Paso 3
+  archivosDigitalesPaso3: {
     dniMenor: File | null;
     dniApoderado: File | null;
     conadis: File | null;
     seguroMedico: File | null;
     declaracionJurada: File | null;
   } = {
-    dniMenor: null,
-    dniApoderado: null,
-    conadis: null,
-    seguroMedico: null,
-    declaracionJurada: null
-  };
-  
-  //  NUEVO: Modales informativos
+      dniMenor: null,
+      dniApoderado: null,
+      conadis: null,
+      seguroMedico: null,
+      declaracionJurada: null
+    };
+
+  //  NUEVO: Modal de confirmación de horario agregado
+  mostrarModalHorarioAgregado: boolean = false;
+  nombreParticipanteHorarioAgregado: string = '';
+
+  //  Modales informativos
   modalesInformativos: ModalInformativo[] = [];
   modalInformativoActual: ModalInformativo | null = null;
   indiceModalActual: number = 0;
 
-  // NUEVO: Carousel de fichas
+  // Carousel de fichas
   fichaActual: number = 0;
 
-  // NUEVO: Tipo de Apoderado
+  // Tipo de Apoderado
   tiposApoderado = [
     { value: 'papa', label: 'Papá' },
     { value: 'mama', label: 'Mamá' },
@@ -189,7 +194,7 @@ export class PreInscripcionComponent implements OnInit {
   departamentos: any[] = [];
   provincias: any[] = [];
   distritos: any[] = [];
-  
+
   // Datos para sede/deporte
   departamentosSede: any[] = [];
   provinciasSede: any[] = [];
@@ -210,7 +215,7 @@ export class PreInscripcionComponent implements OnInit {
   // Datos de confirmación
   codigoRegistro = '';
   datosInscripcion: any = null;
-  
+
   // Archivos subidos (legacy - ahora por participante)
   archivosSubidos: any = {
     dniMenor: null,
@@ -240,7 +245,7 @@ export class PreInscripcionComponent implements OnInit {
   }
 
   inicializarFormularios(): void {
-    // PASO 1: Datos del Apoderado + Dirección ( NUEVO: tipoApoderado)
+    // PASO 1: Datos del Apoderado + Dirección
     this.apoderadoForm = this.fb.group({
       tipoApoderado: ['', Validators.required],
       tipoDocumento: ['30', Validators.required],
@@ -257,7 +262,7 @@ export class PreInscripcionComponent implements OnInit {
       referencia: ['']
     });
 
-    // PASO 2: Datos del Alumno ( NUEVO: modalidadEnvio)
+    // PASO 2: Datos del Alumno (SIN modalidadEnvio - se movió al Paso 3)
     this.alumnoForm = this.fb.group({
       tipoDocumento: ['30', Validators.required],
       numeroDocumento: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(8)]],
@@ -268,8 +273,7 @@ export class PreInscripcionComponent implements OnInit {
       sexo: ['', Validators.required],
       parentesco: ['', Validators.required],
       tipoSeguro: ['', Validators.required],
-      tieneDiscapacidad: [false],
-      modalidadEnvio: [null, Validators.required]
+      tieneDiscapacidad: [false]
     });
 
     // PASO 3: Complejo Deportivo + Deporte + Horarios
@@ -311,13 +315,13 @@ export class PreInscripcionComponent implements OnInit {
   }
 
   // ==================== PASO 1: APODERADO ====================
-  
+
   buscarApoderado(): void {
     const dni = this.apoderadoForm.get('numeroDocumento')?.value;
-    
+
     if (dni && dni.length === 8) {
       this.cargandoApoderado = true;
-      
+
       setTimeout(() => {
         this.apoderadoForm.patchValue({
           apellidoPaterno: 'ARIAS',
@@ -368,14 +372,14 @@ export class PreInscripcionComponent implements OnInit {
     }
   }
 
-  // ==================== PASO 2: PARTICIPANTES (MÚLTIPLES) ====================
-  
+  // ==================== PASO 2: PARTICIPANTES (SIN MODALIDAD) ====================
+
   buscarAlumno(): void {
     const dni = this.alumnoForm.get('numeroDocumento')?.value;
-    
+
     if (dni && dni.length === 8) {
       this.cargandoAlumno = true;
-      
+
       setTimeout(() => {
         this.alumnoForm.patchValue({
           apellidoPaterno: 'GARCÍA',
@@ -388,7 +392,7 @@ export class PreInscripcionComponent implements OnInit {
     }
   }
 
-  //  NUEVO: Verificar si formulario básico está completo (sin modalidad)
+  // Verificar si formulario básico está completo (sin modalidad)
   formularioBasicoCompleto(): boolean {
     const form = this.alumnoForm;
     return !!(
@@ -409,38 +413,19 @@ export class PreInscripcionComponent implements OnInit {
     this.tieneDiscapacidad = event.checked;
   }
 
-  //  NUEVO: Manejar cambio de modalidad de envío (puede cambiar libremente)
-  onModalidadEnvioChange(modalidad: 'digital' | 'presencial'): void {
-    // Si clickea la misma opción, la desmarca
-    if (this.modalidadEnvioActual === modalidad) {
-      this.modalidadEnvioActual = null;
-      this.alumnoForm.patchValue({ modalidadEnvio: null });
-    } else {
-      // Cambia a la nueva opción
-      this.modalidadEnvioActual = modalidad;
-      this.alumnoForm.patchValue({ modalidadEnvio: modalidad });
-    }
-  }
-
-  // Agregar participante al array
+  // Agregar participante al array (SIN modalidad - se asigna en Paso 3)
   agregarParticipante(): void {
     if (this.alumnoForm.valid) {
       const nuevoParticipante: Participante = {
         id: this.participantes.length + 1,
         ...this.alumnoForm.value,
-        archivosDigitales: this.alumnoForm.value.modalidadEnvio === 'digital' ? {
-          dniMenor: this.archivosDigitalesTemp.dniMenor,
-          dniApoderado: this.archivosDigitalesTemp.dniApoderado,
-          conadis: this.archivosDigitalesTemp.conadis,
-          seguroMedico: this.archivosDigitalesTemp.seguroMedico,
-          declaracionJurada: this.archivosDigitalesTemp.declaracionJurada
-        } : undefined,
+        modalidadEnvio: null, // Se asignará en el Paso 3
         horarioAsignado: null
       };
 
       this.participantes.push(nuevoParticipante);
       this.limpiarFormularioAlumno();
-      
+
       setTimeout(() => {
         const elemento = document.querySelector('.participantes-agregados');
         elemento?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -453,26 +438,15 @@ export class PreInscripcionComponent implements OnInit {
   limpiarFormularioAlumno(): void {
     this.alumnoForm.reset({
       tipoDocumento: '30',
-      tieneDiscapacidad: false,
-      modalidadEnvio: null
+      tieneDiscapacidad: false
     });
     this.tieneDiscapacidad = false;
-    this.modalidadEnvioActual = null;
-    
-    //  Limpiar archivos temporales
-    this.archivosDigitalesTemp = {
-      dniMenor: null,
-      dniApoderado: null,
-      conadis: null,
-      seguroMedico: null,
-      declaracionJurada: null
-    };
   }
 
   editarParticipante(participante: Participante): void {
     this.editandoParticipante = true;
     this.participanteActualIndex = this.participantes.findIndex(p => p.id === participante.id);
-    
+
     this.alumnoForm.patchValue({
       tipoDocumento: participante.tipoDocumento,
       numeroDocumento: participante.numeroDocumento,
@@ -483,12 +457,10 @@ export class PreInscripcionComponent implements OnInit {
       sexo: participante.sexo,
       parentesco: participante.parentesco,
       tipoSeguro: participante.tipoSeguro,
-      tieneDiscapacidad: participante.tieneDiscapacidad,
-      modalidadEnvio: participante.modalidadEnvio
+      tieneDiscapacidad: participante.tieneDiscapacidad
     });
-    
+
     this.tieneDiscapacidad = participante.tieneDiscapacidad;
-    this.modalidadEnvioActual = participante.modalidadEnvio;
 
     setTimeout(() => {
       const elemento = document.querySelector('.form-card');
@@ -503,7 +475,7 @@ export class PreInscripcionComponent implements OnInit {
         ...this.alumnoForm.value,
         id: this.participantes[this.participanteActualIndex].id
       };
-      
+
       this.editandoParticipante = false;
       this.limpiarFormularioAlumno();
     }
@@ -531,142 +503,30 @@ export class PreInscripcionComponent implements OnInit {
     return item ? item.label : value;
   }
 
-  //  NUEVO: Subir archivos digitales temporales (formulario actual)
-  onFileSelectTemp(event: any, tipo: 'dniMenor' | 'dniApoderado' | 'conadis' | 'seguroMedico' | 'declaracionJurada'): void {
-    const file = event.target.files[0];
-    if (file) {
-      const allowedTypes = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
-      if (!allowedTypes.includes(file.type)) {
-        alert('Solo se permiten archivos PDF, JPG o PNG');
-        event.target.value = '';
-        return;
-      }
-
-      if (file.size > 5 * 1024 * 1024) {
-        alert('El archivo no debe superar los 5MB');
-        event.target.value = '';
-        return;
-      }
-
-      // Guardar archivo en archivosDigitalesTemp
-      this.archivosDigitalesTemp[tipo] = file;
-    }
-  }
-
-  //  NUEVO: Obtener nombre de archivo temporal
-  getNombreArchivoTemp(tipo: 'dniMenor' | 'dniApoderado' | 'conadis' | 'seguroMedico' | 'declaracionJurada'): string {
-    if (this.archivosDigitalesTemp[tipo]) {
-      return this.archivosDigitalesTemp[tipo]!.name;
-    }
-    return 'Ningún archivo';
-  }
-
-  //  NUEVO: Subir archivos digitales por participante
-  onFileSelectParticipante(event: any, participante: Participante, tipo: string): void {
-    const file = event.target.files[0];
-    if (file) {
-      const allowedTypes = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
-      if (!allowedTypes.includes(file.type)) {
-        alert('Solo se permiten archivos PDF, JPG o PNG');
-        return;
-      }
-
-      if (file.size > 5 * 1024 * 1024) {
-        alert('El archivo no debe superar los 5MB');
-        return;
-      }
-
-      if (participante.archivosDigitales) {
-        (participante.archivosDigitales as any)[tipo] = file;
-      }
-    }
-  }
-
-  getNombreArchivoParticipante(participante: Participante, tipo: string): string {
-    if (participante.archivosDigitales && (participante.archivosDigitales as any)[tipo]) {
-      return (participante.archivosDigitales as any)[tipo].name;
-    }
-    return 'Ningún archivo seleccionado';
-  }
-
-  //  NUEVO: Validar archivos digitales del formulario actual
-  formularioTieneArchivosDigitalesCompletos(): boolean {
-    // Si no es digital, no necesita archivos
-    if (this.modalidadEnvioActual !== 'digital') {
-      return true;
-    }
-
-    const archivos = this.archivosDigitalesTemp;
-    const tieneDiscapacidad = this.alumnoForm.get('tieneDiscapacidad')?.value;
-
-    // Validar archivos obligatorios
-    const tieneObligatorios = !!(
-      archivos.dniMenor &&
-      archivos.dniApoderado &&
-      archivos.seguroMedico &&
-      archivos.declaracionJurada
-    );
-
-    // Si tiene discapacidad, también necesita CONADIS
-    if (tieneDiscapacidad) {
-      return tieneObligatorios && !!archivos.conadis;
-    }
-
-    return tieneObligatorios;
-  }
-
-  //  NUEVO: Validar que tiene archivos digitales completos
-  tieneArchivosDigitalesCompletos(participante: Participante): boolean {
-    if (participante.modalidadEnvio !== 'digital' || !participante.archivosDigitales) {
-      return false;
-    }
-
-    const archivos = participante.archivosDigitales;
-    const obligatorios = ['dniMenor', 'dniApoderado', 'seguroMedico', 'declaracionJurada'];
-    
-    for (const tipo of obligatorios) {
-      if (!(archivos as any)[tipo]) {
-        return false;
-      }
-    }
-
-    if (participante.tieneDiscapacidad && !archivos.conadis) {
-      return false;
-    }
-
-    return true;
-  }
-
-  // NUEVO: Habilitar descarga de Declaración Jurada
-  puedeDescargarDeclaracionJurada(participante: Participante): boolean {
-    return participante.modalidadEnvio === 'digital' && 
-           !!participante.nombres && 
-           !!participante.numeroDocumento;
-  }
-
-  //  NUEVO: Generar Declaración Jurada desde formulario (antes de agregar)
-  generarDeclaracionJuradaFormulario(): void {
-    const datosFormulario = this.alumnoForm.value;
-    console.log('Generando Declaración Jurada para formulario:', datosFormulario);
-    alert('Generando Declaración Jurada. En producción se generará el PDF con los datos del apoderado y participante.');
-    // TODO: Implementar generación de PDF con datos del apoderado y participante del formulario
-  }
-
-  // NUEVO: Generar Declaración Jurada
-  generarDeclaracionJurada(participante: Participante): void {
-    console.log('Generando Declaración Jurada para:', participante);
-    // TODO: Implementar generación de PDF con datos del apoderado y participante
-    alert(`Generando Declaración Jurada para ${participante.nombres} ${participante.apellidoPaterno}...`);
-  }
-
-  // Continúa en siguiente parte...
-
   // ==================== PASO 3: HORARIOS POR PARTICIPANTE ====================
-  
+
+  // NUEVO: Obtener solo participantes SIN horario asignado
+  getParticipantesSinHorario(): Participante[] {
+    return this.participantes.filter(p => !p.horarioAsignado);
+  }
+
+  // NUEVO: Verificar si todos los participantes tienen horario
+  todosParticipantesTienenHorario(): boolean {
+    if (this.participantes.length === 0) return false;
+    return this.participantes.every(p => p.horarioAsignado !== null);
+  }
+
+  // NUEVO: Obtener participante seleccionado actual
+  getParticipanteSeleccionado(): Participante | null {
+    if (!this.participanteSeleccionadoId) return null;
+    return this.participantes.find(p => p.id === this.participanteSeleccionadoId) || null;
+  }
+
   onParticipanteChange(): void {
     const participanteId = this.sedeDeporteForm.get('participante')?.value;
     this.participanteSeleccionadoId = participanteId;
-    // Limpiar selecciones
+
+    // Limpiar selecciones y modalidad
     this.sedeDeporteForm.patchValue({
       departamento: '',
       provincia: '',
@@ -677,6 +537,12 @@ export class PreInscripcionComponent implements OnInit {
     this.deportes = [];
     this.horarios = [];
     this.horarioSeleccionado = null;
+    this.modalidadEnvioPaso3 = null;
+    this.limpiarArchivosDigitalesPaso3();
+    this.mapaVisible = false;
+    this.provinciasSede = [];
+    this.distritosSede = [];
+    this.complejosDeportivos = [];
   }
 
   onDepartamentoSedeChange(): void {
@@ -743,9 +609,9 @@ export class PreInscripcionComponent implements OnInit {
     this.deportes = [];
     this.horarios = [];
     this.horarioSeleccionado = null;
-    
+
     this.sedeDeporteForm.patchValue({ deporte: '' });
-    
+
     const complejo = this.complejosDeportivos.find(c => c.value === complejoId);
     if (complejo) {
       this.mapaVisible = true;
@@ -776,48 +642,48 @@ export class PreInscripcionComponent implements OnInit {
     const deporteId = this.sedeDeporteForm.get('deporte')?.value;
     this.horarios = [];
     this.horarioSeleccionado = null;
-    
+
     if (deporteId === '1') {
       this.horarios = [
-        { 
+        {
           id: '1',
-          edad: '8-12 años', 
-          etapa: 'Masificación', 
-          dias: 'Lun, Mié, Vie', 
+          edad: '8-12 años',
+          etapa: 'Masificación',
+          dias: 'Lun, Mié, Vie',
           horas: '15:00 - 17:00'
         },
-        { 
+        {
           id: '2',
-          edad: '13-17 años', 
-          etapa: 'Iniciación', 
-          dias: 'Mar, Jue, Sáb', 
+          edad: '13-17 años',
+          etapa: 'Iniciación',
+          dias: 'Mar, Jue, Sáb',
           horas: '08:00 - 10:00'
         }
       ];
     } else if (deporteId === '4') {
       this.horarios = [
-        { 
+        {
           id: '3',
-          edad: '10-16 años', 
-          etapa: 'Masificación', 
-          dias: 'Sáb', 
+          edad: '10-16 años',
+          etapa: 'Masificación',
+          dias: 'Sáb',
           horas: '12:00 - 12:45'
         },
-        { 
+        {
           id: '4',
-          edad: '10-16 años', 
-          etapa: 'Masificación', 
-          dias: 'Mié, Vie', 
+          edad: '10-16 años',
+          etapa: 'Masificación',
+          dias: 'Mié, Vie',
           horas: '17:00 - 18:00'
         }
       ];
     } else {
       this.horarios = [
-        { 
+        {
           id: '5',
-          edad: '8-16 años', 
-          etapa: 'Iniciación', 
-          dias: 'Lun, Mié, Vie', 
+          edad: '8-16 años',
+          etapa: 'Iniciación',
+          dias: 'Lun, Mié, Vie',
           horas: '15:30 - 18:30'
         }
       ];
@@ -842,10 +708,109 @@ export class PreInscripcionComponent implements OnInit {
     return this.horarioSeleccionado !== null;
   }
 
-  //  NUEVO: Agregar horario a participante
+  // NUEVO: Manejar cambio de modalidad en Paso 3
+  onModalidadEnvioPaso3Change(modalidad: 'digital' | 'presencial'): void {
+    if (this.modalidadEnvioPaso3 === modalidad) {
+      this.modalidadEnvioPaso3 = null;
+    } else {
+      this.modalidadEnvioPaso3 = modalidad;
+    }
+
+    // Limpiar archivos si cambia de digital a presencial
+    if (modalidad === 'presencial') {
+      this.limpiarArchivosDigitalesPaso3();
+    }
+  }
+
+  // NUEVO: Limpiar archivos digitales del Paso 3
+  limpiarArchivosDigitalesPaso3(): void {
+    this.archivosDigitalesPaso3 = {
+      dniMenor: null,
+      dniApoderado: null,
+      conadis: null,
+      seguroMedico: null,
+      declaracionJurada: null
+    };
+  }
+
+  // NUEVO: Subir archivo digital en Paso 3
+  onFileSelectPaso3(event: any, tipo: 'dniMenor' | 'dniApoderado' | 'conadis' | 'seguroMedico' | 'declaracionJurada'): void {
+    const file = event.target.files[0];
+    if (file) {
+      const allowedTypes = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
+      if (!allowedTypes.includes(file.type)) {
+        alert('Solo se permiten archivos PDF, JPG o PNG');
+        event.target.value = '';
+        return;
+      }
+
+      if (file.size > 5 * 1024 * 1024) {
+        alert('El archivo no debe superar los 5MB');
+        event.target.value = '';
+        return;
+      }
+
+      this.archivosDigitalesPaso3[tipo] = file;
+    }
+  }
+
+  // NUEVO: Obtener nombre de archivo en Paso 3
+  getNombreArchivoPaso3(tipo: 'dniMenor' | 'dniApoderado' | 'conadis' | 'seguroMedico' | 'declaracionJurada'): string {
+    if (this.archivosDigitalesPaso3[tipo]) {
+      return this.archivosDigitalesPaso3[tipo]!.name;
+    }
+    return 'Ningún archivo';
+  }
+
+  // NUEVO: Verificar si tiene discapacidad el participante seleccionado
+  participanteSeleccionadoTieneDiscapacidad(): boolean {
+    const participante = this.getParticipanteSeleccionado();
+    return participante?.tieneDiscapacidad || false;
+  }
+
+  // NUEVO: Validar archivos digitales completos en Paso 3
+  archivosDigitalesPaso3Completos(): boolean {
+    if (this.modalidadEnvioPaso3 !== 'digital') {
+      return true; // Si es presencial, no necesita archivos
+    }
+
+    const archivos = this.archivosDigitalesPaso3;
+    const tieneObligatorios = !!(
+      archivos.dniMenor &&
+      archivos.dniApoderado &&
+      archivos.seguroMedico &&
+      archivos.declaracionJurada
+    );
+
+    // Si tiene discapacidad, también necesita CONADIS
+    if (this.participanteSeleccionadoTieneDiscapacidad()) {
+      return tieneObligatorios && !!archivos.conadis;
+    }
+
+    return tieneObligatorios;
+  }
+
+  // NUEVO: Verificar si puede agregar horario
+  puedeAgregarHorario(): boolean {
+    return this.sedeDeporteForm.valid &&
+      this.tieneHorarioSeleccionado() &&
+      this.modalidadEnvioPaso3 !== null &&
+      this.archivosDigitalesPaso3Completos();
+  }
+
+  // NUEVO: Generar Declaración Jurada en Paso 3
+  generarDeclaracionJuradaPaso3(): void {
+    const participante = this.getParticipanteSeleccionado();
+    if (participante) {
+      console.log('Generando Declaración Jurada para:', participante);
+      alert(`Generando Declaración Jurada para ${participante.nombres} ${participante.apellidoPaterno}...`);
+    }
+  }
+
+  // Agregar horario a participante (ACTUALIZADO)
   agregarHorario(): void {
-    if (!this.sedeDeporteForm.valid || !this.horarioSeleccionado) {
-      alert('Por favor complete todos los campos y seleccione un horario');
+    if (!this.puedeAgregarHorario()) {
+      alert('Por favor complete todos los campos, seleccione un horario y una modalidad de envío');
       return;
     }
 
@@ -874,17 +839,42 @@ export class PreInscripcionComponent implements OnInit {
       complejoDeportivoNombre: this.complejosDeportivos.find(c => c.value === this.sedeDeporteForm.value.complejoDeportivo)?.label || '',
       deporte: this.sedeDeporteForm.value.deporte,
       deporteNombre: this.deportes.find(d => d.value === this.sedeDeporteForm.value.deporte)?.label || '',
-      horario: { ...this.horarioSeleccionado }
+      horario: { ...this.horarioSeleccionado },
+      modalidadEnvio: this.modalidadEnvioPaso3!
     };
 
     this.horariosAsignados.push(nuevoHorario);
-    
+
     // Asignar al participante
     participante.horarioAsignado = nuevoHorario;
-    
+    participante.modalidadEnvio = this.modalidadEnvioPaso3;
+
+    // Si es digital, guardar los archivos
+    if (this.modalidadEnvioPaso3 === 'digital') {
+      participante.archivosDigitales = { ...this.archivosDigitalesPaso3 };
+    }
+
+    // Guardar nombre para el modal
+    this.nombreParticipanteHorarioAgregado = nuevoHorario.participanteNombre;
+
+    // Mostrar modal de confirmación
+    this.mostrarModalHorarioAgregado = true;
+
+    // Cerrar modal automáticamente después de 2.5 segundos
+    setTimeout(() => {
+      this.cerrarModalHorarioAgregado();
+    }, 2500);
+  }
+
+  // NUEVO: Cerrar modal de horario agregado
+  cerrarModalHorarioAgregado(): void {
+    this.mostrarModalHorarioAgregado = false;
+    this.nombreParticipanteHorarioAgregado = '';
+
     // Limpiar formulario
     this.limpiarFormularioHorario();
-    
+
+    // Scroll al colapsable
     setTimeout(() => {
       const elemento = document.querySelector('.horarios-agregados');
       elemento?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -910,37 +900,37 @@ export class PreInscripcionComponent implements OnInit {
     this.provinciasSede = [];
     this.distritosSede = [];
     this.complejosDeportivos = [];
+    this.modalidadEnvioPaso3 = null;
+    this.limpiarArchivosDigitalesPaso3();
   }
 
-  //  NUEVO: Editar horario
-  editarHorario(horario: HorarioAsignado): void {
-    // TODO: Implementar edición de horario
-    alert('Función de editar horario en desarrollo');
-  }
-
-  //  NUEVO: Eliminar horario
+  // Eliminar horario (ACTUALIZADO)
   eliminarHorario(horario: HorarioAsignado): void {
     if (confirm(`¿Está seguro de eliminar el horario de ${horario.participanteNombre}?`)) {
       this.horariosAsignados = this.horariosAsignados.filter(h => h.participanteId !== horario.participanteId);
-      
+
       // Quitar del participante
       const participante = this.participantes.find(p => p.id === horario.participanteId);
       if (participante) {
         participante.horarioAsignado = null;
+        participante.modalidadEnvio = null;
+        participante.archivosDigitales = undefined;
       }
     }
   }
 
-  //  NUEVO: Validar que hay horarios asignados
+  // Validar que hay horarios asignados (ACTUALIZADO)
   puedeFinalizarInscripcion(): boolean {
     // Debe haber al menos un participante
     if (this.participantes.length === 0) {
       return false;
     }
 
-    // TODOS los participantes deben tener un horario asignado
+    // TODOS los participantes deben tener un horario asignado Y modalidad de envío
     return this.participantes.every(participante => {
-      return this.horariosAsignados.some(horario => horario.participanteId === participante.id);
+      const tieneHorario = this.horariosAsignados.some(horario => horario.participanteId === participante.id);
+      const tieneModalidad = participante.modalidadEnvio !== null;
+      return tieneHorario && tieneModalidad;
     });
   }
 
@@ -953,7 +943,7 @@ export class PreInscripcionComponent implements OnInit {
   }
 
   // ==================== FINALIZAR Y MODALES ====================
-  
+
   finalizarPreInscripcion(): void {
     if (this.horariosAsignados.length === 0) {
       alert('Debe asignar al menos un horario a un participante');
@@ -968,12 +958,12 @@ export class PreInscripcionComponent implements OnInit {
 
     // Generar códigos de registro y modales para cada participante
     this.modalesInformativos = [];
-    
+
     this.participantes.forEach(participante => {
       const horario = this.horariosAsignados.find(h => h.participanteId === participante.id);
       if (horario) {
         const codigoRegistro = this.generarCodigoRegistro();
-        
+
         this.modalesInformativos.push({
           participante: participante,
           modalidad: participante.modalidadEnvio || 'presencial',
@@ -986,7 +976,7 @@ export class PreInscripcionComponent implements OnInit {
 
     // Primero mostrar la confirmación
     this.mostrarConfirmacion = true;
-    
+
     // Luego mostrar el primer modal después de un pequeño delay
     setTimeout(() => {
       this.indiceModalActual = 0;
@@ -996,7 +986,7 @@ export class PreInscripcionComponent implements OnInit {
 
   mostrarSiguienteModal(): void {
     console.log('Mostrando modal índice:', this.indiceModalActual, 'de', this.modalesInformativos.length);
-    
+
     if (this.indiceModalActual < this.modalesInformativos.length) {
       this.modalInformativoActual = this.modalesInformativos[this.indiceModalActual];
       this.mostrarModalInformativo = true;
@@ -1017,7 +1007,7 @@ export class PreInscripcionComponent implements OnInit {
     }, 300);
   }
 
-  //  NUEVO: Carousel de fichas
+  // Carousel de fichas
   siguienteFicha(): void {
     if (this.fichaActual < this.participantes.length - 1) {
       this.fichaActual++;
@@ -1030,7 +1020,7 @@ export class PreInscripcionComponent implements OnInit {
     }
   }
 
-  //  NUEVO: Generar Ficha de Pre-inscripción
+  // Generar Ficha de Pre-inscripción
   generarFichaPreinscripcion(participante: Participante): void {
     console.log('Generando Ficha de Pre-inscripción para:', participante);
     // TODO: Implementar generación de PDF
@@ -1042,11 +1032,11 @@ export class PreInscripcionComponent implements OnInit {
     const nacimiento = new Date(fechaNacimiento);
     let edad = hoy.getFullYear() - nacimiento.getFullYear();
     const mes = hoy.getMonth() - nacimiento.getMonth();
-    
+
     if (mes < 0 || (mes === 0 && hoy.getDate() < nacimiento.getDate())) {
       edad--;
     }
-    
+
     return edad;
   }
 
@@ -1054,7 +1044,7 @@ export class PreInscripcionComponent implements OnInit {
     return Math.floor(100000 + Math.random() * 900000).toString();
   }
 
-  //  NUEVO: Formatear fecha a DD/MM/YYYY
+  // Formatear fecha a DD/MM/YYYY
   formatearFecha(fecha: Date): string {
     if (!fecha) return '';
     const d = new Date(fecha);
@@ -1064,8 +1054,15 @@ export class PreInscripcionComponent implements OnInit {
     return `${dia}/${mes}/${anio}`;
   }
 
+  // Generar Declaración Jurada
+  generarDeclaracionJurada(participante: Participante): void {
+    console.log('Generando Declaración Jurada para:', participante);
+    // TODO: Implementar generación de PDF con datos del apoderado y participante
+    alert(`Generando Declaración Jurada para ${participante.nombres} ${participante.apellidoPaterno}...`);
+  }
+
   // ==================== DOCUMENTOS (LEGACY) ====================
-  
+
   onFileSelect(event: any, tipo: string): void {
     const file = event.target.files[0];
     if (file) {
@@ -1102,7 +1099,7 @@ export class PreInscripcionComponent implements OnInit {
 
   resetFormularios(): void {
     this.apoderadoForm.reset({ tipoDocumento: '30', tipoApoderado: '' });
-    this.alumnoForm.reset({ tipoDocumento: '30', tieneDiscapacidad: false, modalidadEnvio: null });
+    this.alumnoForm.reset({ tipoDocumento: '30', tieneDiscapacidad: false });
     this.sedeDeporteForm.reset();
     this.documentosForm.reset();
     this.participantes = [];
@@ -1113,5 +1110,7 @@ export class PreInscripcionComponent implements OnInit {
     this.mostrarModalInformativo = false;
     this.modalesInformativos = [];
     this.fichaActual = 0;
+    this.modalidadEnvioPaso3 = null;
+    this.limpiarArchivosDigitalesPaso3();
   }
 }

@@ -1,6 +1,6 @@
 import { Component, OnInit, HostListener } from '@angular/core';
 import { CommonModule, NgIf } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormControl, FormsModule } from '@angular/forms';
 import { trigger, transition, style, animate } from '@angular/animations';
 
 // Angular Material Modules
@@ -20,13 +20,12 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatAutocompleteModule, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { map, Observable, startWith } from 'rxjs';
 
-/**
- * Interface para Horario
- */
 export interface Horario {
   id: number;
-  turno: string;
+  dias: string;
+  hora: string;
   sede: string;
   disciplina: string;
   temporada: string;
@@ -35,9 +34,6 @@ export interface Horario {
   textoCompleto?: string;
 }
 
-/**
- * Interface para Convocatoria
- */
 export interface Convocatoria {
   id_convocatoria: number;
   titulo: string;
@@ -53,13 +49,11 @@ export interface Convocatoria {
   estado: 'activa' | 'cerrada';
   region?: string;
   sede?: string;
+  temporada?: string;
   fechacreada?: Date | null;
-  horarioActual?: number;
+  isFlipped?: boolean;
 }
 
-/**
- * Interface para información del deporte
- */
 export interface DeporteInfo {
   nombre: string;
   imagen: string;
@@ -70,25 +64,11 @@ export interface DeporteInfo {
   selector: 'app-convocatoria',
   standalone: true,
   imports: [
-    CommonModule,
-    FormsModule,
-    MatCardModule,
-    MatButtonModule,
-    MatIconModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatSelectModule,
-    MatChipsModule,
-    MatBadgeModule,
-    MatTooltipModule,
-    MatProgressSpinnerModule,
-    MatTableModule,
-    MatPaginatorModule,
-    NgIf,
-    MatCheckboxModule,
-    MatButtonToggleModule,
-    MatAutocompleteModule,
-    MatProgressBarModule
+    CommonModule, FormsModule, MatCardModule, MatButtonModule, MatIconModule,
+    MatFormFieldModule, MatInputModule, MatSelectModule, MatChipsModule,
+    MatBadgeModule, MatTooltipModule, MatProgressSpinnerModule, MatTableModule,
+    MatPaginatorModule, NgIf, MatCheckboxModule, MatButtonToggleModule,
+    MatAutocompleteModule, MatProgressBarModule
   ],
   templateUrl: './convocatoria.component.html',
   styleUrls: ['./convocatoria.component.css'],
@@ -109,19 +89,16 @@ export interface DeporteInfo {
 })
 export class ConvocatoriaComponent implements OnInit {
 
-  // =========================
-  // DATOS
-  // =========================
   convocatorias: Convocatoria[] = [];
   
-  // USUARIO - Datos separados
+  // USUARIO
   convocatoriasFiltradasUsuario: Convocatoria[] = [];
   convocatoriasPaginadasUsuario: Convocatoria[] = [];
   pageSizeUsuario: number = 6;
   pageIndexUsuario: number = 0;
   totalConvocatoriasUsuario: number = 0;
 
-  // GESTIÓN - Datos separados
+  // GESTIÓN
   convocatoriasFiltradasGestion: Convocatoria[] = [];
   convocatoriasPaginadasGestion: Convocatoria[] = [];
   pageSizeGestion: number = 10;
@@ -130,49 +107,37 @@ export class ConvocatoriaComponent implements OnInit {
 
   pageSizeOptions: number[] = [6, 12, 18, 24];
 
-  // =========================
   // FILTROS USUARIO
-  // =========================
   busquedaUsuario: string = '';
   regionSeleccionadaUsuario: string = '';
   sedeSeleccionadaUsuario: string = '';
   deporteSeleccionadoUsuario: string = '';
   filtroTipoUsuario: string = '';
 
-  // =========================
+  regionesDisponiblesUsuario: string[] = [];
+  sedesDisponiblesUsuario: string[] = [];
+  deportesDisponiblesUsuario: string[] = [];
+  tiposDisponiblesUsuario: string[] = [];
+
   // FILTROS GESTIÓN
-  // =========================
   busquedaGestion: string = '';
   regionSeleccionadaGestion: string = '';
   sedeSeleccionadaGestion: string = '';
   deporteSeleccionadoGestion: string = '';
   filtroTipoGestion: string = '';
 
-  // =========================
-  // OPCIONES DE FILTROS
-  // =========================
-  regiones: string[] = [];
-  sedes: string[] = [];
-  deportes: string[] = [
-    'Rugby',
-    'Tenis de campo',
-    'Judo',
-    'Voleibol',
-    'Futbol',
-    'Baloncesto',
-    'Atletismo',
-    'Pickleball'
-  ];
+  regionesDisponiblesGestion: string[] = [];
+  sedesDisponiblesGestion: string[] = [];
+  deportesDisponiblesGestion: string[] = [];
+  tiposDisponiblesGestion: string[] = [];
 
-  tiposConvocatoria: { value: string, label: string }[] = [
+  tiposConvocatoria = [
     { value: '', label: 'Todos los tipos' },
     { value: 'deporte', label: 'Deporte' },
     { value: 'paradeporte', label: 'Para Deporte' }
   ];
 
-  // =========================
   // ESTADOS
-  // =========================
   cargando: boolean = true;
   modoGestion: boolean = false;
   mostrarFormulario: boolean = false;
@@ -181,81 +146,39 @@ export class ConvocatoriaComponent implements OnInit {
   mostrarPreview: boolean = false;
   convocatoriaPreview: Convocatoria | null = null;
 
-  // =========================
-  // MODAL DEPORTE INFORMATIVO
-  // =========================
+  // MODAL DEPORTE
   mostrarModalDeporte: boolean = false;
   deporteInfoActual: DeporteInfo | null = null;
-  deportesMostrados: Set<string> = new Set();
+  ultimoDeporteSeleccionado: string = '';
 
   deportesInfo: { [key: string]: DeporteInfo } = {
-    'Rugby': {
-      nombre: 'Rugby',
-      imagen: 'https://i.imgur.com/srcVUcm.png',
-      descripcion: 'El rugby es un deporte de contacto en equipo que combina fuerza, velocidad, resistencia y trabajo en equipo. En la Academia IPD, desarrollamos habilidades técnicas y tácticas fundamentales, promoviendo valores como el respeto, la disciplina y el compañerismo.'
-    },
-    'Tenis de campo': {
-      nombre: 'Tenis de Campo',
-      imagen: 'https://i.imgur.com/srcVUcm.png',
-      descripcion: 'El tenis de campo es un deporte de raqueta que mejora la coordinación, agilidad y concentración. Nuestro programa ofrece formación integral para principiantes y deportistas en desarrollo, enfocándose en técnicas de golpeo, estrategia de juego y preparación física.'
-    },
-    'Judo': {
-      nombre: 'Judo',
-      imagen: 'https://i.imgur.com/srcVUcm.png',
-      descripcion: 'El judo es un arte marcial japonés que desarrolla la fuerza, flexibilidad y disciplina mental. En nuestras clases, los participantes aprenden técnicas de proyección, control y caída segura, siempre bajo los principios de máxima eficiencia y beneficio mutuo.'
-    },
-    'Voleibol': {
-      nombre: 'Voleibol',
-      imagen: 'https://i.imgur.com/srcVUcm.png',
-      descripcion: 'El voleibol es un deporte de equipo dinámico que desarrolla reflejos, coordinación y comunicación. El programa de la Academia IPD incluye formación técnica en saque, recepción, colocación y remate, además de tácticas de juego en equipo.'
-    },
-    'Futbol': {
-      nombre: 'Fútbol',
-      imagen: 'https://i.imgur.com/srcVUcm.png',
-      descripcion: 'El fútbol es el deporte más popular del mundo, ideal para desarrollar trabajo en equipo, resistencia y habilidades motoras. Nuestro programa abarca desde fundamentos técnicos hasta tácticas avanzadas para formar deportistas integrales.'
-    },
-    'Baloncesto': {
-      nombre: 'Baloncesto',
-      imagen: 'https://i.imgur.com/srcVUcm.png',
-      descripcion: 'El baloncesto combina velocidad, agilidad y estrategia en un juego de equipo emocionante. En la Academia IPD trabajamos habilidades de dribling, pase, tiro y defensa, además de desarrollar visión de juego y trabajo colaborativo.'
-    },
-    'Atletismo': {
-      nombre: 'Atletismo',
-      imagen: 'https://i.imgur.com/srcVUcm.png',
-      descripcion: 'El atletismo es la base de todos los deportes, desarrollando capacidades físicas fundamentales como velocidad, resistencia, fuerza y coordinación. Ofrecemos formación en carreras, saltos y lanzamientos para todas las edades.'
-    },
-    'Pickleball': {
-      nombre: 'Pickleball',
-      imagen: 'https://i.imgur.com/srcVUcm.png',
-      descripcion: 'El pickleball es un deporte de raqueta en crecimiento que combina elementos del tenis, bádminton y ping pong. Es accesible para todas las edades y niveles, promoviendo la actividad física de manera divertida y social.'
-    }
+    'Rugby': { nombre: 'Rugby', imagen: 'https://i.imgur.com/srcVUcm.png', descripcion: 'El rugby es un deporte de contacto en equipo que combina fuerza, velocidad, resistencia y trabajo en equipo. En la Academia IPD, desarrollamos habilidades técnicas y tácticas fundamentales.' },
+    'Tenis de campo': { nombre: 'Tenis de Campo', imagen: 'https://i.imgur.com/srcVUcm.png', descripcion: 'El tenis de campo es un deporte de raqueta que mejora la coordinación, agilidad y concentración. Nuestro programa ofrece formación integral para principiantes y deportistas en desarrollo.' },
+    'Judo': { nombre: 'Judo', imagen: 'https://i.imgur.com/srcVUcm.png', descripcion: 'El judo es un arte marcial japonés que desarrolla la fuerza, flexibilidad y disciplina mental. En nuestras clases, los participantes aprenden técnicas de proyección, control y caída segura.' },
+    'Voleibol': { nombre: 'Voleibol', imagen: 'https://i.imgur.com/srcVUcm.png', descripcion: 'El voleibol es un deporte de equipo dinámico que desarrolla reflejos, coordinación y comunicación. El programa incluye formación técnica en saque, recepción, colocación y remate.' },
+    'Futbol': { nombre: 'Fútbol', imagen: 'https://i.imgur.com/srcVUcm.png', descripcion: 'El fútbol es el deporte más popular del mundo, ideal para desarrollar trabajo en equipo, resistencia y habilidades motoras.' },
+    'Baloncesto': { nombre: 'Baloncesto', imagen: 'https://i.imgur.com/srcVUcm.png', descripcion: 'El baloncesto combina velocidad, agilidad y estrategia. Trabajamos habilidades de dribling, pase, tiro y defensa.' },
+    'Atletismo': { nombre: 'Atletismo', imagen: 'https://i.imgur.com/srcVUcm.png', descripcion: 'El atletismo es la base de todos los deportes, desarrollando velocidad, resistencia, fuerza y coordinación.' },
+    'Pickleball': { nombre: 'Pickleball', imagen: 'https://i.imgur.com/srcVUcm.png', descripcion: 'El pickleball combina elementos del tenis, bádminton y ping pong. Es accesible para todas las edades y niveles.' }
   };
 
-  // =========================
   // MENSAJES
-  // =========================
   mostrarMensajeCentral: boolean = false;
   tipoMensaje: 'success' | 'error' | 'loading' = 'success';
   textoMensaje: string = '';
 
-  // =========================
   // CONFIRMACIÓN
-  // =========================
   mostrarConfirmacion: boolean = false;
   tituloConfirmacion: string = '';
   mensajeConfirmacion: string = '';
   accionConfirmacion: (() => void) | null = null;
 
-  // =========================
-  // FORMULARIO - CAMPOS REDUCIDOS
-  // =========================
-  columnasTabla: string[] = ['numero', 'titulo', 'subtitulo', 'descripcion', 'horario', 'numdisponibles', 'estado', 'acciones'];
+  // FORMULARIO
   nuevaConvocatoria: Convocatoria = this.crearConvocatoriaVacia();
   imagenSeleccionada: File | null = null;
   imagenPreview: string = '';
   erroresFormulario: { [key: string]: boolean } = {};
 
-  // HORARIOS - Autocomplete
   todosLosHorarios: Horario[] = [];
   horariosFiltradosAutocomplete: Horario[] = [];
   horarioSeleccionadoTexto: string = '';
@@ -266,73 +189,105 @@ export class ConvocatoriaComponent implements OnInit {
 
   ngOnInit(): void {
     this.cargarConvocatorias();
-    this.actualizarEstadosPorCupos();
     this.cargarHorariosDisponibles();
+
+    this.filteredOptions = this.my.valueChanges.pipe(
+      startWith(''),
+      map(value => this._filter(value || '')),
+    );
   }
 
-  // =========================
-  // CARGA DE DATOS
-  // =========================
-  
   cargarConvocatorias(): void {
     this.cargando = true;
     setTimeout(() => {
       this.convocatorias = this.obtenerDatosEjemplo();
-      this.extraerOpcionesFiltros();
+      this.inicializarFiltrosUsuario();
+      this.inicializarFiltrosGestion();
       this.aplicarFiltrosUsuario();
       this.aplicarFiltrosGestion();
       this.cargando = false;
     }, 500);
   }
 
-  extraerOpcionesFiltros(): void {
-    this.regiones = [...new Set(this.convocatorias.map(c => c.region).filter(r => r))].sort() as string[];
-    this.sedes = [...new Set(this.convocatorias.map(c => c.sede).filter(s => s))].sort() as string[];
-  }
-
   cargarHorariosDisponibles(): void {
     this.todosLosHorarios = [
-      { id: 1, turno: 'Lun–Mié–Vie: 3–6 PM', sede: 'Estadio Nacional', disciplina: 'Rugby', temporada: 'Temporada 2026', vacantes: 30, disponibles: 20, textoCompleto: 'Lun–Mié–Vie: 3–6 PM – Estadio Nacional – Rugby – Temporada 2026' },
-      { id: 2, turno: 'Mar–Jue: 3–6 PM', sede: 'Estadio Nacional', disciplina: 'Fútbol', temporada: 'Temporada 2026', vacantes: 30, disponibles: 25, textoCompleto: 'Mar–Jue: 3–6 PM – Estadio Nacional – Fútbol – Temporada 2026' },
-      { id: 3, turno: 'Lun–Mié–Vie: 8–10 AM', sede: 'Estadio Nacional', disciplina: 'Atletismo', temporada: 'Temporada 2026', vacantes: 40, disponibles: 30, textoCompleto: 'Lun–Mié–Vie: 8–10 AM – Estadio Nacional – Atletismo – Temporada 2026' },
-      { id: 4, turno: 'Sáb: 9–12 PM', sede: 'Complejo Chacapampa', disciplina: 'Voleibol', temporada: 'Temporada 2026', vacantes: 25, disponibles: 15, textoCompleto: 'Sáb: 9–12 PM – Complejo Chacapampa – Voleibol – Temporada 2026' },
-      { id: 5, turno: 'Mar–Jue: 4–7 PM', sede: 'Estadio Nacional', disciplina: 'Baloncesto', temporada: 'Temporada 2026', vacantes: 35, disponibles: 28, textoCompleto: 'Mar–Jue: 4–7 PM – Estadio Nacional – Baloncesto – Temporada 2026' },
-      { id: 6, turno: 'Lun–Vie: 5–7 PM', sede: 'Complejo Chacapampa', disciplina: 'Tenis de campo', temporada: 'Temporada 2026', vacantes: 20, disponibles: 12, textoCompleto: 'Lun–Vie: 5–7 PM – Complejo Chacapampa – Tenis de campo – Temporada 2026' }
+      { id: 1, dias: 'Lunes - Miércoles - Viernes', hora: '3 - 6 PM', sede: 'Estadio Nacional', disciplina: 'Rugby', temporada: 'Academia IPD 2026', vacantes: 30, disponibles: 20, textoCompleto: 'Lun-Mié-Vie: 3-6 PM – Estadio Nacional' },
+      { id: 2, dias: 'Martes - Jueves', hora: '3 - 6 PM', sede: 'Estadio Nacional', disciplina: 'Fútbol', temporada: 'Academia IPD 2026', vacantes: 30, disponibles: 25, textoCompleto: 'Mar-Jue: 3-6 PM – Estadio Nacional' },
+      { id: 3, dias: 'Lunes - Miércoles - Viernes', hora: '8 - 10 AM', sede: 'Estadio Nacional', disciplina: 'Atletismo', temporada: 'Academia IPD 2026', vacantes: 40, disponibles: 30, textoCompleto: 'Lun-Mié-Vie: 8-10 AM – Estadio Nacional' },
+      { id: 4, dias: 'Sábado', hora: '9 AM - 12 PM', sede: 'Complejo Chacapampa', disciplina: 'Voleibol', temporada: 'Academia IPD 2026', vacantes: 25, disponibles: 15, textoCompleto: 'Sáb: 9-12 PM – Complejo Chacapampa' },
+      { id: 5, dias: 'Martes - Jueves', hora: '4 - 7 PM', sede: 'Estadio Nacional', disciplina: 'Baloncesto', temporada: 'Academia IPD 2026', vacantes: 35, disponibles: 28, textoCompleto: 'Mar-Jue: 4-7 PM – Estadio Nacional' }
     ];
     this.horariosFiltradosAutocomplete = [...this.todosLosHorarios];
   }
 
-  // =========================
-  // FILTROS USUARIO
-  // =========================
+  // ========================= FILTROS INTERCONECTADOS USUARIO =========================
+
+  inicializarFiltrosUsuario(): void {
+    this.actualizarOpcionesFiltrosUsuario();
+  }
+
+  actualizarOpcionesFiltrosUsuario(): void {
+    let base = this.convocatorias;
+    if (this.busquedaUsuario) {
+      const b = this.busquedaUsuario.toLowerCase();
+      base = base.filter(c => c.titulo.toLowerCase().includes(b) || c.descripcion.toLowerCase().includes(b));
+    }
+
+    let pRegion = base;
+    if (this.sedeSeleccionadaUsuario) pRegion = pRegion.filter(c => c.sede === this.sedeSeleccionadaUsuario);
+    if (this.deporteSeleccionadoUsuario) pRegion = pRegion.filter(c => c.deporte === this.deporteSeleccionadoUsuario);
+    if (this.filtroTipoUsuario) pRegion = pRegion.filter(c => c.tipo === this.filtroTipoUsuario);
+    this.regionesDisponiblesUsuario = [...new Set(pRegion.map(c => c.region).filter(r => r))].sort() as string[];
+
+    let pSede = base;
+    if (this.regionSeleccionadaUsuario) pSede = pSede.filter(c => c.region === this.regionSeleccionadaUsuario);
+    if (this.deporteSeleccionadoUsuario) pSede = pSede.filter(c => c.deporte === this.deporteSeleccionadoUsuario);
+    if (this.filtroTipoUsuario) pSede = pSede.filter(c => c.tipo === this.filtroTipoUsuario);
+    this.sedesDisponiblesUsuario = [...new Set(pSede.map(c => c.sede).filter(s => s))].sort() as string[];
+
+    let pDeporte = base;
+    if (this.regionSeleccionadaUsuario) pDeporte = pDeporte.filter(c => c.region === this.regionSeleccionadaUsuario);
+    if (this.sedeSeleccionadaUsuario) pDeporte = pDeporte.filter(c => c.sede === this.sedeSeleccionadaUsuario);
+    if (this.filtroTipoUsuario) pDeporte = pDeporte.filter(c => c.tipo === this.filtroTipoUsuario);
+    this.deportesDisponiblesUsuario = [...new Set(pDeporte.map(c => c.deporte).filter(d => d))].sort() as string[];
+
+    let pTipo = base;
+    if (this.regionSeleccionadaUsuario) pTipo = pTipo.filter(c => c.region === this.regionSeleccionadaUsuario);
+    if (this.sedeSeleccionadaUsuario) pTipo = pTipo.filter(c => c.sede === this.sedeSeleccionadaUsuario);
+    if (this.deporteSeleccionadoUsuario) pTipo = pTipo.filter(c => c.deporte === this.deporteSeleccionadoUsuario);
+    this.tiposDisponiblesUsuario = [...new Set(pTipo.map(c => c.tipo))];
+  }
 
   aplicarFiltrosUsuario(): void {
     this.convocatoriasFiltradasUsuario = this.convocatorias.filter(conv => {
-      const matchBusqueda = this.busquedaUsuario === '' ||
-        conv.titulo.toLowerCase().includes(this.busquedaUsuario.toLowerCase()) ||
-        conv.descripcion.toLowerCase().includes(this.busquedaUsuario.toLowerCase()) ||
-        conv.subtitulo.toLowerCase().includes(this.busquedaUsuario.toLowerCase());
-      const matchRegion = this.regionSeleccionadaUsuario === '' || conv.region === this.regionSeleccionadaUsuario;
-      const matchSede = this.sedeSeleccionadaUsuario === '' || conv.sede === this.sedeSeleccionadaUsuario;
-      const matchDeporte = this.deporteSeleccionadoUsuario === '' || conv.deporte === this.deporteSeleccionadoUsuario;
-      const matchTipo = this.filtroTipoUsuario === '' || conv.tipo === this.filtroTipoUsuario;
+      const matchBusqueda = !this.busquedaUsuario || conv.titulo.toLowerCase().includes(this.busquedaUsuario.toLowerCase()) || conv.descripcion.toLowerCase().includes(this.busquedaUsuario.toLowerCase());
+      const matchRegion = !this.regionSeleccionadaUsuario || conv.region === this.regionSeleccionadaUsuario;
+      const matchSede = !this.sedeSeleccionadaUsuario || conv.sede === this.sedeSeleccionadaUsuario;
+      const matchDeporte = !this.deporteSeleccionadoUsuario || conv.deporte === this.deporteSeleccionadoUsuario;
+      const matchTipo = !this.filtroTipoUsuario || conv.tipo === this.filtroTipoUsuario;
       return matchBusqueda && matchRegion && matchSede && matchDeporte && matchTipo;
     });
     this.totalConvocatoriasUsuario = this.convocatoriasFiltradasUsuario.length;
     this.pageIndexUsuario = 0;
     this.actualizarPaginacionUsuario();
+    this.actualizarOpcionesFiltrosUsuario();
   }
 
-  onDeporteChange(): void {
+  onFiltroChangeUsuario(): void {
     this.aplicarFiltrosUsuario();
-    if (this.deporteSeleccionadoUsuario && !this.deportesMostrados.has(this.deporteSeleccionadoUsuario)) {
-      const deporteInfo = this.deportesInfo[this.deporteSeleccionadoUsuario];
-      if (deporteInfo) {
-        this.deporteInfoActual = deporteInfo;
+  }
+
+  onDeporteChangeUsuario(): void {
+    const deporteActual = this.deporteSeleccionadoUsuario;
+    this.aplicarFiltrosUsuario();
+    if (deporteActual && deporteActual !== this.ultimoDeporteSeleccionado) {
+      const info = this.deportesInfo[deporteActual];
+      if (info) {
+        this.deporteInfoActual = info;
         this.mostrarModalDeporte = true;
-        this.deportesMostrados.add(this.deporteSeleccionadoUsuario);
       }
     }
+    this.ultimoDeporteSeleccionado = deporteActual;
   }
 
   cerrarModalDeporte(): void {
@@ -354,28 +309,65 @@ export class ConvocatoriaComponent implements OnInit {
     this.sedeSeleccionadaUsuario = '';
     this.deporteSeleccionadoUsuario = '';
     this.filtroTipoUsuario = '';
+    this.ultimoDeporteSeleccionado = '';
     this.aplicarFiltrosUsuario();
   }
 
-  // =========================
-  // FILTROS GESTIÓN
-  // =========================
+  // ========================= FILTROS INTERCONECTADOS GESTIÓN =========================
+
+  inicializarFiltrosGestion(): void {
+    this.actualizarOpcionesFiltrosGestion();
+  }
+
+  actualizarOpcionesFiltrosGestion(): void {
+    let base = this.convocatorias;
+    if (this.busquedaGestion) {
+      const b = this.busquedaGestion.toLowerCase();
+      base = base.filter(c => c.titulo.toLowerCase().includes(b) || c.descripcion.toLowerCase().includes(b));
+    }
+
+    let pRegion = base;
+    if (this.sedeSeleccionadaGestion) pRegion = pRegion.filter(c => c.sede === this.sedeSeleccionadaGestion);
+    if (this.deporteSeleccionadoGestion) pRegion = pRegion.filter(c => c.deporte === this.deporteSeleccionadoGestion);
+    if (this.filtroTipoGestion) pRegion = pRegion.filter(c => c.tipo === this.filtroTipoGestion);
+    this.regionesDisponiblesGestion = [...new Set(pRegion.map(c => c.region).filter(r => r))].sort() as string[];
+
+    let pSede = base;
+    if (this.regionSeleccionadaGestion) pSede = pSede.filter(c => c.region === this.regionSeleccionadaGestion);
+    if (this.deporteSeleccionadoGestion) pSede = pSede.filter(c => c.deporte === this.deporteSeleccionadoGestion);
+    if (this.filtroTipoGestion) pSede = pSede.filter(c => c.tipo === this.filtroTipoGestion);
+    this.sedesDisponiblesGestion = [...new Set(pSede.map(c => c.sede).filter(s => s))].sort() as string[];
+
+    let pDeporte = base;
+    if (this.regionSeleccionadaGestion) pDeporte = pDeporte.filter(c => c.region === this.regionSeleccionadaGestion);
+    if (this.sedeSeleccionadaGestion) pDeporte = pDeporte.filter(c => c.sede === this.sedeSeleccionadaGestion);
+    if (this.filtroTipoGestion) pDeporte = pDeporte.filter(c => c.tipo === this.filtroTipoGestion);
+    this.deportesDisponiblesGestion = [...new Set(pDeporte.map(c => c.deporte).filter(d => d))].sort() as string[];
+
+    let pTipo = base;
+    if (this.regionSeleccionadaGestion) pTipo = pTipo.filter(c => c.region === this.regionSeleccionadaGestion);
+    if (this.sedeSeleccionadaGestion) pTipo = pTipo.filter(c => c.sede === this.sedeSeleccionadaGestion);
+    if (this.deporteSeleccionadoGestion) pTipo = pTipo.filter(c => c.deporte === this.deporteSeleccionadoGestion);
+    this.tiposDisponiblesGestion = [...new Set(pTipo.map(c => c.tipo))];
+  }
 
   aplicarFiltrosGestion(): void {
     this.convocatoriasFiltradasGestion = this.convocatorias.filter(conv => {
-      const matchBusqueda = this.busquedaGestion === '' ||
-        conv.titulo.toLowerCase().includes(this.busquedaGestion.toLowerCase()) ||
-        conv.descripcion.toLowerCase().includes(this.busquedaGestion.toLowerCase()) ||
-        conv.subtitulo.toLowerCase().includes(this.busquedaGestion.toLowerCase());
-      const matchRegion = this.regionSeleccionadaGestion === '' || conv.region === this.regionSeleccionadaGestion;
-      const matchSede = this.sedeSeleccionadaGestion === '' || conv.sede === this.sedeSeleccionadaGestion;
-      const matchDeporte = this.deporteSeleccionadoGestion === '' || conv.deporte === this.deporteSeleccionadoGestion;
-      const matchTipo = this.filtroTipoGestion === '' || conv.tipo === this.filtroTipoGestion;
+      const matchBusqueda = !this.busquedaGestion || conv.titulo.toLowerCase().includes(this.busquedaGestion.toLowerCase()) || conv.descripcion.toLowerCase().includes(this.busquedaGestion.toLowerCase());
+      const matchRegion = !this.regionSeleccionadaGestion || conv.region === this.regionSeleccionadaGestion;
+      const matchSede = !this.sedeSeleccionadaGestion || conv.sede === this.sedeSeleccionadaGestion;
+      const matchDeporte = !this.deporteSeleccionadoGestion || conv.deporte === this.deporteSeleccionadoGestion;
+      const matchTipo = !this.filtroTipoGestion || conv.tipo === this.filtroTipoGestion;
       return matchBusqueda && matchRegion && matchSede && matchDeporte && matchTipo;
     });
     this.totalConvocatoriasGestion = this.convocatoriasFiltradasGestion.length;
     this.pageIndexGestion = 0;
     this.actualizarPaginacionGestion();
+    this.actualizarOpcionesFiltrosGestion();
+  }
+
+  onFiltroChangeGestion(): void {
+    this.aplicarFiltrosGestion();
   }
 
   limpiarFiltrosGestion(): void {
@@ -387,14 +379,11 @@ export class ConvocatoriaComponent implements OnInit {
     this.aplicarFiltrosGestion();
   }
 
-  // =========================
-  // PAGINACIÓN
-  // =========================
+  // ========================= PAGINACIÓN =========================
 
   actualizarPaginacionUsuario(): void {
     const inicio = this.pageIndexUsuario * this.pageSizeUsuario;
-    const fin = inicio + this.pageSizeUsuario;
-    this.convocatoriasPaginadasUsuario = this.convocatoriasFiltradasUsuario.slice(inicio, fin);
+    this.convocatoriasPaginadasUsuario = this.convocatoriasFiltradasUsuario.slice(inicio, inicio + this.pageSizeUsuario);
   }
 
   cambiarPaginaUsuario(event: any): void {
@@ -405,8 +394,7 @@ export class ConvocatoriaComponent implements OnInit {
 
   actualizarPaginacionGestion(): void {
     const inicio = this.pageIndexGestion * this.pageSizeGestion;
-    const fin = inicio + this.pageSizeGestion;
-    this.convocatoriasPaginadasGestion = this.convocatoriasFiltradasGestion.slice(inicio, fin);
+    this.convocatoriasPaginadasGestion = this.convocatoriasFiltradasGestion.slice(inicio, inicio + this.pageSizeGestion);
   }
 
   cambiarPaginaGestion(event: any): void {
@@ -415,12 +403,39 @@ export class ConvocatoriaComponent implements OnInit {
     this.actualizarPaginacionGestion();
   }
 
-  // =========================
-  // AUTOCOMPLETE DE HORARIOS
-  // =========================
+  // ========================= FLIP CARD =========================
 
-  displayHorario(horario: Horario | null): string {
-    return horario ? horario.turno : '';
+  toggleFlipCard(conv: Convocatoria, event: Event): void {
+    event.stopPropagation();
+    conv.isFlipped = !conv.isFlipped;
+  }
+
+  // ========================= OCUPACIÓN =========================
+
+  getPorcentajeOcupacion(conv: Convocatoria): number {
+    if (conv.numvacantes === 0) return 100;
+    const ocupados = conv.numvacantes - conv.numdisponibles;
+    return Math.round((ocupados / conv.numvacantes) * 100);
+  }
+
+  getClaseOcupacion(conv: Convocatoria): string {
+    const p = this.getPorcentajeOcupacion(conv);
+    if (p < 50) return 'ocupacion-baja';
+    if (p < 80) return 'ocupacion-media';
+    return 'ocupacion-alta';
+  }
+
+  getColorBarra(conv: Convocatoria): string {
+    const p = this.getPorcentajeOcupacion(conv);
+    if (p < 50) return '#4caf50';
+    if (p < 80) return '#ff9800';
+    return '#f44336';
+  }
+
+  // ========================= HORARIOS =========================
+
+  displayHorario(h: Horario | null): string {
+    return h ? `${h.dias} - ${h.hora}` : '';
   }
 
   onHorarioSelected(event: MatAutocompleteSelectedEvent): void {
@@ -428,115 +443,54 @@ export class ConvocatoriaComponent implements OnInit {
   }
 
   filtrarHorariosAutocomplete(): void {
-    const texto = this.horarioSeleccionadoTexto;
-    if (!texto || texto.trim() === '') {
+    const t = this.horarioSeleccionadoTexto?.toLowerCase().trim() || '';
+    if (!t) {
       this.horariosFiltradosAutocomplete = [...this.todosLosHorarios];
       return;
     }
-    const busquedaLower = texto.toLowerCase().trim();
-    this.horariosFiltradosAutocomplete = this.todosLosHorarios.filter(horario =>
-      (horario.textoCompleto && horario.textoCompleto.toLowerCase().includes(busquedaLower)) ||
-      horario.turno.toLowerCase().includes(busquedaLower) ||
-      horario.sede.toLowerCase().includes(busquedaLower) ||
-      horario.disciplina.toLowerCase().includes(busquedaLower) ||
-      horario.temporada.toLowerCase().includes(busquedaLower)
+    this.horariosFiltradosAutocomplete = this.todosLosHorarios.filter(h =>
+      h.textoCompleto?.toLowerCase().includes(t) || h.dias.toLowerCase().includes(t) || h.sede.toLowerCase().includes(t)
     );
   }
 
   agregarHorario(): void {
     if (!this.horarioTemporal) return;
-    const yaAgregado = this.horariosAgregados.some(h => h.id === this.horarioTemporal!.id);
-    if (yaAgregado) {
-      this.mostrarMensajeFlotante('error', 'Este horario ya ha sido agregado');
+    if (this.horariosAgregados.some(h => h.id === this.horarioTemporal!.id)) {
+      this.mostrarMensajeFlotante('error', 'Este horario ya fue agregado');
       return;
     }
     this.horariosAgregados.push(this.horarioTemporal);
     this.horarioSeleccionadoTexto = '';
     this.horarioTemporal = null;
     this.horariosFiltradosAutocomplete = [...this.todosLosHorarios];
-    this.mostrarMensajeFlotante('success', 'Horario agregado correctamente');
+    this.mostrarMensajeFlotante('success', 'Horario agregado');
   }
 
-  eliminarHorario(horario: Horario): void {
-    const index = this.horariosAgregados.findIndex(h => h.id === horario.id);
-    if (index !== -1) {
-      this.horariosAgregados.splice(index, 1);
+  eliminarHorario(h: Horario): void {
+    const i = this.horariosAgregados.findIndex(x => x.id === h.id);
+    if (i !== -1) {
+      this.horariosAgregados.splice(i, 1);
       this.mostrarMensajeFlotante('success', 'Horario eliminado');
     }
   }
 
-  // =========================
-  // NAVEGACIÓN DE HORARIOS
-  // =========================
-
-  tieneMultiplesHorarios(conv: Convocatoria): boolean {
-    return conv.horarios && conv.horarios.length > 1;
+  getTotalDisponibles(c: Convocatoria): number {
+    return c.horarios?.reduce((s, h) => s + h.disponibles, 0) || c.numdisponibles;
   }
 
-  getHorarioActual(conv: Convocatoria): Horario {
-    if (!conv.horarios || conv.horarios.length === 0) {
-      return { id: 0, turno: 'Sin horario', sede: '', disciplina: '', temporada: '', vacantes: 0, disponibles: 0 };
-    }
-    const index = conv.horarioActual || 0;
-    return conv.horarios[index];
+  getTotalVacantes(c: Convocatoria): number {
+    return c.horarios?.reduce((s, h) => s + h.vacantes, 0) || c.numvacantes;
   }
 
-  anteriorHorario(conv: Convocatoria): void {
-    if (!conv.horarios || conv.horarios.length === 0) return;
-    if (conv.horarioActual === undefined) conv.horarioActual = 0;
-    conv.horarioActual = (conv.horarioActual - 1 + conv.horarios.length) % conv.horarios.length;
-  }
+  // ========================= ACCIONES =========================
 
-  siguienteHorario(conv: Convocatoria): void {
-    if (!conv.horarios || conv.horarios.length === 0) return;
-    if (conv.horarioActual === undefined) conv.horarioActual = 0;
-    conv.horarioActual = (conv.horarioActual + 1) % conv.horarios.length;
-  }
-
-  getTotalDisponibles(conv: Convocatoria): number {
-    if (!conv.horarios || conv.horarios.length === 0) return 0;
-    return conv.horarios.reduce((total, horario) => total + horario.disponibles, 0);
-  }
-
-  getTotalVacantes(conv: Convocatoria): number {
-    if (!conv.horarios || conv.horarios.length === 0) return 0;
-    return conv.horarios.reduce((total, horario) => total + horario.vacantes, 0);
-  }
-
-  getCuposColor(disponibles: number, vacantes: number): string {
-    const porcentaje = (disponibles / vacantes) * 100;
-    if (porcentaje < 30) return 'linear-gradient(135deg, #f44336, #d32f2f)';
-    if (porcentaje < 60) return 'linear-gradient(135deg, #ff9800, #f57c00)';
-    return 'linear-gradient(135deg, #4caf50, #388e3c)';
-  }
-
-  // =========================
-  // ACCIONES
-  // =========================
-
-  inscribirse(conv: Convocatoria): void {
+  inscribirse(conv: Convocatoria, event: Event): void {
+    event.stopPropagation();
     if (conv.estado === 'cerrada') {
-      this.mostrarMensajeFlotante('error', 'Esta convocatoria se encuentra cerrada');
+      this.mostrarMensajeFlotante('error', 'Esta convocatoria está cerrada');
       return;
     }
-    this.mostrarMensajeFlotante('success', `Redirigiendo a inscripción de: ${conv.titulo}`);
-  }
-
-  compartir(conv: Convocatoria): void {
-    const url = `${window.location.origin}/convocatorias/${conv.id_convocatoria}`;
-    if (navigator.share) {
-      navigator.share({ title: conv.titulo, text: conv.descripcion, url: url })
-        .then(() => this.mostrarMensajeFlotante('success', 'Compartido exitosamente'))
-        .catch(() => this.copiarAlPortapapeles(url));
-    } else {
-      this.copiarAlPortapapeles(url);
-    }
-  }
-
-  copiarAlPortapapeles(texto: string): void {
-    navigator.clipboard.writeText(texto)
-      .then(() => this.mostrarMensajeFlotante('success', 'Enlace copiado al portapapeles'))
-      .catch(() => this.mostrarMensajeFlotante('error', 'Error al copiar enlace'));
+    this.mostrarMensajeFlotante('success', `Redirigiendo a inscripción: ${conv.titulo}`);
   }
 
   verPreview(conv: Convocatoria): void {
@@ -549,12 +503,9 @@ export class ConvocatoriaComponent implements OnInit {
     this.convocatoriaPreview = null;
   }
 
-  // =========================
-  // MODO GESTIÓN
-  // =========================
-
   toggleModoGestion(): void {
     this.modoGestion = !this.modoGestion;
+    this.convocatorias.forEach(c => c.isFlipped = false);
     if (this.modoGestion) {
       this.pageIndexGestion = 0;
       this.actualizarPaginacionGestion();
@@ -592,116 +543,67 @@ export class ConvocatoriaComponent implements OnInit {
   }
 
   confirmarEliminar(conv: Convocatoria): void {
-    this.abrirConfirmacion(
-      'Eliminar Convocatoria',
-      `¿Está seguro de eliminar "${conv.titulo}"? Esta acción no se puede deshacer.`,
-      () => this.eliminarConvocatoria(conv)
-    );
+    this.abrirConfirmacion('Eliminar Convocatoria', `¿Eliminar "${conv.titulo}"?`, () => this.eliminarConvocatoria(conv));
   }
 
   eliminarConvocatoria(conv: Convocatoria): void {
-    this.mostrarMensajeFlotante('loading', 'Eliminando convocatoria...');
+    this.mostrarMensajeFlotante('loading', 'Eliminando...');
     setTimeout(() => {
-      const index = this.convocatorias.findIndex(c => c.id_convocatoria === conv.id_convocatoria);
-      if (index !== -1) {
-        this.convocatorias.splice(index, 1);
+      const i = this.convocatorias.findIndex(c => c.id_convocatoria === conv.id_convocatoria);
+      if (i !== -1) {
+        this.convocatorias.splice(i, 1);
         this.aplicarFiltrosUsuario();
         this.aplicarFiltrosGestion();
-        this.mostrarMensajeFlotante('success', 'Convocatoria eliminada exitosamente');
+        this.mostrarMensajeFlotante('success', 'Eliminada exitosamente');
       }
     }, 800);
   }
 
-  // =========================
-  // FORMULARIO
-  // =========================
-
   crearConvocatoriaVacia(): Convocatoria {
     return {
-      id_convocatoria: 0,
-      titulo: '',
-      subtitulo: '',
-      descripcion: '',
-      urlimagen: '',
-      deporte: '',
-      tipo: 'deporte',
-      horarios: [],
-      numvacantes: 0,
-      numdisponibles: 0,
-      numinscritos: 0,
-      estado: 'activa',
-      region: '',
-      sede: '',
-      fechacreada: null,
-      horarioActual: 0
+      id_convocatoria: 0, titulo: '', subtitulo: '', descripcion: '', urlimagen: '',
+      deporte: '', tipo: 'deporte', horarios: [], numvacantes: 0, numdisponibles: 0,
+      numinscritos: 0, estado: 'activa', region: '', sede: '', temporada: 'Temporada 2026',
+      fechacreada: null, isFlipped: false
     };
   }
 
   seleccionarImagen(event: any): void {
-    const archivo = event.target.files[0];
-    if (archivo) {
-      this.imagenSeleccionada = archivo;
+    const f = event.target.files[0];
+    if (f) {
+      this.imagenSeleccionada = f;
       const reader = new FileReader();
-      reader.onload = (e: any) => {
-        this.imagenPreview = e.target.result;
-      };
-      reader.readAsDataURL(archivo);
+      reader.onload = (e: any) => { this.imagenPreview = e.target.result; };
+      reader.readAsDataURL(f);
     }
   }
 
   validarFormulario(): boolean {
     this.erroresFormulario = {};
-    let valido = true;
-
-    if (!this.nuevaConvocatoria.titulo || this.nuevaConvocatoria.titulo.trim() === '') {
-      this.erroresFormulario['titulo'] = true;
-      valido = false;
-    }
-    if (!this.nuevaConvocatoria.subtitulo || this.nuevaConvocatoria.subtitulo.trim() === '') {
-      this.erroresFormulario['subtitulo'] = true;
-      valido = false;
-    }
-    if (!this.nuevaConvocatoria.descripcion || this.nuevaConvocatoria.descripcion.trim() === '') {
-      this.erroresFormulario['descripcion'] = true;
-      valido = false;
-    }
-    if (this.horariosAgregados.length === 0) {
-      this.erroresFormulario['horarios'] = true;
-      valido = false;
-      this.mostrarMensajeFlotante('error', 'Debe agregar al menos un horario');
-    }
-    if (this.nuevaConvocatoria.numvacantes <= 0) {
-      this.erroresFormulario['numvacantes'] = true;
-      valido = false;
-    }
-
-    return valido;
+    let v = true;
+    if (!this.nuevaConvocatoria.titulo?.trim()) { this.erroresFormulario['titulo'] = true; v = false; }
+    if (!this.nuevaConvocatoria.subtitulo?.trim()) { this.erroresFormulario['subtitulo'] = true; v = false; }
+    if (!this.nuevaConvocatoria.descripcion?.trim()) { this.erroresFormulario['descripcion'] = true; v = false; }
+    if (this.horariosAgregados.length === 0) { this.erroresFormulario['horarios'] = true; v = false; this.mostrarMensajeFlotante('error', 'Agregue al menos un horario'); }
+    if (this.nuevaConvocatoria.numvacantes <= 0) { this.erroresFormulario['numvacantes'] = true; v = false; }
+    return v;
   }
 
   guardarConvocatoria(): void {
-    if (!this.validarFormulario()) {
-      this.mostrarMensajeFlotante('error', 'Por favor complete todos los campos obligatorios');
-      return;
-    }
-
+    if (!this.validarFormulario()) { this.mostrarMensajeFlotante('error', 'Complete todos los campos'); return; }
     this.nuevaConvocatoria.horarios = [...this.horariosAgregados];
-    // Calcular disponibles basado en horarios
-    this.nuevaConvocatoria.numdisponibles = this.horariosAgregados.reduce((sum, h) => sum + h.disponibles, 0);
-    
-    this.mostrarMensajeFlotante('loading', this.modoEdicion ? 'Actualizando convocatoria...' : 'Guardando convocatoria...');
-
+    this.nuevaConvocatoria.numdisponibles = this.horariosAgregados.reduce((s, h) => s + h.disponibles, 0);
+    this.mostrarMensajeFlotante('loading', this.modoEdicion ? 'Actualizando...' : 'Guardando...');
     setTimeout(() => {
       if (this.modoEdicion && this.convocatoriaEditando) {
-        const index = this.convocatorias.findIndex(c => c.id_convocatoria === this.convocatoriaEditando!.id_convocatoria);
-        if (index !== -1) {
-          this.convocatorias[index] = { ...this.nuevaConvocatoria };
-        }
-        this.mostrarMensajeFlotante('success', 'Convocatoria actualizada exitosamente');
+        const i = this.convocatorias.findIndex(c => c.id_convocatoria === this.convocatoriaEditando!.id_convocatoria);
+        if (i !== -1) this.convocatorias[i] = { ...this.nuevaConvocatoria };
+        this.mostrarMensajeFlotante('success', 'Actualizada');
       } else {
         this.nuevaConvocatoria.id_convocatoria = this.convocatorias.length + 1;
         this.nuevaConvocatoria.fechacreada = new Date();
         this.convocatorias.unshift({ ...this.nuevaConvocatoria });
-        this.mostrarMensajeFlotante('success', 'Convocatoria creada exitosamente');
+        this.mostrarMensajeFlotante('success', 'Creada');
       }
       this.cerrarFormulario();
       this.aplicarFiltrosUsuario();
@@ -719,20 +621,13 @@ export class ConvocatoriaComponent implements OnInit {
     this.imagenPreview = '';
     this.horarioSeleccionadoTexto = '';
     this.horarioTemporal = null;
-    this.horariosFiltradosAutocomplete = [...this.todosLosHorarios];
   }
-
-  // =========================
-  // MENSAJES Y CONFIRMACIONES
-  // =========================
 
   mostrarMensajeFlotante(tipo: 'success' | 'error' | 'loading', texto: string): void {
     this.tipoMensaje = tipo;
     this.textoMensaje = texto;
     this.mostrarMensajeCentral = true;
-    if (tipo !== 'loading') {
-      setTimeout(() => { this.mostrarMensajeCentral = false; }, 3000);
-    }
+    if (tipo !== 'loading') setTimeout(() => { this.mostrarMensajeCentral = false; }, 3000);
   }
 
   abrirConfirmacion(titulo: string, mensaje: string, accion: () => void): void {
@@ -744,10 +639,7 @@ export class ConvocatoriaComponent implements OnInit {
 
   confirmarAccion(): void {
     this.mostrarConfirmacion = false;
-    if (this.accionConfirmacion) {
-      this.accionConfirmacion();
-      this.accionConfirmacion = null;
-    }
+    if (this.accionConfirmacion) { this.accionConfirmacion(); this.accionConfirmacion = null; }
   }
 
   cancelarConfirmacion(): void {
@@ -755,154 +647,72 @@ export class ConvocatoriaComponent implements OnInit {
     this.accionConfirmacion = null;
   }
 
-  // =========================
-  // UTILIDADES
-  // =========================
-
-  actualizarEstadosPorCupos(): void {
-    this.convocatorias.forEach(conv => {
-      conv.estado = conv.numdisponibles === 0 ? 'cerrada' : 'activa';
-    });
-  }
-
-  getEstadoClass(estado: string): string {
-    return estado === 'activa' ? 'estado-activa' : 'estado-cerrada';
-  }
-
-  getEstadoTexto(estado: string): string {
-    return estado === 'activa' ? 'Activa' : 'Cerrada';
-  }
-
-  getTipoTexto(tipo: string): string {
-    return tipo === 'paradeporte' ? 'Para Deporte' : 'Deporte';
-  }
-
-  getTipoClass(tipo: string): string {
-    return tipo === 'paradeporte' ? 'tipo-paradeporte' : 'tipo-deporte';
-  }
-
-  // =========================
-  // DATOS DE EJEMPLO
-  // =========================
+  getEstadoClass(e: string): string { return e === 'activa' ? 'estado-activa' : 'estado-cerrada'; }
+  getEstadoTexto(e: string): string { return e === 'activa' ? 'Activa' : 'Cerrada'; }
+  getTipoTexto(t: string): string { return t === 'paradeporte' ? 'Para Deporte' : 'Deporte'; }
+  getTipoClass(t: string): string { return t === 'paradeporte' ? 'tipo-paradeporte' : 'tipo-deporte'; }
 
   obtenerDatosEjemplo(): Convocatoria[] {
-    const convocatorias: Convocatoria[] = [];
+    const conv: Convocatoria[] = [];
     let id = 1;
-
-    const deportesNormales = ['Rugby', 'Tenis de campo', 'Judo', 'Voleibol', 'Futbol', 'Baloncesto', 'Atletismo', 'Pickleball'];
+    const deportes = ['Rugby', 'Tenis de campo', 'Judo', 'Voleibol', 'Futbol', 'Baloncesto', 'Atletismo', 'Pickleball'];
     
-    deportesNormales.forEach(deporte => {
-      convocatorias.push({
-        id_convocatoria: id++,
-        titulo: `${deporte}`,
-        subtitulo: 'Temporada 2026',
-        descripcion: `Inscripciones abiertas para ${deporte}. ¡Totalmente gratuito!`,
-        urlimagen: 'https://i.imgur.com/srcVUcm.png',
-        deporte: deporte,
-        tipo: 'deporte',
-        horarios: [{ id: id, turno: 'Lun-Mié-Vie: 3-6 PM', sede: 'Estadio Nacional', disciplina: deporte, temporada: 'Temporada 2026', vacantes: 30, disponibles: 20, textoCompleto: `Lun-Mié-Vie – 3-6 PM – Estadio Nacional – ${deporte}` }],
-        numvacantes: 30,
-        numdisponibles: 20,
-        numinscritos: 10,
-        estado: 'activa',
-        region: 'Lima',
-        sede: 'Estadio Nacional',
-        fechacreada: new Date(),
-        horarioActual: 0
+    deportes.forEach(d => {
+      conv.push({
+        id_convocatoria: id++, titulo: d, subtitulo: 'Academia IPD - Temporada 2026',
+        descripcion: `Inscripciones abiertas para ${d}. ¡Totalmente gratuito!`,
+        urlimagen: 'https://i.imgur.com/srcVUcm.png', deporte: d, tipo: 'deporte', temporada: 'Temporada 2026',
+        horarios: [{ id: id, dias: 'Lunes - Miércoles - Viernes', hora: '3 - 6 PM', sede: 'Estadio Nacional', disciplina: d, temporada: 'Academia IPD 2026', vacantes: 60, disponibles: 42, textoCompleto: 'Lun-Mié-Vie: 3-6 PM' }],
+        numvacantes: 60, numdisponibles: 42, numinscritos: 18, estado: 'activa',
+        region: 'Lima', sede: 'Estadio Nacional', fechacreada: new Date(), isFlipped: false
       });
     });
 
-    deportesNormales.forEach(deporte => {
-      convocatorias.push({
-        id_convocatoria: id++,
-        titulo: `${deporte}`,
-        subtitulo: 'Temporada 2026',
-        descripcion: `Inscripciones abiertas para ${deporte}. Múltiples horarios.`,
-        urlimagen: 'https://i.imgur.com/srcVUcm.png',
-        deporte: deporte,
-        tipo: 'deporte',
-        horarios: [
-          { id: id * 10, turno: 'Mar-Jue: 3-6 PM', sede: 'Estadio Nacional', disciplina: deporte, temporada: 'Temporada 2026', vacantes: 30, disponibles: 15, textoCompleto: `Mar-Jue: 3-6 PM – ${deporte}` },
-          { id: id * 10 + 1, turno: 'Lun-Mié-Vie: 8-10 AM', sede: 'Estadio Nacional', disciplina: deporte, temporada: 'Temporada 2026', vacantes: 25, disponibles: 18, textoCompleto: `Lun-Mié-Vie: 8-10 AM – ${deporte}` }
-        ],
-        numvacantes: 55,
-        numdisponibles: 33,
-        numinscritos: 22,
-        estado: 'activa',
-        region: 'Lima',
-        sede: 'Estadio Nacional',
-        fechacreada: new Date(),
-        horarioActual: 0
+    conv.push({
+      id_convocatoria: id++, titulo: 'Voleibol', subtitulo: 'Academia IPD - Múltiples Horarios',
+      descripcion: 'Inscripciones con dos horarios disponibles.',
+      urlimagen: 'https://i.imgur.com/srcVUcm.png', deporte: 'Voleibol', tipo: 'deporte', temporada: 'Temporada 2026',
+      horarios: [
+        { id: id * 10, dias: 'Martes - Jueves', hora: '3 - 6 PM', sede: 'Estadio Nacional', disciplina: 'Voleibol', temporada: 'Academia IPD 2026', vacantes: 30, disponibles: 15, textoCompleto: 'Mar-Jue: 3-6 PM' },
+        { id: id * 10 + 1, dias: 'Sábado', hora: '9 AM - 12 PM', sede: 'Complejo Chacapampa', disciplina: 'Voleibol', temporada: 'Academia IPD 2026', vacantes: 25, disponibles: 18, textoCompleto: 'Sáb: 9-12 PM' }
+      ],
+      numvacantes: 55, numdisponibles: 33, numinscritos: 22, estado: 'activa',
+      region: 'Lima', sede: 'Estadio Nacional', fechacreada: new Date(), isFlipped: false
+    });
+
+    [{ d: 'Atletismo', n: 'Para Atletismo' }, { d: 'Judo', n: 'Para Judo' }].forEach(pd => {
+      conv.push({
+        id_convocatoria: id++, titulo: pd.n, subtitulo: 'Academia IPD Para Deporte',
+        descripcion: `Programa inclusivo de ${pd.n}.`,
+        urlimagen: 'https://i.imgur.com/srcVUcm.png', deporte: pd.d, tipo: 'paradeporte', temporada: 'Temporada 2026',
+        horarios: [{ id: id * 100, dias: 'Lunes - Miércoles - Viernes', hora: '3 - 6 PM', sede: 'Estadio Nacional', disciplina: pd.d, temporada: 'Academia IPD 2026', vacantes: 25, disponibles: 8, textoCompleto: 'Lun-Mié-Vie: 3-6 PM' }],
+        numvacantes: 25, numdisponibles: 8, numinscritos: 17, estado: 'activa',
+        region: 'Lima', sede: 'Estadio Nacional', fechacreada: new Date(), isFlipped: false
       });
     });
 
-    const paraDeportes = [
-      { deporte: 'Atletismo', nombre: 'Para Atletismo (Atletismo Adaptado)' },
-      { deporte: 'Tenis de campo', nombre: 'Tenis de Campo para Discapacidad Intelectual' },
-      { deporte: 'Futbol', nombre: 'Futbol de Ciego' },
-      { deporte: 'Judo', nombre: 'Para Judo' }
-    ];
-
-    paraDeportes.forEach(pd => {
-      convocatorias.push({
-        id_convocatoria: id++,
-        titulo: pd.nombre,
-        subtitulo: 'Temporada 2026',
-        descripcion: `Programa inclusivo de ${pd.nombre} para personas con discapacidad.`,
-        urlimagen: 'https://i.imgur.com/srcVUcm.png',
-        deporte: pd.deporte,
-        tipo: 'paradeporte',
-        horarios: [{ id: id * 100, turno: 'Lun-Mié-Vie: 3-6 PM', sede: 'Estadio Nacional', disciplina: pd.deporte, temporada: 'Temporada 2026', vacantes: 25, disponibles: 18, textoCompleto: `Lun-Mié-Vie: 3-6 PM – ${pd.deporte}` }],
-        numvacantes: 25,
-        numdisponibles: 18,
-        numinscritos: 7,
-        estado: 'activa',
-        region: 'Lima',
-        sede: 'Estadio Nacional',
-        fechacreada: new Date(),
-        horarioActual: 0
-      });
+    conv.push({
+      id_convocatoria: id++, titulo: 'Futbol', subtitulo: 'ACADEMIA IPD - Cusco',
+      descripcion: 'Programa cerrado.',
+      urlimagen: 'https://i.imgur.com/srcVUcm.png', deporte: 'Futbol', tipo: 'deporte', temporada: 'Temporada 2025',
+      horarios: [{ id: id * 1000, dias: 'Martes - Jueves', hora: '3 - 6 PM', sede: 'Complejo Cusco', disciplina: 'Futbol', temporada: 'Academia IPD 2025', vacantes: 150, disponibles: 0, textoCompleto: 'Mar-Jue: 3-6 PM' }],
+      numvacantes: 150, numdisponibles: 0, numinscritos: 150, estado: 'cerrada',
+      region: 'Cusco', sede: 'Complejo Cusco', fechacreada: new Date(), isFlipped: false
     });
 
-    convocatorias.push(
-      {
-        id_convocatoria: id++,
-        titulo: 'Vóley IPD Chacapampa',
-        subtitulo: 'ACADEMIA IPD',
-        descripcion: 'Inscripciones abiertas para vóley.',
-        urlimagen: 'https://i.imgur.com/srcVUcm.png',
-        deporte: 'Voleibol',
-        tipo: 'deporte',
-        horarios: [{ id: id * 1000, turno: 'Lun-Mié-Vie: 3-6 PM', sede: 'Complejo Chacapampa', disciplina: 'Voleibol', temporada: 'Temporada 2026', vacantes: 60, disponibles: 42, textoCompleto: 'Lun-Mié-Vie: 3-6 PM – Voleibol' }],
-        numvacantes: 60,
-        numdisponibles: 42,
-        numinscritos: 18,
-        estado: 'activa',
-        region: 'Lima',
-        sede: 'Complejo Chacapampa',
-        fechacreada: new Date(),
-        horarioActual: 0
-      },
-      {
-        id_convocatoria: id++,
-        titulo: 'Cusco Multideporte 2024',
-        subtitulo: 'ACADEMIA IPD',
-        descripcion: 'Programa multideportivo.',
-        urlimagen: 'https://i.imgur.com/srcVUcm.png',
-        deporte: 'Futbol',
-        tipo: 'deporte',
-        horarios: [{ id: id * 1000, turno: 'Mar-Jue: 3-6 PM', sede: 'Complejo Deportivo Cusco', disciplina: 'Futbol', temporada: 'Temporada 2026', vacantes: 150, disponibles: 0, textoCompleto: 'Mar-Jue: 3-6 PM – Futbol' }],
-        numvacantes: 150,
-        numdisponibles: 0,
-        numinscritos: 150,
-        estado: 'cerrada',
-        region: 'Cusco',
-        sede: 'Complejo Deportivo Cusco',
-        fechacreada: new Date(),
-        horarioActual: 0
-      }
-    );
-
-    return convocatorias;
+    return conv;
   }
+
+
+  my= new FormControl('');
+  options: string[] = ['One', 'Two', 'Three'];
+  filteredOptions: Observable<string[]>;
+
+
+  private _filter(value: string): string[] {
+    const filterValue = value.toLowerCase();
+
+    return this.options.filter(option => option.toLowerCase().includes(filterValue));
+  }
+
 }
