@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, CUSTOM_ELEMENTS_SCHEMA, OnInit } from '@angular/core';
 import { register } from 'swiper/element/bundle';
 import { MaterialModule } from '../../material/material.module';
@@ -21,7 +21,7 @@ interface Producto {
 }
 @Component({
   selector: 'app-home',
-  imports: [CommonModule, MaterialModule, RouterLink],
+  imports: [MaterialModule, RouterLink],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'

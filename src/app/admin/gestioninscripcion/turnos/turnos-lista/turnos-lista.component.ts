@@ -1,13 +1,13 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { MatTableDataSource } from '@angular/material/table';
-import { CommonModule } from '@angular/common';
+
 import { MaterialModule } from '../../../../material/material.module';
 
 @Component({
   selector: 'app-turno',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, MaterialModule],
+  imports: [ReactiveFormsModule, MaterialModule],
   templateUrl: './turnos-lista.component.html',
   styleUrls: ['./turnos-lista.component.css']
 })

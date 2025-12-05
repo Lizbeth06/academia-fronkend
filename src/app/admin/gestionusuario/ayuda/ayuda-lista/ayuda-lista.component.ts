@@ -1,10 +1,10 @@
 import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { MaterialModule } from '../../../../material/material.module';
 
 @Component({
   selector: 'app-ayuda-lista',
-  imports: [MaterialModule,CommonModule],
+  imports: [MaterialModule],
   templateUrl: './ayuda-lista.component.html',
   styleUrl: './ayuda-lista.component.css'
 })

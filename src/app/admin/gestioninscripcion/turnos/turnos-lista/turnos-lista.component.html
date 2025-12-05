@@ -18,9 +18,11 @@
         <mat-form-field appearance="outline">
           <mat-label>Horario</mat-label>
           <mat-select formControlName="id_horario">
-            <mat-option *ngFor="let h of horarios" [value]="h.id">
-              {{ h.descripcion }}
-            </mat-option>
+            @for (h of horarios; track h) {
+              <mat-option [value]="h.id">
+                {{ h.descripcion }}
+              </mat-option>
+            }
           </mat-select>
         </mat-form-field>
 

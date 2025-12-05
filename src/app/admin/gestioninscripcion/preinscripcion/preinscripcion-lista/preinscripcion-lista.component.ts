@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
@@ -82,7 +82,6 @@ export interface ModalInformativo {
   selector: 'app-pre-inscripcion',
   standalone: true,
   imports: [
-    CommonModule,
     ReactiveFormsModule,
     MatStepperModule,
     MatFormFieldModule,
@@ -99,7 +98,7 @@ export interface ModalInformativo {
     MatRadioModule,
     MatDialogModule,
     MatExpansionModule
-  ],
+],
   providers: [
     { provide: MAT_DATE_FORMATS, useValue: MY_DATE_FORMATS },
     { provide: MAT_DATE_LOCALE, useValue: 'es-PE' }

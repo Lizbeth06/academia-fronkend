@@ -1,9 +1,9 @@
-import { AfterViewInit, ChangeDetectorRef, Component, inject, Inject, OnDestroy, OnInit, PLATFORM_ID, Renderer2, signal } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, inject, Inject, OnDestroy, OnInit, PLATFORM_ID, Renderer2, signal, DOCUMENT } from '@angular/core';
 import { RouterModule, RouterOutlet } from '@angular/router';
 import { MaterialModule } from '../../material/material.module';
 import { MenuOption } from './interfaces/menu-option';
 import { LoginService } from '../../services/login.service';
-import { DOCUMENT, isPlatformBrowser, NgClass, TitleCasePipe } from '@angular/common';
+import { isPlatformBrowser, NgClass, TitleCasePipe } from '@angular/common';
 import { ItemMenuOptionComponent } from './components/item-menu-option/item-menu-option.component';
 import { Usuario } from '../../model/usuario';
 import { UsuarioService } from '../../services/usuario.service';

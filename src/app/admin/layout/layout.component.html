@@ -7,163 +7,165 @@
         class="navbar-brand-image d-inline-block mr-2"
         alt=""
         style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover;"
-      />
-      {{ nombreinstitucion() }}
-    </a>
-
-
-    <form class="form-inline form-quicksearch d-none d-md-block mx-auto">
-      <div class="input-group">
-        <div class="input-group-prepend">
-          <div class="input-group-icon">
-            <i data-feather="search"></i>
-          </div>
-        </div>
-        <input type="text" class="form-control" id="search" placeholder="Type to search..." />
-      </div>
-    </form>
-
-    <div class="d-flex flex-1 d-block d-md-none">
-      <a class="sidebar-toggle ml-3">
-        <i data-feather="menu"></i>
+        />
+        {{ nombreinstitucion() }}
       </a>
-    </div>
 
-    <ul class="navbar-nav d-flex justify-content-end mr-2">
-      <!-- Notifications -->
-      <li class="nav-item dropdown d-flex align-items-center mr-2">
-        <a class="nav-link nav-link-notifications" id="dropdownNotifications" data-toggle="dropdown" href="#">
-          <i class="oi oi-bell display-inline-block align-middle"></i>
-          <span class="nav-link-notification-number">3</span>
-        </a>
-        <div class="dropdown-menu dropdown-menu-right dropdown-menu-notifications" aria-labelledby="dropdownNotifications">
-          <div class="notifications-header d-flex justify-content-between align-items-center">
-            <span class="notifications-header-title">Notifications</span>
-            <a href="#" class="d-flex"><small>Mark all as read</small></a>
+
+      <form class="form-inline form-quicksearch d-none d-md-block mx-auto">
+        <div class="input-group">
+          <div class="input-group-prepend">
+            <div class="input-group-icon">
+              <i data-feather="search"></i>
+            </div>
           </div>
-          <div class="list-group">
-            <!-- Ejemplo de notificación -->
-            <a href="#" class="list-group-item list-group-item-action unread">
-              <p class="mb-1">
-                Invitation for <strong>Lunch</strong> on <strong>Jan 12th 2018</strong> by <strong>Laura</strong>
-              </p>
-              <div class="mb-1">
-                <button type="button" class="btn btn-primary btn-sm">Accept invite</button>
-                <button type="button" class="btn btn-outline-danger btn-sm">Decline</button>
-              </div>
-              <small>1 hour ago</small>
-            </a>
-            <!-- Otras notificaciones -->
-          </div>
-          <div class="notifications-footer text-center">
-            <a href="#"><small>View all notifications</small></a>
-          </div>
+          <input type="text" class="form-control" id="search" placeholder="Type to search..." />
         </div>
-      </li>
+      </form>
 
-      <!-- User dropdown -->
-      <li class="nav-item dropdown">
-        <a class="nav-link avatar-with-name" id="navbarDropdownMenuLink" data-toggle="dropdown" href="#">
-          <span class="mr-2 d-none d-lg-inline text-gray-600 small">{{ nombreConRol }}</span>
-          <img [src]="fotopersona()" class="d-inline-block align-top" alt="" />
+      <div class="d-flex flex-1 d-block d-md-none">
+        <a class="sidebar-toggle ml-3">
+          <i data-feather="menu"></i>
         </a>
-        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
-          <a class="dropdown-item" *ngFor="let menu of menusDropdown" [routerLink]="menu.urlMenu">
-            <mat-icon>{{ menu.icono }}</mat-icon> {{ menu.nombreMenu| titlecase }}
+      </div>
+
+      <ul class="navbar-nav d-flex justify-content-end mr-2">
+        <!-- Notifications -->
+        <li class="nav-item dropdown d-flex align-items-center mr-2">
+          <a class="nav-link nav-link-notifications" id="dropdownNotifications" data-toggle="dropdown" href="#">
+            <i class="oi oi-bell display-inline-block align-middle"></i>
+            <span class="nav-link-notification-number">3</span>
           </a>
-          <div class="dropdown-divider"></div>
-          <a class="dropdown-item text-danger sidebar-nav-link" (click)="confirmLogout()">Salir</a>
-        </div>
-      </li>
-    </ul>
-  </nav>
+          <div class="dropdown-menu dropdown-menu-right dropdown-menu-notifications" aria-labelledby="dropdownNotifications">
+            <div class="notifications-header d-flex justify-content-between align-items-center">
+              <span class="notifications-header-title">Notifications</span>
+              <a href="#" class="d-flex"><small>Mark all as read</small></a>
+            </div>
+            <div class="list-group">
+              <!-- Ejemplo de notificación -->
+              <a href="#" class="list-group-item list-group-item-action unread">
+                <p class="mb-1">
+                  Invitation for <strong>Lunch</strong> on <strong>Jan 12th 2018</strong> by <strong>Laura</strong>
+                </p>
+                <div class="mb-1">
+                  <button type="button" class="btn btn-primary btn-sm">Accept invite</button>
+                  <button type="button" class="btn btn-outline-danger btn-sm">Decline</button>
+                </div>
+                <small>1 hour ago</small>
+              </a>
+              <!-- Otras notificaciones -->
+            </div>
+            <div class="notifications-footer text-center">
+              <a href="#"><small>View all notifications</small></a>
+            </div>
+          </div>
+        </li>
 
-  <!-- Sidebar -->
-  <div class="adminx-sidebar expand-hover push "
-  style="z-index: 10;"
-       [class.collapsed-sidebar]="isCollapsed"
-       [class.sidebar-hovered]="isCollapsed && isHovered"
-       [class.expanded-sidebar]="!isCollapsed"
-       (mouseenter)="onSidebarHover(true)"
-       (mouseleave)="onSidebarHover(false)">
-    <ul class="sidebar-nav">
-      <!-- Principal -->
-      <li class="sidebar-nav-item">
-        <a routerLink="/admin" class="sidebar-nav-link active">
-          <span class="sidebar-nav-icon menu-icon-wrapper">
-            <mat-icon class="small-icon">home</mat-icon>
-            <span class="icon-label">Principal</span>
-          </span>
-          <span class="sidebar-nav-name">Principal</span>
-        </a>
-      </li>
+        <!-- User dropdown -->
+        <li class="nav-item dropdown">
+          <a class="nav-link avatar-with-name" id="navbarDropdownMenuLink" data-toggle="dropdown" href="#">
+            <span class="mr-2 d-none d-lg-inline text-gray-600 small">{{ nombreConRol }}</span>
+            <img [src]="fotopersona()" class="d-inline-block align-top" alt="" />
+          </a>
+          <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
+            @for (menu of menusDropdown; track menu) {
+              <a class="dropdown-item" [routerLink]="menu.urlMenu">
+                <mat-icon>{{ menu.icono }}</mat-icon> {{ menu.nombreMenu| titlecase }}
+              </a>
+            }
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item text-danger sidebar-nav-link" (click)="confirmLogout()">Salir</a>
+          </div>
+        </li>
+      </ul>
+    </nav>
 
-      <!-- Menús con grupos -->
-      @for (grupoMenu of menuGrupos; track grupoMenu.grupo.idMenugrupo) {
+    <!-- Sidebar -->
+    <div class="adminx-sidebar expand-hover push "
+      style="z-index: 10;"
+      [class.collapsed-sidebar]="isCollapsed"
+      [class.sidebar-hovered]="isCollapsed && isHovered"
+      [class.expanded-sidebar]="!isCollapsed"
+      (mouseenter)="onSidebarHover(true)"
+      (mouseleave)="onSidebarHover(false)">
+      <ul class="sidebar-nav">
+        <!-- Principal -->
         <li class="sidebar-nav-item">
-          <a class="sidebar-nav-link collapsed" data-toggle="collapse" [attr.href]="'#menuGrupo' + grupoMenu.grupo.idMenugrupo">
-            <span class="sidebar-nav-icon menu-icon-wrapper" [matTooltip]="grupoMenu.grupo.titulo">
-              <mat-icon class="small-icon">{{ grupoMenu.grupo.icono }}</mat-icon>
-              <span class="icon-label">{{ grupoMenu.grupo.titulo }}</span>
+          <a routerLink="/admin" class="sidebar-nav-link active">
+            <span class="sidebar-nav-icon menu-icon-wrapper">
+              <mat-icon class="small-icon">home</mat-icon>
+              <span class="icon-label">Principal</span>
             </span>
-            <span class="sidebar-nav-name">{{ grupoMenu.grupo.descripcion }}</span>
-            <span class="sidebar-nav-end">
-              <mat-icon class="nav-collapse-icon">chevron_right</mat-icon>
-            </span>
+            <span class="sidebar-nav-name">Principal</span>
           </a>
-          <ul class="sidebar-sub-nav collapse" [attr.id]="'menuGrupo' + grupoMenu.grupo.idMenugrupo">
-            @for (item of grupoMenu.items; track item.idMenu) {
+        </li>
+
+        <!-- Menús con grupos -->
+        @for (grupoMenu of menuGrupos; track grupoMenu.grupo.idMenugrupo) {
+          <li class="sidebar-nav-item">
+            <a class="sidebar-nav-link collapsed" data-toggle="collapse" [attr.href]="'#menuGrupo' + grupoMenu.grupo.idMenugrupo">
+              <span class="sidebar-nav-icon menu-icon-wrapper" [matTooltip]="grupoMenu.grupo.titulo">
+                <mat-icon class="small-icon">{{ grupoMenu.grupo.icono }}</mat-icon>
+                <span class="icon-label">{{ grupoMenu.grupo.titulo }}</span>
+              </span>
+              <span class="sidebar-nav-name">{{ grupoMenu.grupo.descripcion }}</span>
+              <span class="sidebar-nav-end">
+                <mat-icon class="nav-collapse-icon">chevron_right</mat-icon>
+              </span>
+            </a>
+            <ul class="sidebar-sub-nav collapse" [attr.id]="'menuGrupo' + grupoMenu.grupo.idMenugrupo">
+              @for (item of grupoMenu.items; track item.idMenu) {
               <item-menu-option [itemOption]="{
                    href: item.urlMenu ,
                    icono: item.icono,
                    name: item.nombreMenu  | titlecase
                  }"></item-menu-option>
-            }
-          </ul>
-        </li>
-      }
+              }
+            </ul>
+          </li>
+        }
 
-      <!-- Menús sin grupo -->
-      @for (menu of menusSinGrupo; track menu.idMenu) {
-        <li class="sidebar-nav-item">
-          <a [routerLink]="menu.urlMenu" class="sidebar-nav-link" [ngClass]="{'active': menu.urlMenu === '/admin'}">
-            <span class="sidebar-nav-icon menu-icon-wrapper">
-              <mat-icon>{{ menu.icono }}</mat-icon>
-              <span class="icon-label">{{ menu.nombreMenu  | titlecase }}</span>
+        <!-- Menús sin grupo -->
+        @for (menu of menusSinGrupo; track menu.idMenu) {
+          <li class="sidebar-nav-item">
+            <a [routerLink]="menu.urlMenu" class="sidebar-nav-link" [ngClass]="{'active': menu.urlMenu === '/admin'}">
+              <span class="sidebar-nav-icon menu-icon-wrapper">
+                <mat-icon>{{ menu.icono }}</mat-icon>
+                <span class="icon-label">{{ menu.nombreMenu  | titlecase }}</span>
+              </span>
+              <span class="sidebar-nav-name">{{ menu.nombreMenu  | titlecase }}</span>
+            </a>
+          </li>
+        }
+
+        <!-- Cerrar sesión -->
+        <li class="sidebar-nav-item logout-item">
+          <a class="sidebar-nav-link text-danger" (click)="confirmLogout()">
+            <span class="sidebar-nav-icon menu-icon-wrapper" matTooltip="Cerrar sesión">
+              <mat-icon class="small-icon">logout</mat-icon>
+              <span class="icon-label">Salir</span>
             </span>
-            <span class="sidebar-nav-name">{{ menu.nombreMenu  | titlecase }}</span>
+            <span class="sidebar-nav-name">Cerrar sesión</span>
           </a>
         </li>
-      }
-
-      <!-- Cerrar sesión -->
-      <li class="sidebar-nav-item logout-item">
-        <a class="sidebar-nav-link text-danger" (click)="confirmLogout()">
-          <span class="sidebar-nav-icon menu-icon-wrapper" matTooltip="Cerrar sesión">
-            <mat-icon class="small-icon">logout</mat-icon>
-            <span class="icon-label">Salir</span>
-          </span>
-          <span class="sidebar-nav-name">Cerrar sesión</span>
-        </a>
-      </li>
-    </ul>
-  </div>
-  <!-- Sidebar End -->
-
-  <!-- Main Content -->
-  <div class="adminx-content">
-    <div class="adminx-main-content">
-      <div class="container-fluid">
-        <router-outlet></router-outlet>
-      </div>
+      </ul>
     </div>
+    <!-- Sidebar End -->
 
-    <!-- Footer -->
-    <footer class="text-white text-center text-lg-start mt-5 color-header">
-      <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.2)">
-        &copy; {{ currentYear }} Academia IPD.Todos los derechos reservados.
-        <a class="text-white" href="https://appweb.ipd.gob.pe/academia/web/"> academia.ipd.gob.pe</a>
+    <!-- Main Content -->
+    <div class="adminx-content">
+      <div class="adminx-main-content">
+        <div class="container-fluid">
+          <router-outlet></router-outlet>
+        </div>
       </div>
-    </footer>
+
+      <!-- Footer -->
+      <footer class="text-white text-center text-lg-start mt-5 color-header">
+        <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.2)">
+          &copy; {{ currentYear }} Academia IPD.Todos los derechos reservados.
+          <a class="text-white" href="https://appweb.ipd.gob.pe/academia/web/"> academia.ipd.gob.pe</a>
+        </div>
+      </footer>
+    </div>
   </div>
-</div>

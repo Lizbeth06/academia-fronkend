@@ -2,7 +2,7 @@ import { Component, Inject, inject } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, FormsModule, Validators } from '@angular/forms';
 import { MatPseudoCheckboxModule } from '@angular/material/core';
 import { MatRadioModule } from '@angular/material/radio';
-import { CommonModule } from '@angular/common';
+
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MaterialModule } from '../../../../material/material.module';
 import { Persona } from '../../../../model/persona';
@@ -14,7 +14,7 @@ import { Usuario } from '../../../../model/usuario';
 
 @Component({
   selector: 'app-usuario-form',
-  imports: [MaterialModule,  MatPseudoCheckboxModule, FormsModule, MatRadioModule,CommonModule],
+  imports: [MaterialModule, MatPseudoCheckboxModule, FormsModule, MatRadioModule],
   templateUrl: './usuario-form.component.html',
   styleUrl: './usuario-form.component.css'
 })

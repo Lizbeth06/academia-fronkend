@@ -4,7 +4,7 @@ import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator, MatPaginatorIntl } from '@angular/material/paginator';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { CommonModule } from '@angular/common';
+
 import { ToastrService } from 'ngx-toastr';
 import { MaterialModule } from '../../../../material/material.module';
 import { PaginatorService } from '../../../../services/security/paginator.service';
@@ -16,7 +16,7 @@ import { DialogcustomComponent } from '../../../dialogcustom/dialogcustom.compon
 
 @Component({
   selector: 'app-institucion-list',
-  imports: [MaterialModule, CommonModule],
+  imports: [MaterialModule],
   templateUrl: './institucion-list.component.html',
   styleUrl: './institucion-list.component.css',
   providers:[{ provide: MatPaginatorIntl, useClass: PaginatorService}]

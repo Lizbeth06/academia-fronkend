@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { CommonModule } from '@angular/common';
+
 import { MaterialModule } from '../../../../material/material.module';
 import { Tipodocumento } from '../../../../model/tipodocumento';
 import { Ubigeo } from '../../../../model/ubigeo';
@@ -17,7 +17,7 @@ import { validarInput, ValidationType } from '../../../../util/validaciones.util
 
 @Component({
   selector: 'app-institucion-form',
-  imports: [MaterialModule, CommonModule],
+  imports: [MaterialModule],
   templateUrl: './institucion-form.component.html',
   styleUrl: './institucion-form.component.css'
 })

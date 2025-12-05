@@ -3,7 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { JwtHelperService } from '@auth0/angular-jwt';
 import { PerfilFormComponent } from '../perfil-form/perfil-form.component';
-import { CommonModule } from '@angular/common';
+
 import { MatDialog } from '@angular/material/dialog';
 import { MaterialModule } from '../../../../material/material.module';
 import { Usuario } from '../../../../model/usuario';
@@ -13,7 +13,7 @@ import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-perfil-lista',
-  imports:[MaterialModule,CommonModule],
+  imports: [MaterialModule],
   templateUrl: './perfil-list.component.html',
   styleUrls: ['./perfil-list.component.css']
 })

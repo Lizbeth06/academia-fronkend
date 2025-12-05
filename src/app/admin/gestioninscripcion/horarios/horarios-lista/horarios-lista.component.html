@@ -22,7 +22,9 @@
           <mat-form-field appearance="outline">
             <mat-label>Turno</mat-label>
             <mat-select formControlName="turnoId">
-              <mat-option *ngFor="let t of turnos" [value]="t.id">{{ t.nombre }}</mat-option>
+              @for (t of turnos; track t) {
+                <mat-option [value]="t.id">{{ t.nombre }}</mat-option>
+              }
             </mat-select>
           </mat-form-field>
 
@@ -30,7 +32,9 @@
           <mat-form-field appearance="outline">
             <mat-label>Disciplina</mat-label>
             <mat-select formControlName="disciplinaId">
-              <mat-option *ngFor="let d of disciplinas" [value]="d.id">{{ d.nombre }}</mat-option>
+              @for (d of disciplinas; track d) {
+                <mat-option [value]="d.id">{{ d.nombre }}</mat-option>
+              }
             </mat-select>
           </mat-form-field>
 
@@ -38,7 +42,9 @@
           <mat-form-field appearance="outline">
             <mat-label>Categoría</mat-label>
             <mat-select formControlName="categoriaId">
-              <mat-option *ngFor="let c of categorias" [value]="c.id">{{ c.nombre }}</mat-option>
+              @for (c of categorias; track c) {
+                <mat-option [value]="c.id">{{ c.nombre }}</mat-option>
+              }
             </mat-select>
           </mat-form-field>
 
@@ -46,7 +52,9 @@
           <mat-form-field appearance="outline">
             <mat-label>Temporada</mat-label>
             <mat-select formControlName="temporadaId">
-              <mat-option *ngFor="let t of temporadas" [value]="t.id">{{ t.descripcion }}</mat-option>
+              @for (t of temporadas; track t) {
+                <mat-option [value]="t.id">{{ t.descripcion }}</mat-option>
+              }
             </mat-select>
           </mat-form-field>
 
