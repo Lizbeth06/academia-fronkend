@@ -30,8 +30,8 @@ export const appConfig: ApplicationConfig = {
       JwtModule.forRoot({
         config: {
           tokenGetter: tokenGetter,
-          allowedDomains: ["localhost:81"],
-          disallowedRoutes: ["http://localhost:81/login/forget"],
+          allowedDomains: ["localhost:8080"],
+          disallowedRoutes: ["http://localhost:8080/login/forget"],
         },
       }),
     ), provideAnimationsAsync(), provideAnimationsAsync()
