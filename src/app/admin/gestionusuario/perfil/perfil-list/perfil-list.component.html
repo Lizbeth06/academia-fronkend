@@ -1,0 +1,170 @@
+<mat-card class="perfil-container">
+  @if (isLoading) {
+    <div class="loading-overlay">
+      <div class="loading-content">
+        <mat-spinner diameter="50" color="accent"></mat-spinner>
+        <p class="loading-text">Cargando datos del perfil...</p>
+      </div>
+    </div>
+  }
+
+  @if (!isLoading) {
+    <div class="profile-content">
+      <!-- Tarjeta de perfil principal -->
+      <mat-card class="profile-card mat-elevation-z8">
+        <div class="profile-header">
+          <div class="avatar-container">
+            <div class="avatar-wrapper">
+              <img [src]="profileImage" class="profile-avatar" alt="Foto de perfil">
+              <button mat-mini-fab color="primary" class="avatar-edit-button" (click)="fileInput.click()" matTooltip="Cambiar foto">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <input #fileInput type="file" accept="image/*" style="display: none" (change)="onFileSelected($event)">
+            </div>
+            <div class="profile-info">
+              <h1 class="profile-name">
+                {{ usuario?.trabajador?.persona?.nombres || 'Usuario' }}
+                {{ usuario?.trabajador?.persona?.apaterno || '' }}
+              </h1>
+              <div class="profile-position">
+                <mat-icon class="position-icon">work_outline</mat-icon>
+                <span>{{ usuario?.trabajador?.cargo || 'Sin cargo asignado' }}</span>
+              </div>
+              <div class="profile-office">
+                <mat-icon class="office-icon">business</mat-icon>
+                <span>{{ usuario?.trabajador?.oficina?.descripcion || 'Sin oficina asignada' }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <mat-divider></mat-divider>
+        <mat-card-content>
+          <!-- Información Personal -->
+          <section class="info-section">
+            <div class="section-header">
+              <mat-icon class="section-icon">person</mat-icon>
+              <h2 class="section-title">Información Personal</h2>
+            </div>
+            <div class="info-grid">
+              <div class="info-item">
+                <mat-icon class="info-icon">badge</mat-icon>
+                <div class="info-content">
+                  <label>Documento de Identidad</label>
+                  <p>{{ usuario?.trabajador?.persona?.numDocumento || 'No disponible' }}</p>
+                </div>
+              </div>
+              <div class="info-item">
+                <mat-icon class="info-icon">person</mat-icon>
+                <div class="info-content">
+                  <label>Nombres Completos</label>
+                  <p>
+                    {{ usuario?.trabajador?.persona?.nombres || '' }}
+                    {{ usuario?.trabajador?.persona?.apaterno || '' }}
+                    {{ usuario?.trabajador?.persona?.amaterno || '' }}
+                  </p>
+                </div>
+              </div>
+              <div class="info-item">
+                <mat-icon class="info-icon">email</mat-icon>
+                <div class="info-content">
+                  <label>Correo Electrónico</label>
+                  <p>{{ usuario?.trabajador?.persona?.correo || 'No disponible' }}</p>
+                </div>
+              </div>
+              <div class="info-item">
+                <mat-icon class="info-icon">phone</mat-icon>
+                <div class="info-content">
+                  <label>Teléfono</label>
+                  <p>{{ usuario?.trabajador?.persona?.telefono || 'No disponible' }}</p>
+                </div>
+              </div>
+              <div class="info-item">
+                <mat-icon class="info-icon">home</mat-icon>
+                <div class="info-content">
+                  <label>Dirección</label>
+                  <p>{{ usuario?.trabajador?.persona?.direccion || 'No disponible' }}</p>
+                </div>
+              </div>
+            </div>
+          </section>
+          <mat-divider></mat-divider>
+          <!-- Información Laboral -->
+          <section class="info-section">
+            <div class="section-header">
+              <mat-icon class="section-icon">work</mat-icon>
+              <h2 class="section-title">Información Laboral</h2>
+            </div>
+            <div class="info-grid">
+              <div class="info-item">
+                <mat-icon class="info-icon">work_outline</mat-icon>
+                <div class="info-content">
+                  <label>Cargo</label>
+                  <p>{{ usuario?.trabajador?.cargo || 'No disponible' }}</p>
+                </div>
+              </div>
+              <div class="info-item">
+                <mat-icon class="info-icon">business</mat-icon>
+                <div class="info-content">
+                  <label>Oficina</label>
+                  <p>{{ usuario?.trabajador?.oficina?.descripcion || 'No disponible' }}</p>
+                </div>
+              </div>
+              <div class="info-item">
+                <mat-icon class="info-icon">event</mat-icon>
+                <div class="info-content">
+                  <label>Fecha de Ingreso</label>
+                  <p>{{ usuario?.trabajador?.fingreso || 'No disponible' }}</p>
+                </div>
+              </div>
+              <div class="info-item">
+                <mat-icon class="info-icon">attach_money</mat-icon>
+                <div class="info-content">
+                  <label>Salario</label>
+                  <p>{{ usuario?.trabajador?.salario }}</p>
+                </div>
+              </div>
+            </div>
+          </section>
+        </mat-card-content>
+        <mat-card-actions class="profile-actions">
+          <button mat-raised-button color="primary" class="edit-button" (click)="actualizarDatos(usuario!)">
+            <mat-icon>edit</mat-icon> Editar Perfil
+          </button>
+        </mat-card-actions>
+      </mat-card>
+      <!-- Panel de cambio de contraseña -->
+      <mat-card class="password-card mat-elevation-z8">
+        <mat-accordion>
+          <mat-expansion-panel>
+            <mat-expansion-panel-header class="password-header">
+              <mat-icon class="password-icon">lock</mat-icon>
+              <span class="password-title">Cambiar Contraseña</span>
+            </mat-expansion-panel-header>
+            <form [formGroup]="passwordForm" (ngSubmit)="updatePassword()" >
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Contraseña Actual</mat-label>
+                <mat-icon matPrefix>lock</mat-icon>
+                <input matInput type="password" formControlName="actual" required>
+              </mat-form-field>
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Nueva Contraseña</mat-label>
+                <mat-icon matPrefix>lock_reset</mat-icon>
+                <input matInput type="password" formControlName="nueva" required>
+                <mat-hint>Mínimo 6 caracteres</mat-hint>
+              </mat-form-field>
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Confirmar Nueva Contraseña</mat-label>
+                <mat-icon matPrefix>lock</mat-icon>
+                <input matInput type="password" formControlName="confirmar" required>
+              </mat-form-field>
+              <button mat-raised-button color="warn" class="password-button"
+                [disabled]="!passwordForm.valid">
+                <mat-icon>vpn_key</mat-icon> Cambiar Contraseña
+              </button>
+            </form>
+          </mat-expansion-panel>
+        </mat-accordion>
+      </mat-card>
+    </div>
+  }
+</mat-card>

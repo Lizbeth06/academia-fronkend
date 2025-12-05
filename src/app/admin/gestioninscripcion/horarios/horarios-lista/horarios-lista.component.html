@@ -1,0 +1,178 @@
+<div class="container">
+  <div class="row">
+
+    <!-- ENCABEZADO -->
+    <div class="header-section">
+      <h2>HORARIOS</h2>
+    </div>
+
+    <!-- BANNER -->
+    <div class="info-banner">
+      Define los horarios por turno, disciplina, categoría y temporada.
+    </div>
+
+    <!-- FORMULARIO -->
+    <div class="card-modern">
+      <h3 class="subtitle">Registro de horarios</h3>
+
+      <form [formGroup]="horarioForm" (ngSubmit)="guardarHorario()">
+        <div class="form-grid">
+
+          <!-- Turno -->
+          <mat-form-field appearance="outline">
+            <mat-label>Turno</mat-label>
+            <mat-select formControlName="turnoId">
+              @for (t of turnos; track t) {
+                <mat-option [value]="t.id">{{ t.nombre }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+
+          <!-- Disciplina -->
+          <mat-form-field appearance="outline">
+            <mat-label>Disciplina</mat-label>
+            <mat-select formControlName="disciplinaId">
+              @for (d of disciplinas; track d) {
+                <mat-option [value]="d.id">{{ d.nombre }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+
+          <!-- Categoría -->
+          <mat-form-field appearance="outline">
+            <mat-label>Categoría</mat-label>
+            <mat-select formControlName="categoriaId">
+              @for (c of categorias; track c) {
+                <mat-option [value]="c.id">{{ c.nombre }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+
+          <!-- Temporada -->
+          <mat-form-field appearance="outline">
+            <mat-label>Temporada</mat-label>
+            <mat-select formControlName="temporadaId">
+              @for (t of temporadas; track t) {
+                <mat-option [value]="t.id">{{ t.descripcion }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+
+          <!-- Contador -->
+          <mat-form-field appearance="outline">
+            <mat-label>Contador</mat-label>
+            <input matInput type="number" formControlName="contador">
+          </mat-form-field>
+
+          <!-- Vacantes -->
+          <mat-form-field appearance="outline">
+            <mat-label>N° vacantes</mat-label>
+            <input matInput type="number" formControlName="numVacante">
+          </mat-form-field>
+
+          <!-- Estado -->
+          <mat-form-field appearance="outline">
+            <mat-label>Estado</mat-label>
+            <mat-select formControlName="estado">
+              <mat-option value="Activo">Activo</mat-option>
+              <mat-option value="Inactivo">Inactivo</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+        </div>
+
+        <!-- BOTONES -->
+        <div class="actions">
+          <button mat-raised-button color="primary" type="submit">
+            <mat-icon>save</mat-icon> Guardar
+          </button>
+
+          <button mat-stroked-button color="warn" type="button" (click)="limpiarFormulario()">
+            <mat-icon>close</mat-icon> Cancelar
+          </button>
+        </div>
+
+      </form>
+    </div>
+
+    <!-- TABLA -->
+    <div class="card-modern">
+      <div class="tabla-header">
+        <h3 class="subtitle">Horarios registrados</h3>
+
+        <mat-form-field appearance="outline" class="buscador">
+          <mat-label>Buscar</mat-label>
+          <input matInput (input)="aplicarFiltro($any($event.target).value)">
+          <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+      </div>
+
+      <table mat-table [dataSource]="dataSource" class="table-modern">
+
+        <!-- Turno -->
+        <ng-container matColumnDef="turno">
+          <th mat-header-cell *matHeaderCellDef>Turno</th>
+          <td mat-cell *matCellDef="let row">{{ obtenerTurnoNombre(row.turnoId) }}</td>
+        </ng-container>
+
+        <!-- Disciplina -->
+        <ng-container matColumnDef="disciplina">
+          <th mat-header-cell *matHeaderCellDef>Disciplina</th>
+          <td mat-cell *matCellDef="let row" class="left-cell">{{ obtenerDisciplinaNombre(row.disciplinaId) }}</td>
+        </ng-container>
+
+        <!-- Categoría -->
+        <ng-container matColumnDef="categoria">
+          <th mat-header-cell *matHeaderCellDef>Categoría</th>
+          <td mat-cell *matCellDef="let row" class="left-cell">{{ obtenerCategoriaNombre(row.categoriaId) }}</td>
+        </ng-container>
+
+        <!-- Temporada -->
+        <ng-container matColumnDef="temporada">
+          <th mat-header-cell *matHeaderCellDef>Temporada</th>
+          <td mat-cell *matCellDef="let row" class="left-cell">{{ obtenerTemporadaDescripcion(row.temporadaId) }}</td>
+        </ng-container>
+
+        <!-- Contador -->
+        <ng-container matColumnDef="contador">
+          <th mat-header-cell *matHeaderCellDef>Contador</th>
+          <td mat-cell *matCellDef="let row">{{ row.contador }}</td>
+        </ng-container>
+
+        <!-- Vacantes -->
+        <ng-container matColumnDef="vacantes">
+          <th mat-header-cell *matHeaderCellDef>Vacantes</th>
+          <td mat-cell *matCellDef="let row">{{ row.numVacante }}</td>
+        </ng-container>
+
+        <!-- Estado -->
+        <ng-container matColumnDef="estado">
+          <th mat-header-cell *matHeaderCellDef>Estado</th>
+          <td mat-cell *matCellDef="let row">
+            <span [ngClass]="row.estado === 'Activo' ? 'badge-activo' : 'badge-inactivo'">
+              {{ row.estado }}
+            </span>
+          </td>
+        </ng-container>
+
+        <!-- ACCIONES -->
+        <ng-container matColumnDef="acciones">
+          <th mat-header-cell *matHeaderCellDef>Acciones</th>
+          <td mat-cell *matCellDef="let row" class="acciones-col">
+            <button mat-icon-button color="primary" (click)="editarHorario(row)">
+              <mat-icon>edit</mat-icon>
+            </button>
+
+            <button mat-icon-button color="warn" (click)="eliminarHorario(row)">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+      </table>
+    </div>
+  </div>
+</div>

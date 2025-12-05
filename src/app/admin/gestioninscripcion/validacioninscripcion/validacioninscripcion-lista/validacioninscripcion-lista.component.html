@@ -1,0 +1,201 @@
+<div class="container">
+  <div class="row">
+
+    <!-- ENCABEZADO MODERNO -->
+    <div class="header-section">
+      <h2>CONFIRMAR PRE-INSCRIPCIÓN</h2>
+    </div>
+
+    <!-- INFO DEBAJO DEL ENCABEZADO -->
+    <div class="info-banner">
+      <p>
+        Confirma la inscripción de los participantes buscando por el número de registro
+        que aparece en su ficha de pre-inscripción.
+      </p>
+    </div>
+
+    <!-- SECCIÓN PRINCIPAL -->
+    <div class="card-modern">
+      <h3 class="subtitle-1">Validación de Inscripción</h3>
+
+      <!-- BUSCAR POR REGISTRO -->
+      <form [formGroup]="registroForm" class="row-inline">
+        <input
+          type="text"
+          placeholder="N° Registro"
+          formControlName="nroRegistro"
+          >
+          <button class="btn-search" (click)="buscarRegistro()">
+            <mat-icon>search</mat-icon> Buscar
+          </button>
+        </form>
+
+        <!-- crear dos columnas el primer columna de 9 de 12 (acordion o expansion) y el segundo columna 3 de 12  (listar butones un debajo de otro)-->
+
+        <!--CRAER UN ACORDION  O EXPANSION EL PRIMERO DEBE estar abierto con la informacion de beneficiario en una tablaa de dos columnas-->
+        <!-- segundo acordion o expansion en material angular listar en  numeros y durecciondatos del padre sus -->
+
+        <!-- crear dos columnas el primer columna de 9 de 12 (acordion o expansion) y el segundo columna 3 de 12  (listar butones un debajo de otro)-->
+        <div class="row mt-4">
+          <div class="col-xl-9">
+            <mat-accordion>
+              <mat-expansion-panel [expanded]="true">
+                <mat-expansion-panel-header>
+                  <mat-panel-title class="text-center">Datos principales de beneficiario</mat-panel-title>
+
+                </mat-expansion-panel-header>
+
+                <div class="table-container">
+                  <table style="width:100%;border-collapse:collapse;">
+                    <tr>
+                      <td style="width:15%;padding:8px;font-weight:600;">Nombre:</td>
+                      <td style="width:35%;padding:8px;">Juan Pérez</td>
+                      <td style="width:15%;padding:8px;font-weight:600;">DNI:</td>
+                      <td style="width:35%;padding:8px;">12345678</td>
+                    </tr>
+                    <tr>
+                      <td style="padding:8px;font-weight:600;">Fecha Nac.:</td>
+                      <td style="padding:8px;">01/01/2010</td>
+                      <td style="padding:8px;font-weight:600;">Dirección:</td>
+                      <td style="padding:8px;">Av. Siempre Viva 123, Distrito</td>
+                    </tr>
+                    <tr>
+                      <td style="padding:8px;font-weight:600;">Estado:</td>
+                      <td style="padding:8px;">Pre-inscrito</td>
+                      <td style="padding:8px;font-weight:600;">Deporte:</td>
+                      <td style="padding:8px;">Fútbol</td>
+                    </tr>
+                    <tr>
+                      <td style="padding:8px;font-weight:600;">Modalidad:</td>
+                      <td style="padding:8px;">Formativa</td>
+                      <td style="padding:8px;font-weight:600;">Etapa:</td>
+                      <td style="padding:8px;">Infantil</td>
+                    </tr>
+                    <tr>
+                      <td style="padding:8px;font-weight:600;">Complejo:</td>
+                      <td style="padding:8px;">Polideportivo Central</td>
+                      <td style="padding:8px;font-weight:600;">Horario:</td>
+                      <td style="padding:8px;">Lun/Mié/Vie 16:00 - 18:00</td>
+                    </tr>
+                  </table>
+                </div>
+
+              </mat-expansion-panel>
+
+              <mat-expansion-panel>
+                <mat-expansion-panel-header>
+                  <mat-panel-title class="text-center">Archivos de beneficiario</mat-panel-title>
+                </mat-expansion-panel-header>
+                <div class="table-container">
+                  <table class="tabla-4c">
+                    <tr>
+                      <td><strong>Archivo 01:</strong></td>
+                      <td><a><img src="https://res.cloudinary.com/dpumt2sth/image/upload/v1763512471/pdf_r7zwl3.png" class="pdf-img" alt="PDF"></a></td>
+
+                      <td><strong>Archivo 02:</strong></td>
+                      <td><a><img src="https://res.cloudinary.com/dpumt2sth/image/upload/v1763512471/pdf_r7zwl3.png" class="pdf-img" alt="PDF"></a></td>
+                    </tr>
+
+                    <tr>
+                      <td><strong>Archivo 03:</strong></td>
+                      <td><a><img src="https://res.cloudinary.com/dpumt2sth/image/upload/v1763512471/pdf_r7zwl3.png" class="pdf-img" alt="PDF"></a></td>
+
+                      <td><strong>Archivo 04:</strong></td>
+                      <td><a><img src="https://res.cloudinary.com/dpumt2sth/image/upload/v1763512471/pdf_r7zwl3.png" class="pdf-img" alt="PDF"></a></td>
+                    </tr>
+
+                    <tr>
+                      <td><strong>Archivo 05:</strong></td>
+                      <td><a><img src="https://res.cloudinary.com/dpumt2sth/image/upload/v1763512471/pdf_r7zwl3.png" class="pdf-img" alt="PDF"></a></td>
+
+                      <td><strong>Archivo 06:</strong></td>
+                      <td><a><img src="https://res.cloudinary.com/dpumt2sth/image/upload/v1763512471/pdf_r7zwl3.png" class="pdf-img" alt="PDF"></a></td>
+                    </tr>
+                  </table>
+                </div>
+
+              </mat-expansion-panel>
+
+              <mat-expansion-panel>
+                <mat-expansion-panel-header>
+                  <mat-panel-title class="text-center">Datos Familiares</mat-panel-title>
+                </mat-expansion-panel-header>
+                <div class="table-container">
+                  <table style="width:100%;">
+                    <tr>
+                      <td style="padding:8px;"><strong>Nombre Tutor:</strong></td>
+                      <td style="padding:8px;">María López</td>
+                    </tr>
+                    <tr>
+                      <td style="padding:8px;"><strong>Parentesco:</strong></td>
+                      <td style="padding:8px;">Madre</td>
+                    </tr>
+                    <tr>
+                      <td style="padding:8px;"><strong>Ocupación:</strong></td>
+                      <td style="padding:8px;">Comerciante</td>
+                    </tr>
+                  </table>
+                </div>
+              </mat-expansion-panel>
+            </mat-accordion>
+          </div>
+          <div class="col-xl-3">
+            <button mat-raised-button color="primary" class="mt-5 mb-2" style="width:100%;"><mat-icon>phone</mat-icon> Llamar</button>
+            <button mat-raised-button color="accent" class="mb-2" style="width:100%;"><mat-icon>email</mat-icon> Enviar Correo</button>
+            <button mat-stroked-button color="warn" class="mb-2" style="width:100%;"><mat-icon>check_circle</mat-icon> Confirmar Inscripción</button>
+            <button mat-stroked-button class="btn-amarillo mb-2" style="width:100%;"><mat-icon>download</mat-icon> Carnet Digital</button>
+            <button mat-flat-button class="btn-red mb-2" style="width:100%;"><mat-icon>remove_circle</mat-icon> Retirar Inscripción</button>
+          </div>
+        </div>
+
+
+
+
+
+
+        <!-- BOTONES DE ACCIÓN -->
+
+
+      </div>
+
+
+      <!-- BÚSQUEDA AVANZADA -->
+      <div class="card-modern">
+
+        <h4 class="subtitle">Búsqueda Avanzada de Beneficiarios</h4>
+
+        <!-- FORMULARIO CORRECTO -->
+        <form [formGroup]="filtroForm" class="row-inline">
+
+          <input
+            type="text"
+            placeholder="N° DNI"
+            formControlName="dni"
+            >
+
+            <button class="btn-search" (click)="buscarAvanzado()">
+              <mat-icon>search</mat-icon> Buscar
+            </button>
+
+          </form>
+
+          <!-- TABLA -->
+          <div class="table-container">
+            <table mat-table [dataSource]="dataSource" class="table-modern">
+
+              @for (col of displayedColumns; track col) {
+                <ng-container [matColumnDef]="col">
+                  <th mat-header-cell *matHeaderCellDef>{{ col | titlecase }}</th>
+                  <td mat-cell *matCellDef="let row">{{ row[col] }}</td>
+                </ng-container>
+              }
+
+              <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+            </table>
+          </div>
+
+        </div>
+      </div>
+    </div>

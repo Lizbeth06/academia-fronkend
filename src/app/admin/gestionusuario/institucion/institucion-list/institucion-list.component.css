@@ -1,0 +1,41 @@
+table {
+    width: 100%;
+  }
+  
+  .mat-mdc-form-field {
+    font-size: 14px;
+    width: 100%;
+  }
+  
+  td, th {
+    width: 25%;
+  }
+
+  .table-container {
+    width: 100%;
+    overflow-x: auto;
+  }
+  
+  .table-responsive {
+    min-width: 600px; /* Ajusta según la cantidad de columnas */
+  }
+
+  .table-respons {
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  button {
+    margin-right: 8px;
+  }
+
+  .button-row {
+    display: flex;
+    gap: 1px; /* Espacio entre los botones */
+    align-items: center; /* Alineación vertical */
+  }
+
+  
+  

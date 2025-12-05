@@ -1,0 +1,223 @@
+<div class="container-sedes">
+  <!-- ENCABEZADO -->
+  <div class="header-section">
+    <h2>SEDES</h2>
+  </div>
+
+  <!-- BANNER INFORMATIVO -->
+  <div class="info-banner">
+    Aquí podrás gestionar las sedes deportivas de Academia IPD, indicando su
+    sector, ubicación, dirección y capacidad.
+  </div>
+
+  <!-- CARD: FORMULARIO -->
+  <div class="card-modern">
+    <h3 class="subtitle">Registro de sedes</h3>
+
+    <form
+      [formGroup]="sedeForm"
+      (ngSubmit)="guardarSede()"
+      class="form-grid"
+      >
+      <!-- Código -->
+      <mat-form-field appearance="outline">
+        <mat-label>Código*</mat-label>
+        <input matInput formControlName="codigo" />
+      </mat-form-field>
+
+      <!-- Nombre -->
+      <mat-form-field appearance="outline">
+        <mat-label>Nombre de la sede*</mat-label>
+        <input matInput formControlName="nombre" />
+      </mat-form-field>
+
+      <!-- Sector -->
+      <mat-form-field appearance="outline">
+        <mat-label>Sector*</mat-label>
+        <mat-select formControlName="id_sector">
+          
+        </mat-select>
+      </mat-form-field>
+
+      <!-- Ubigeo -->
+      <mat-form-field appearance="outline">
+        <mat-label>Ubigeo</mat-label>
+        <input
+          matInput
+          formControlName="id_ubigeo"
+          placeholder="Ej. Lima - Cercado"
+          />
+        </mat-form-field>
+
+        <!-- Capacidad -->
+        <mat-form-field appearance="outline">
+          <mat-label>Capacidad (aforo)</mat-label>
+          <input
+            matInput
+            type="number"
+            formControlName="capacidad"
+            min="0"
+            />
+          </mat-form-field>
+
+          <!-- Estado -->
+          <mat-form-field appearance="outline">
+            <mat-label>Estado</mat-label>
+            <mat-select formControlName="estado">
+              <mat-option value="Activo">Activo</mat-option>
+              <mat-option value="Inactivo">Inactivo</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <!-- Dirección (toma todo el ancho) -->
+          <mat-form-field
+            appearance="outline"
+            class="full-column"
+            >
+            <mat-label>Dirección</mat-label>
+            <textarea
+              matInput
+              formControlName="direccion"
+              rows="2"
+            ></textarea>
+          </mat-form-field>
+
+          <!-- Botones -->
+          <div class="actions full-column">
+            <button
+              mat-raised-button
+              color="primary"
+              type="submit"
+              >
+              <mat-icon>save</mat-icon>
+              {{ sedeForm.get('id')?.value ? 'Actualizar sede' : 'Guardar' }}
+            </button>
+
+            <button
+              mat-stroked-button
+              color="warn"
+              type="button"
+              (click)="limpiarFormulario()"
+              >
+              <mat-icon>close</mat-icon>
+              Cancelar
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- CARD: TABLA -->
+      <div class="card-modern">
+        <div class="tabla-header">
+          <h3 class="subtitle">Sedes registradas</h3>
+
+          <mat-form-field
+            appearance="outline"
+            class="buscador"
+            >
+            <mat-label>Buscar</mat-label>
+            <input
+              matInput
+              #filtro
+              (input)="aplicarFiltro($event)"
+              placeholder="Código, nombre, sector..."
+              />
+              <mat-icon matSuffix>search</mat-icon>
+            </mat-form-field>
+          </div>
+          <div class="tabla-sede">
+            <table
+              mat-table
+              [dataSource]="dataSource"
+              class="mat-elevation-z8"
+              >
+              <!-- Código -->
+              <ng-container matColumnDef="codigo">
+                <th mat-header-cell *matHeaderCellDef>N°</th>
+                <td mat-cell *matCellDef="let row; let idx=index">
+                  {{idx+1}}
+                </td>
+              </ng-container>
+  
+              <!-- Nombre -->
+              <ng-container matColumnDef="nombre">
+                <th mat-header-cell *matHeaderCellDef>Nombre</th>
+                <td mat-cell *matCellDef="let row">
+                  {{ row.nombre }}
+                </td>
+              </ng-container>
+  
+              <!-- Sector -->
+              <ng-container matColumnDef="sector">
+                <th mat-header-cell *matHeaderCellDef>Sector</th>
+                <td mat-cell *matCellDef="let row">
+                  {{ row.sector.descripcion}}
+                </td>
+              </ng-container>
+  
+              <!-- Ubigeo -->
+              <ng-container matColumnDef="ubicacion">
+                <th mat-header-cell *matHeaderCellDef>Ubicación</th>
+                <td mat-cell *matCellDef="let row">
+                  {{ row.ubicacion }}
+                </td>
+              </ng-container>
+  
+              <!-- Capacidad -->
+              <ng-container matColumnDef="capacidad">
+                <th mat-header-cell *matHeaderCellDef>Capacidad</th>
+                <td mat-cell *matCellDef="let row">
+                  {{ row.capacidad }}
+                </td>
+              </ng-container>
+  
+              <!-- Estado -->
+              <ng-container matColumnDef="estado">
+                <th mat-header-cell *matHeaderCellDef>Estado</th>
+                <td mat-cell *matCellDef="let row">
+                  <span
+                    [ngClass]="row.estado === 'Activo' ? 'badge-activo' : 'badge-inactivo'"
+                    >
+                    {{ row.estado=='1'?'Activo':'Inactivo' }}
+                  </span>
+                </td>
+              </ng-container>
+  
+              <!-- Acciones -->
+              <ng-container matColumnDef="acciones">
+                <th mat-header-cell *matHeaderCellDef>Acciones</th>
+                <td
+                  mat-cell
+                  *matCellDef="let row"
+                  class="acciones-col"
+                  >
+                  <button
+                    mat-icon-button
+                    color="primary"
+                    (click)="editarSede(row)"
+                    >
+                    <mat-icon>edit</mat-icon>
+                  </button>
+  
+                  <button mat-icon-button
+                    color="warn"
+                    (click)="eliminar(row)">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+  
+                </td>
+              </ng-container>
+  
+              <tr
+                mat-header-row
+                *matHeaderRowDef="displayedColumns"
+              ></tr>
+              <tr
+                mat-row
+                *matRowDef="let row; columns: displayedColumns"
+              ></tr>
+            </table>
+          </div>
+          <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" aria-label="Select page of users" showFirstLastButtons></mat-paginator>
+        </div>
+      </div>

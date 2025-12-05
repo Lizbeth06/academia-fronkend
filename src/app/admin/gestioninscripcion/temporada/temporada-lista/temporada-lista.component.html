@@ -1,0 +1,200 @@
+<div class="container">
+  <div class="row">
+
+    <!-- ENCABEZADO MODERNO -->
+    <div class="header-section">
+      <h2>TEMPORADAS</h2>
+    </div>
+
+    <!-- INFO DEBAJO DEL ENCABEZADO -->
+    <div class="info-banner">
+      <p>
+        Aquí podrás gestionar los ciclos y temporadas de Academia.
+      </p>
+    </div>
+
+    <!-- FORMULARIO -->
+    <form
+      [formGroup]="temporadaForm"
+      (ngSubmit)="guardarTemporada()"
+      class="card"
+      >
+      <h3 class="subtitle-1">Registrar Temporada</h3>
+      <div class="form-grid">
+        <!-- Año -->
+        <mat-form-field appearance="outline">
+          <mat-label>Año</mat-label>
+          <mat-select formControlName="anio">
+            @for (a of anios; track a) {
+              <mat-option [value]="a">
+                {{ a }}
+              </mat-option>
+            }
+          </mat-select>
+          @if (temporadaForm.get('anio')?.hasError('required')) {
+            <mat-error>
+              Obligatorio
+            </mat-error>
+          }
+        </mat-form-field>
+
+        <!-- Descripción -->
+        <mat-form-field appearance="outline">
+          <mat-label>Descripción</mat-label>
+          <input matInput formControlName="descripcion" />
+          @if (temporadaForm.get('descripcion')?.hasError('required')) {
+            <mat-error>
+              Obligatorio
+            </mat-error>
+          }
+        </mat-form-field>
+
+        <!-- Fecha apertura inscripción -->
+        <mat-form-field appearance="outline">
+          <mat-label>Fecha apertura inscripción</mat-label>
+          <input
+            matInput
+            [matDatepicker]="dpAper"
+            formControlName="fechaAperturaInscripcion"
+            />
+            <mat-datepicker-toggle matSuffix [for]="dpAper"></mat-datepicker-toggle>
+            <mat-datepicker #dpAper></mat-datepicker>
+            @if (temporadaForm.get('fechaAperturaInscripcion')?.hasError('required')) {
+              <mat-error>
+                Obligatorio
+              </mat-error>
+            }
+          </mat-form-field>
+
+          <!-- Fecha inicio clases -->
+          <mat-form-field appearance="outline">
+            <mat-label>Fecha inicio clases</mat-label>
+            <input
+              matInput
+              [matDatepicker]="dpIni"
+              formControlName="fechaInicioClases"
+              />
+              <mat-datepicker-toggle matSuffix [for]="dpIni"></mat-datepicker-toggle>
+              <mat-datepicker #dpIni></mat-datepicker>
+              @if (temporadaForm.get('fechaInicioClases')?.hasError('required')) {
+                <mat-error>
+                  Obligatorio
+                </mat-error>
+              }
+            </mat-form-field>
+
+            <!-- Fecha cierre clases -->
+            <mat-form-field appearance="outline">
+              <mat-label>Fecha cierre clases</mat-label>
+              <input
+                matInput
+                [matDatepicker]="dpCierreClases"
+                formControlName="fechaCierreClases"
+                />
+                <mat-datepicker-toggle matSuffix [for]="dpCierreClases"></mat-datepicker-toggle>
+                <mat-datepicker #dpCierreClases></mat-datepicker>
+                @if (temporadaForm.get('fechaCierreClases')?.hasError('required')) {
+                  <mat-error>
+                    Obligatorio
+                  </mat-error>
+                }
+              </mat-form-field>
+
+              <!-- Fecha cierre inscripción -->
+              <mat-form-field appearance="outline">
+                <mat-label>Fecha cierre inscripción</mat-label>
+                <input
+                  matInput
+                  [matDatepicker]="dpCierreIns"
+                  formControlName="fechaCierreInscripcion"
+                  />
+                  <mat-datepicker-toggle matSuffix [for]="dpCierreIns"></mat-datepicker-toggle>
+                  <mat-datepicker #dpCierreIns></mat-datepicker>
+                  @if (temporadaForm.get('fechaCierreInscripcion')?.hasError('required')) {
+                    <mat-error>
+                      Obligatorio
+                    </mat-error>
+                  }
+                </mat-form-field>
+
+                <!-- Estado -->
+                <mat-form-field appearance="outline">
+                  <mat-label>Estado</mat-label>
+                  <mat-select formControlName="estado">
+                    <mat-option value="En curso">En curso</mat-option>
+                    <mat-option value="Cerrado">Cerrado</mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+
+              <div class="actions">
+                <button mat-raised-button color="primary" type="submit">
+                  <mat-icon>save</mat-icon>
+                  {{ temporadaForm.get('id')?.value ? 'Actualizar temporada' : 'Guardar' }}
+                </button>
+                <button
+                  mat-stroked-button
+                  type="button"
+                  color="primary"
+                  (click)="limpiarFormulario()"
+                  >
+                  Cancelar
+                </button>
+              </div>
+            </form>
+
+            <!-- LISTA DE TEMPORADAS -->
+            <div class="card">
+              <div class="tabla-header" style="display:flex; flex-direction:column; gap:12px; align-items:stretch;">
+                <h4 class="subtitle" style="margin:0; text-align:center;">Temporadas Registradas</h4>
+
+                <!-- Buscador que ocupa todo el ancho del card -->
+                <mat-form-field appearance="outline" class="buscador" style="width:100%; max-width:none;">
+                  <mat-label>Buscar</mat-label>
+                  <input matInput (input)="aplicarFiltro($any($event.target).value)">
+                  <mat-icon matSuffix>search</mat-icon>
+                </mat-form-field>
+              </div>
+
+              <table class="tabla">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Año</th>
+                    <th>Descripción</th>
+                    <th>Pre-inscripción</th>
+                    <th>Inicio clases</th>
+                    <th>Fin clases</th>
+                    <th>Cierre inscripción</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  @for (t of filteredTemporadas; track t) {
+                    <tr>
+                      <td>{{ t.id }}</td>
+                      <td>{{ t.anio }}</td>
+                      <td>{{ t.descripcion }}</td>
+                      <td>{{ t.fechaAperturaInscripcion | date:'dd/MM/yyyy' }}</td>
+                      <td>{{ t.fechaInicioClases | date:'dd/MM/yyyy' }}</td>
+                      <td>{{ t.fechaCierreClases | date:'dd/MM/yyyy' }}</td>
+                      <td>{{ t.fechaCierreInscripcion | date:'dd/MM/yyyy' }}</td>
+                      <td>{{ t.estado }}</td>
+                      <td class="acciones-col">
+                        <button mat-icon-button color="primary" (click)="editarTemporada(t)">
+                          <mat-icon>edit</mat-icon>
+                        </button>
+                        <button mat-icon-button color="warn" (click)="eliminarTemporada(t)">
+                          <mat-icon>delete</mat-icon>
+                        </button>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+
+            </div>
+          </div>
+        </div>

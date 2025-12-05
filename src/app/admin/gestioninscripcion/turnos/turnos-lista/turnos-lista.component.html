@@ -1,0 +1,113 @@
+<div class="container-turno">
+  <div class="header-section">
+    <h2>TURNOS</h2>
+  </div>
+
+  <div class="info-banner">
+    Gestiona los turnos indicando su horario de inicio y fin.
+  </div>
+
+  <!-- FORMULARIO -->
+  <div class="card-modern">
+    <h3 class="subtitle">Registro de turnos</h3>
+
+    <form [formGroup]="turnoForm" (ngSubmit)="guardarTurno()">
+      <div class="form-grid">
+
+        <!-- id_horario -->
+        <mat-form-field appearance="outline">
+          <mat-label>Horario</mat-label>
+          <mat-select formControlName="id_horario">
+            @for (h of horarios; track h) {
+              <mat-option [value]="h.id">
+                {{ h.descripcion }}
+              </mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <!-- Hora inicio -->
+        <mat-form-field appearance="outline">
+          <mat-label>Hora inicio</mat-label>
+          <input matInput type="time" formControlName="hora_inicio">
+        </mat-form-field>
+
+        <!-- Hora fin -->
+        <mat-form-field appearance="outline">
+          <mat-label>Hora fin</mat-label>
+          <input matInput type="time" formControlName="hora_fin">
+        </mat-form-field>
+
+      </div>
+
+      <div class="actions">
+        <button mat-raised-button color="primary" type="submit">
+          <mat-icon>save</mat-icon> Guardar
+        </button>
+
+        <button mat-stroked-button color="warn" type="button" (click)="limpiarFormulario()">
+          <mat-icon>close</mat-icon> Cancelar
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- TABLA -->
+  <div class="card-modern">
+    <div class="tabla-header">
+      <h3 class="subtitle">Turnos registrados</h3>
+
+      <mat-form-field appearance="outline" class="buscador">
+        <mat-label>Buscar</mat-label>
+        <input matInput (input)="aplicarFiltro($any($event.target).value)">
+        <mat-icon matSuffix>search</mat-icon>
+      </mat-form-field>
+    </div>
+
+    <table mat-table [dataSource]="dataSource" class="table-modern">
+
+      <!-- ID -->
+      <ng-container matColumnDef="id">
+        <th mat-header-cell *matHeaderCellDef>ID</th>
+        <td mat-cell *matCellDef="let row">{{ row.id }}</td>
+      </ng-container>
+
+      <!-- Horario -->
+      <ng-container matColumnDef="horario">
+        <th mat-header-cell *matHeaderCellDef>Horario</th>
+        <td mat-cell *matCellDef="let row">
+          {{ obtenerHorarioDescripcion(row.id_horario) }}
+        </td>
+      </ng-container>
+
+      <!-- Hora Inicio -->
+      <ng-container matColumnDef="hora_inicio">
+        <th mat-header-cell *matHeaderCellDef>Inicio</th>
+        <td mat-cell *matCellDef="let row">{{ row.hora_inicio }}</td>
+      </ng-container>
+
+      <!-- Hora Fin -->
+      <ng-container matColumnDef="hora_fin">
+        <th mat-header-cell *matHeaderCellDef>Fin</th>
+        <td mat-cell *matCellDef="let row">{{ row.hora_fin }}</td>
+      </ng-container>
+
+      <!-- Acciones -->
+      <ng-container matColumnDef="acciones">
+        <th mat-header-cell *matHeaderCellDef>Acciones</th>
+        <td mat-cell *matCellDef="let row" class="acciones-col">
+          <button mat-icon-button color="primary" (click)="editarTurno(row)">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button color="warn" (click)="eliminarTurno(row)">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+    </table>
+  </div>
+</div>
