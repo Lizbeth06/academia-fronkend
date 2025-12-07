@@ -1,10 +1,15 @@
-import { Component } from '@angular/core';
+import { Component, inject, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatIconModule } from '@angular/material/icon';
 import { MaterialModule } from '../../../../material/material.module';
+import { Sede } from '../../../../model/sede.model';
+import { SedeService } from '../../../../services/sede.service';
+import { MatPaginator, MatPaginatorIntl } from '@angular/material/paginator';
+import { PaginatorService } from '../../../../services/security/paginator.service';
+import { MatSort } from '@angular/material/sort';
 
 @Component({
   selector: 'app-sedes-lista',
@@ -17,29 +22,23 @@ import { MaterialModule } from '../../../../material/material.module';
     MaterialModule
   ],
   templateUrl: './sedes-lista.component.html',
-  styleUrl: './sedes-lista.component.css'
+  styleUrl: './sedes-lista.component.css', 
+  providers: [{ provide: MatPaginatorIntl, useClass: PaginatorService }],
 })
-export class SedesListaComponent {
-
+export class SedesListaComponent implements OnInit {
+  
   sedeForm: FormGroup;
-
+  
   displayedColumns: string[] = [
     'codigo',
     'nombre',
     'sector',
-    'ubigeo',
+    'ubicacion',
     'capacidad',
     'estado',
     'acciones'
   ];
-
-  dataSource = new MatTableDataSource<any>([]);
-
-  sectores = [
-    { id: 1, descripcion: 'Público' },
-    { id: 2, descripcion: 'Privado' }
-  ];
-
+  
   constructor(private fb: FormBuilder) {
     this.sedeForm = this.fb.group({
       id: [null],
@@ -51,36 +50,26 @@ export class SedesListaComponent {
       capacidad: [null, [Validators.min(0)]],
       estado: ['Activo', Validators.required]
     });
-
-    // Datos de ejemplo
-    this.dataSource.data = [
-      {
-        id: 1,
-        codigo: 'S001',
-        nombre: 'Sede Central',
-        id_sector: 1,
-        id_ubigeo: 'Lima - Cercado',
-        direccion: 'Av. Siempre Viva 123',
-        capacidad: 300,
-        estado: 'Activo'
-      },
-      {
-        id: 2,
-        codigo: 'S002',
-        nombre: 'Sede Norte',
-        id_sector: 2,
-        id_ubigeo: 'Lima - Los Olivos',
-        direccion: 'Jr. Los Laureles 456',
-        capacidad: 180,
-        estado: 'Inactivo'
-      }
-    ];
-
-    // Filtro por texto simple (convierte cada fila a JSON)
-    this.dataSource.filterPredicate = (data, filter) =>
-      JSON.stringify(data).toLowerCase().includes(filter);
+  
   }
+  private sedeService=inject(SedeService);
 
+  dataSource!:MatTableDataSource<Sede>;
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
+  @ViewChild(MatSort) sort!: MatSort;
+
+  ngOnInit(): void {
+   this.getAllSede(); 
+  }
+  getAllSede(){
+    this.sedeService.findAll().subscribe(data=>{
+      this.crearTabla(data)});
+  }
+  crearTabla(data: Sede[]){
+    this.dataSource = new MatTableDataSource(data);
+    this.dataSource.paginator = this.paginator;
+    this.dataSource.sort = this.sort;
+  }
   guardarSede(): void {
     if (this.sedeForm.invalid) {
       this.sedeForm.markAllAsTouched();
@@ -89,21 +78,21 @@ export class SedesListaComponent {
 
     const formValue = this.sedeForm.value;
 
-    if (!formValue.id) {
-      // nueva sede
-      formValue.id = this.dataSource.data.length
-        ? Math.max(...this.dataSource.data.map(s => s.id)) + 1
-        : 1;
+    // if (!formValue.id) {
+    //   // nueva sede
+    //   formValue.id = this.dataSource.data.length
+    //     ? Math.max(...this.dataSource.data.map(s => s.id)) + 1
+    //     : 1;
 
-      this.dataSource.data = [...this.dataSource.data, formValue];
-    } else {
-      // edición
-      const index = this.dataSource.data.findIndex(s => s.id === formValue.id);
-      if (index !== -1) {
-        this.dataSource.data[index] = formValue;
-        this.dataSource._updateChangeSubscription();
-      }
-    }
+    //   this.dataSource.data = [...this.dataSource.data, formValue];
+    // } else {
+    //   // edición
+    //   const index = this.dataSource.data.findIndex(s => s.id === formValue.id);
+    //   if (index !== -1) {
+    //     this.dataSource.data[index] = formValue;
+    //     this.dataSource._updateChangeSubscription();
+    //   }
+    // }
 
     this.limpiarFormulario();
   }
@@ -121,8 +110,13 @@ export class SedesListaComponent {
     });
   }
 
-  aplicarFiltro(texto: string): void {
-    this.dataSource.filter = texto.trim().toLowerCase();
+  aplicarFiltro(event: Event) {
+    const filterValue = (event.target as HTMLInputElement).value;
+    this.dataSource.filter = filterValue.trim().toLowerCase();
+ 
+    if (this.dataSource.paginator) {
+      this.dataSource.paginator.firstPage();
+    }
   }
 
   editarSede(row: any): void {
@@ -130,9 +124,6 @@ export class SedesListaComponent {
     window.scroll({ top: 0, behavior: 'smooth' });
   }
 
-  obtenerSectorDescripcion(id: number): string {
-    return this.sectores.find(s => s.id === id)?.descripcion || '';
-  }
 
   eliminar(row: any) {
   if (confirm('¿Estás seguro de eliminar esta disciplina?')) {

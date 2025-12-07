@@ -1,95 +1,89 @@
-
-<div class="title-modal" >Agregar Institución</div>
+<div class="title-modal">Agregar Institución</div>
 <div mat-dialog-content>
   <form [formGroup]="formInstitucion" (ngSubmit)="onSave()">
     <fieldset class="row dense-3 between-md">
-      <legend  class="float-none w-auto p-2">Información institucional</legend>
+      <legend class="float-none w-auto p-2">Información institucional</legend>
 
       <div class="col-12 col-md-4">
         <mat-form-field appearance="outline" class="full-width mat-body">
           <mat-label class="mat-body">Tipo documento</mat-label>
           <mat-select formControlName="tipodocumento" placeholder="Seleccione tipo documento">
             @for (sp of tipodocumento; track $index) {
-              <mat-option [value]="sp.idTipoDocumento">{{sp.descripcion}}</mat-option>
+            <mat-option [value]="sp.idTipoDocumento">{{ sp.descripcion }}</mat-option>
             }
           </mat-select>
-          <mat-error>
-            @if (formInstitucion.get('tipodocumento')?.hasError('required')) {
-              Este campo es requerido.
-            }
-          </mat-error>
+          <mat-error> @if (formInstitucion.get('tipodocumento')?.hasError('required')) { Este campo es requerido. } </mat-error>
         </mat-form-field>
       </div>
       <div class="col-12 col-md-4">
         <mat-form-field class="full-width mat-body" appearance="outline">
           <mat-label class="mat-body">N° Documento</mat-label>
-          <input matInput type="text" formControlName="numdocumento" placeholder="Numero documento" (keydown)="validarNumeros($event,'numero')" maxlength="11">
+          <input
+            matInput
+            type="text"
+            formControlName="numdocumento"
+            placeholder="Numero documento"
+            (keydown)="validarNumeros($event, 'numero')"
+            maxlength="11"
+          />
 
           <!-- Botón de búsqueda con ícono de lupa al lado del input -->
           <button mat-icon-button matSuffix (click)="buscarxDoc()">
             <mat-icon>search</mat-icon>
           </button>
           <mat-error>
-            @if (formInstitucion.get('numdocumento')?.hasError('required')) {
-              Este campo es requerido.
-            }
-            @if (formInstitucion.get('numdocumento')?.hasError('pattern')) {
-              Ingrese un documento correcto.
-            }
+            @if (formInstitucion.get('numdocumento')?.hasError('required')) { Este campo es requerido. } @if
+            (formInstitucion.get('numdocumento')?.hasError('pattern')) { Ingrese un documento correcto. }
           </mat-error>
         </mat-form-field>
       </div>
       <div class="col-12 col-md-4">
         <mat-form-field appearance="outline" class="full-width mat-body">
           <mat-label class="mat-body">Nombre de la institución</mat-label>
-          <input matInput formControlName="nombrecomercial" placeholder="Nombre comercial">
-          <mat-error>
-            @if (formInstitucion.get('nombrecomercial')?.hasError('required')) {
-              Este campo es requerido.
-            }
-          </mat-error>
+          <input matInput formControlName="nombrecomercial" placeholder="Nombre comercial" />
+          <mat-error> @if (formInstitucion.get('nombrecomercial')?.hasError('required')) { Este campo es requerido. } </mat-error>
         </mat-form-field>
       </div>
 
       <div class="col-12 col-md-6">
         <mat-form-field appearance="outline" class="full-width mat-body">
           <mat-label class="mat-body">Razón Social</mat-label>
-          <input matInput formControlName="razonsocial" placeholder="Razon social">
-          <mat-error>
-            @if (formInstitucion.get('razonsocial')?.hasError('required')) {
-              Este campo es requerido.
-            }
-          </mat-error>
+          <input matInput formControlName="razonsocial" placeholder="Razon social" />
+          <mat-error> @if (formInstitucion.get('razonsocial')?.hasError('required')) { Este campo es requerido. } </mat-error>
         </mat-form-field>
       </div>
       <div class="col-12 col-md-6 capa-image">
         <div class="image-container" matTooltip="Subir logo" matTooltipPosition="above">
-          <input class="image-input" formControlName="urllogo" type="file" (change)="onImagelogo($event)" #imageLogo accept="image/jpeg, image/png" name="image logo">
-          <mat-icon  (click)="imageLogo.click()">add_a_photo</mat-icon>
+          <input
+            class="image-input"
+            formControlName="urllogo"
+            type="file"
+            (change)="onImagelogo($event)"
+            #imageLogo
+            accept="image/jpeg, image/png"
+            name="image logo"
+          />
+          <mat-icon (click)="imageLogo.click()">add_a_photo</mat-icon>
           @if (selectedLogo) {
-            <div  style="display: flex; align-items: center; gap:10px;margin-top: 8px;">
-              <img [src]="selectedLogo" alt="Image firma" style="max-width: 100%; max-height: 200px; margin-top: 8px;">
-              <button mat-button color="warn" (click)="removeImage()">Quitar Logo</button>
-            </div>
+          <div style="display: flex; align-items: center; gap: 10px; margin-top: 8px">
+            <img [src]="selectedLogo" alt="Image firma" style="max-width: 100%; max-height: 200px; margin-top: 8px" />
+            <button mat-button color="warn" (click)="removeImage()">Quitar Logo</button>
+          </div>
           }
         </div>
       </div>
     </fieldset>
     <fieldset class="row dense-3 between-md">
-      <legend  class="float-none w-auto p-2">Dirección y contacto</legend>
+      <legend class="float-none w-auto p-2">Dirección y contacto</legend>
       <div class="col-12 col-md-4">
         <mat-form-field appearance="outline" class="full-width mat-body">
           <mat-label class="mat-body">Departamento</mat-label>
           <mat-select formControlName="departamento" (selectionChange)="obtenerProvinciasDir()" placeholder="Seleccione un departamento">
             @for (departamento of departamentosDir; track departamento.idUbigeo) {
-              <mat-option [value]="departamento.ubiDpto">{{departamento.ubiNombre}}</mat-option>
+            <mat-option [value]="departamento.ubiDpto">{{ departamento.ubiNombre }}</mat-option>
             }
           </mat-select>
-          <mat-error>
-            @if (formInstitucion.get('departamento')?.hasError('required')) {
-              Este campo es requerido.
-            }
-          </mat-error>
+          <mat-error> @if (formInstitucion.get('departamento')?.hasError('required')) { Este campo es requerido. } </mat-error>
         </mat-form-field>
       </div>
       <div class="col-12 col-md-4">
@@ -97,14 +91,10 @@
           <mat-label class="mat-body">Provincia</mat-label>
           <mat-select formControlName="provincia" (selectionChange)="obtenerDistritosDir()" placeholder="Seleccione una provincia">
             @for (provincia of provinciasDir; track provincia.idUbigeo) {
-              <mat-option [value]="provincia.ubiProvincia">{{provincia.ubiNombre}}</mat-option>
+            <mat-option [value]="provincia.ubiProvincia">{{ provincia.ubiNombre }}</mat-option>
             }
           </mat-select>
-          <mat-error>
-            @if (formInstitucion.get('provincia')?.hasError('required')) {
-              Este campo es requerido.
-            }
-          </mat-error>
+          <mat-error> @if (formInstitucion.get('provincia')?.hasError('required')) { Este campo es requerido. } </mat-error>
         </mat-form-field>
       </div>
       <div class="col-12 col-md-4">
@@ -112,92 +102,66 @@
           <mat-label class="mat-body">Distrito</mat-label>
           <mat-select formControlName="distrito" placeholder="Seleccione un distrito">
             @for (distrito of distritosDir; track distrito.idUbigeo) {
-              <mat-option [value]="distrito.idUbigeo">{{distrito.ubiNombre}}</mat-option>
+            <mat-option [value]="distrito.idUbigeo">{{ distrito.ubiNombre }}</mat-option>
             }
           </mat-select>
-          <mat-error>
-            @if (formInstitucion.get('distrito')?.hasError('required')) {
-              Este campo es requerido.
-            }
-          </mat-error>
+          <mat-error> @if (formInstitucion.get('distrito')?.hasError('required')) { Este campo es requerido. } </mat-error>
         </mat-form-field>
       </div>
       <div class="col-12 col-md-4">
         <mat-form-field appearance="outline" class="full-width mat-body">
           <mat-label class="mat-body">Teléfono</mat-label>
-          <input matInput formControlName="telefono" placeholder="Número teléfono" (keydown)="validarNumeros($event,'numero')" maxlength="10">
-          <mat-error>
-            @if (formInstitucion.get('telefono')?.hasError('pattern')) {
-              Num. de dígitos invalido.
-            }
-          </mat-error>
+          <input matInput formControlName="telefono" placeholder="Número teléfono" (keydown)="validarNumeros($event, 'numero')" maxlength="10" />
+          <mat-error> @if (formInstitucion.get('telefono')?.hasError('pattern')) { Num. de dígitos invalido. } </mat-error>
         </mat-form-field>
       </div>
       <div class="col-12 col-md-4">
         <mat-form-field appearance="outline" class="full-width mat-body">
           <mat-label class="mat-body">Celular</mat-label>
-          <input matInput formControlName="celular" placeholder="Número de celular" (keydown)="validarNumeros($event,'numero')" maxlength="9">
+          <input matInput formControlName="celular" placeholder="Número de celular" (keydown)="validarNumeros($event, 'numero')" maxlength="9" />
           <mat-error>
-            @if (formInstitucion.get('celular')?.hasError('required')) {
-              Este campo es requerido.
-            }
-            @if (formInstitucion.get('celular')?.hasError('pattern')) {
-              Num. de dígitos invalido.
-            }
+            @if (formInstitucion.get('celular')?.hasError('required')) { Este campo es requerido. } @if
+            (formInstitucion.get('celular')?.hasError('pattern')) { Num. de dígitos invalido. }
           </mat-error>
         </mat-form-field>
       </div>
       <div class="col-12 col-md-4">
         <mat-form-field appearance="outline" class="full-width mat-body">
           <mat-label class="mat-body">Correo Electrónico</mat-label>
-          <input matInput formControlName="correo" type="email" placeholder="Correo electrónico">
-          @if (formInstitucion?.get('correo')?.hasError('email')) {
-            <mat-error>
-              Ingrese un correo válido.
-            </mat-error>
+          <input matInput formControlName="correo" type="email" placeholder="Correo electrónico" />
+          @if (formInstitucion!.get('correo')?.hasError('email')) {
+          <mat-error> Ingrese un correo válido. </mat-error>
           }
         </mat-form-field>
       </div>
       <div class="col-12 col-md-12">
         <mat-form-field appearance="outline" class="full-width mat-body">
           <mat-label class="mat-body">Dirección</mat-label>
-          <input matInput formControlName="direccion" placeholder="Dirección específica">
-          <mat-error>
-            @if (formInstitucion.get('direccion')?.hasError('required')) {
-              Este campo es requerido.
-            }
-          </mat-error>
+          <input matInput formControlName="direccion" placeholder="Dirección específica" />
+          <mat-error> @if (formInstitucion.get('direccion')?.hasError('required')) { Este campo es requerido. } </mat-error>
         </mat-form-field>
       </div>
     </fieldset>
     <fieldset class="row dense-3 between-md">
-      <legend  class="float-none w-auto p-2">Otros</legend>
+      <legend class="float-none w-auto p-2">Otros</legend>
       <div class="col-12 col-md-4">
         <mat-form-field appearance="outline" class="full-width mat-body">
           <mat-label class="mat-body">IGV</mat-label>
-          <input matInput formControlName="igv" placeholder="Igv">
+          <input matInput formControlName="igv" placeholder="Igv" />
         </mat-form-field>
       </div>
       <div class="col-12 col-md-4">
         <mat-form-field appearance="outline" class="full-width mat-body">
           <mat-label class="mat-body">Usuario Sol</mat-label>
-          <input matInput formControlName="usuariosol" placeholder="Usuario sol">
-          <mat-error>
-            @if (formInstitucion.get('usuariosol')?.hasError('required')) {
-              Este campo es requerido.
-            }
-          </mat-error>
+          <input matInput formControlName="usuariosol" placeholder="Usuario sol" />
+          <mat-error> @if (formInstitucion.get('usuariosol')?.hasError('required')) { Este campo es requerido. } </mat-error>
         </mat-form-field>
       </div>
       <div class="col-12 col-md-4">
         <mat-form-field appearance="outline" class="full-width mat-body">
           <mat-label class="mat-body">Clave Sol</mat-label>
-          <input matInput formControlName="clavesol" placeholder="Clave sol">
-          <mat-error>
-            @if (formInstitucion.get('clavesol')?.hasError('required')) {
-              Este campo es requerido.
-            }
-          </mat-error>
+          <input matInput formControlName="clavesol" placeholder="Clave sol" />
+          <mat-error> @if (formInstitucion.get('clavesol')?.hasError('required')) { Este campo es requerido. } </mat-error>
         </mat-form-field>
       </div>
 
@@ -205,15 +169,11 @@
       <input type="file" class="form-control" formControlName="urlLogo">
       <mat-hint>Seleccionar Logo</mat-hint>
     </div>
-    -->
-  </fieldset>
+    --></fieldset>
 
-  <div mat-dialog-actions align="center">
-    <button mat-stroked-button mat-button mat-dialog-close>Cancelar</button>
-    <button mat-raised-button type="submit" (click)="onSave()" [disabled]="this.formInstitucion.invalid"><mat-icon>save</mat-icon> Guardar</button>
-  </div>
-
-</form>
-
+    <div mat-dialog-actions align="center">
+      <button mat-stroked-button mat-button mat-dialog-close>Cancelar</button>
+      <button mat-raised-button type="submit" (click)="onSave()" [disabled]="this.formInstitucion.invalid"><mat-icon>save</mat-icon> Guardar</button>
+    </div>
+  </form>
 </div>
-

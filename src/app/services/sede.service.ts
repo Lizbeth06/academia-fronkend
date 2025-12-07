@@ -1,0 +1,34 @@
+import { Injectable } from "@angular/core";
+import { Sede } from "../model/sede.model";
+import { GenericService } from "./generic.service";
+import { Subject } from "rxjs";
+import { HttpClient } from "@angular/common/http";
+import { environment } from "../environments/environment";
+
+@Injectable({
+  providedIn: 'root'
+})
+export class SedeService extends GenericService<Sede>{
+  private sedeChange: Subject<Sede[]> = new Subject<Sede[]>
+
+  constructor(
+    protected override http: HttpClient,
+  ) { 
+    super(
+      http,
+      `${environment.HOST}/api/sede`
+    );
+  }
+
+  
+
+  setSedeChange(data:Sede[]){
+    this.sedeChange.next(data);
+  }
+
+  getSedeChange(){
+    return this.sedeChange.asObservable();
+  }
+  
+
+}
