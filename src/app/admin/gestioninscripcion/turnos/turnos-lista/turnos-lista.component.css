@@ -11,24 +11,15 @@
   border-radius: 12px;
   color: white;
 
-  background: linear-gradient(
-    135deg,
-    #ff704a 0%,
-    #cb532e 25%,
-    #542394 75%,
-    #7b4bf0 100%
-  );
-  box-shadow: 
-    0 0 150px rgba(255, 255, 255, 0.6),
-    0 0 300px rgba(255, 255, 255, 0.35),
-    0 4px 25px rgba(0, 0, 0, 0.15);
+  background: linear-gradient(135deg, #ff704a 0%, #cb532e 25%, #542394 75%, #7b4bf0 100%);
+  box-shadow: 0 0 150px rgba(255, 255, 255, 0.6), 0 0 300px rgba(255, 255, 255, 0.35), 0 4px 25px rgba(0, 0, 0, 0.15);
 }
 
 .info-banner {
   background: #fff4c7;
   padding: 12px 18px;
-  margin: 15px auto 25px auto;
-  max-width: 900px;
+  margin: 24px auto;
+  width: 100%;
   border-radius: 4px;
   text-align: center;
 }
@@ -37,7 +28,7 @@
   background: #fff;
   padding: 22px;
   border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   margin-bottom: 24px;
 }
 
@@ -45,66 +36,18 @@
   text-align: center;
   font-size: 18px;
   font-weight: 600;
+  margin-bottom: 24px;
 }
 
-/* FORM GRID */
-.form-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 18px;
-}
-
-/* ACTION BUTTONS */
-.actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-  margin-top: 15px;
-}
-
-/* TABLA */
-.table-modern {
+/*Tabla*/
+.table-turno {
   width: 100%;
-  border-collapse: collapse;
-  font-size: 14px;
+  overflow-x: auto;
 }
-
-.table-modern th,
-.table-modern td {
-  text-align: center !important;
-  padding: 10px;
-  border-bottom: 1px solid #e0e0e0;
-}
-
-.tabla-header {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-bottom: 12px;
-}
-
-.buscador {
-  width: 100%;
-}
-
-/* ACCIONES */
-.acciones-col {
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-}
-
-/* RESPONSIVE */
-@media (max-width: 768px) {
-  .form-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .actions {
-    flex-direction: column;
-  }
-
-  .actions button {
-    width: 100%;
-  }
+.mat-column-id,
+.mat-column-horario,
+.mat-column-hora_inicio,
+.mat-column-hora_fin,
+.mat-column-acciones {
+  text-align: center;
 }

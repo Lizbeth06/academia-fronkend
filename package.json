@@ -24,6 +24,7 @@
     "@auth0/angular-jwt": "^5.2.0",
     "@ng-matero/extensions": "^19.4.1",
     "@ng-matero/extensions-moment-adapter": "^19.1.0",
+    "boostrap": "^2.0.0",
     "bootstrap": "^5.3.3",
     "flatpickr": "^4.6.13",
     "moment": "^2.30.1",

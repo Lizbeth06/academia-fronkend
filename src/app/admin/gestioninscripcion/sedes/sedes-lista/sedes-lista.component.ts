@@ -63,7 +63,6 @@ export class SedesListaComponent implements OnInit {
   }
   getAllSede(){
     this.sedeService.findAll().subscribe(data=>{
-      console.log(data);
       this.crearTabla(data)});
   }
   crearTabla(data: Sede[]){
