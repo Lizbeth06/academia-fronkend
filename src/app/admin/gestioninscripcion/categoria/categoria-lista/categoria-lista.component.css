@@ -61,16 +61,6 @@
   border-radius: 4px;
   text-align: center;
 }
-/*Tabla*/
-
 table {
   background: #fff;
-}
-
-.mat-column-id,
-.mat-column-horario,
-.mat-column-hora_inicio,
-.mat-column-hora_fin,
-.mat-column-acciones {
-  text-align: center;
 }

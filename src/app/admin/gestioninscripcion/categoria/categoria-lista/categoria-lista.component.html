@@ -2,23 +2,23 @@
   <div class="row">
     <!-- ENCABEZADO MODERNO -->
     <div class="header-section">
-      <h2>TEMPORADAS</h2>
+      <h2>CATEGORÍAS</h2>
     </div>
 
     <!-- INFO DEBAJO DEL ENCABEZADO -->
     <div class="info-banner">
-      <p class="m-0">Aquí podrás gestionar los ciclos y temporadas de Academia.</p>
+      <p class="m-0">Aquí podrás gestionar las categorías de la Academia.</p>
     </div>
 
     <!-- FORMULARIO -->
     <div class="p-0">
-      <app-temporada-form />
+      <app-categoria-form />
     </div>
 
     <!-- LISTA DE TEMPORADAS -->
     <mat-card class="card-personal">
       <mat-card-header class="d-flex justify-content-center pb-4">
-        <mat-card-title>Temporadas Registradas</mat-card-title>
+        <mat-card-title>Categorías registradas</mat-card-title>
       </mat-card-header>
       <mat-card-content>
         <mat-form-field appearance="outline" class="buscador w-100">
@@ -33,41 +33,34 @@
               <td mat-cell *matCellDef="let element; let idx = index">{{ 1 + idx }}</td>
             </ng-container>
             <ng-container matColumnDef="descripcion">
-              <th mat-header-cell *matHeaderCellDef>Temporada</th>
+              <th mat-header-cell *matHeaderCellDef>Categoría</th>
               <td mat-cell *matCellDef="let element">{{ element.descripcion }}</td>
             </ng-container>
-            <ng-container matColumnDef="fapertura">
-              <th mat-header-cell *matHeaderCellDef>Fecha apertura inscripición</th>
-              <td mat-cell *matCellDef="let element">{{ element.faperturainscripcion | date : "dd-MM-yyyy" }}</td>
+            <ng-container matColumnDef="edadminima">
+              <th mat-header-cell *matHeaderCellDef>Edad Mínima</th>
+              <td mat-cell *matCellDef="let element">{{ `${element.edadminima} AÑOS` }}</td>
             </ng-container>
-            <ng-container matColumnDef="fcierre">
-              <th mat-header-cell *matHeaderCellDef>Fecha cierre inscripción</th>
-              <td mat-cell *matCellDef="let element">{{ element.fcierreinscripcion | date : "dd-MM-yyyy" }}</td>
+            <ng-container matColumnDef="edadmaxima">
+              <th mat-header-cell *matHeaderCellDef>Edad Máxima</th>
+              <td mat-cell *matCellDef="let element">{{ `${element.edadmaxima} AÑOS` }}</td>
             </ng-container>
-            <ng-container matColumnDef="finicioclase">
-              <th mat-header-cell *matHeaderCellDef>Inicio de clases</th>
-              <td mat-cell *matCellDef="let element">{{ element.finicioclases | date : "dd-MM-yyyy" }}</td>
+            <ng-container matColumnDef="grupo">
+              <th mat-header-cell *matHeaderCellDef>Grupo</th>
+              <td mat-cell *matCellDef="let element">{{ element.criterioparticipacion.descripcion }}</td>
             </ng-container>
-            <ng-container matColumnDef="ffinclase">
-              <th mat-header-cell *matHeaderCellDef>Fin de clases</th>
-              <td mat-cell *matCellDef="let element">{{ element.fcierreclases | date : "dd-MM-yyyy" }}</td>
+            <ng-container matColumnDef="estado">
+              <th mat-header-cell *matHeaderCellDef>Estado</th>
+              <td mat-cell *matCellDef="let element">{{ element.estado === "1" ? "EN CURSO" : "CERRADO" }}</td>
             </ng-container>
-            <ng-container matColumnDef="anio">
-              <th mat-header-cell *matHeaderCellDef>Año</th>
-              <td mat-cell *matCellDef="let element">{{ element.anio.descripcion }}</td>
-            </ng-container>
-            <ng-container matColumnDef="fregistro">
-              <th mat-header-cell *matHeaderCellDef>Registro</th>
-              <td mat-cell *matCellDef="let element">{{ element.fregistro | date : "dd-MM-yyyy HH:mm:ss" }}</td>
-            </ng-container>
+
             <ng-container matColumnDef="acciones">
               <th mat-header-cell *matHeaderCellDef>Acciones</th>
               <td mat-cell *matCellDef="let element" class="acciones-col">
                 <div class="d-flex">
-                  <button mat-icon-button color="primary" (click)="editarTemporada(element.idTemporada)">
+                  <button mat-icon-button color="primary" (click)="editarCategoria(element.idCategoriaedad)">
                     <mat-icon>edit</mat-icon>
                   </button>
-                  <button mat-icon-button color="warn" (click)="eliminarTemporada(element.idTemporada)">
+                  <button mat-icon-button color="warn" (click)="eliminarCategoria(element.idCategoriaedad)">
                     <mat-icon>delete</mat-icon>
                   </button>
                 </div>

@@ -1,1 +1,98 @@
-<p>temporada-form works!</p>
+<mat-card class="card-personal mb-4">
+  <mat-card-header class="d-flex justify-content-center pb-4">
+    <mat-card-title> Registrar Temporada </mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <form [formGroup]="temporadaForm" (ngSubmit)="guardarTemporada($event)">
+      <div class="row">
+        <div class="col-12 col-sm-12 col-md-4">
+          <!-- Descripción -->
+          <mat-form-field appearance="outline">
+            <mat-label>Descripción de temporada</mat-label>
+            <input matInput formControlName="descripcion" placeholder="Ejemplo: Temporada 2026-I" />
+            <mat-error *ngIf="temporadaForm.get('descripcion')?.hasError('required')">Campo obligatorio</mat-error>
+            <mat-error *ngIf="temporadaForm.get('descripcion')?.hasError('pattern')">Datos incorrectos</mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="col-12 col-sm-6 col-md-4">
+          <!-- Fecha apertura inscripción -->
+          <mat-form-field appearance="outline">
+            <mat-label>Fecha de apertura inscripción</mat-label>
+            <input matInput [matDatepicker]="dpAper" formControlName="faperturainscripcion" />
+            <mat-datepicker-toggle matSuffix [for]="dpAper"></mat-datepicker-toggle>
+            <mat-datepicker #dpAper></mat-datepicker>
+            <mat-error *ngIf="temporadaForm.get('faperturainscripcion')?.hasError('required')">Campo obligatorio</mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="col-12 col-sm-6 col-md-4">
+          <!-- Fecha cierre inscripción -->
+          <mat-form-field appearance="outline">
+            <mat-label>Fecha de cierre inscripción</mat-label>
+            <input matInput [matDatepicker]="dpCierreIns" formControlName="fcierreinscripcion" />
+            <mat-datepicker-toggle matSuffix [for]="dpCierreIns"></mat-datepicker-toggle>
+            <mat-datepicker #dpCierreIns></mat-datepicker>
+            <mat-error *ngIf="temporadaForm.get('fcierreinscripcion')?.hasError('required')">Campo obligatorio</mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="col-12 col-sm-6 col-md-4">
+          <!-- Fecha inicio clases -->
+          <mat-form-field appearance="outline">
+            <mat-label>Fecha de inicio clases</mat-label>
+            <input matInput [matDatepicker]="dpIni" formControlName="finicioclase" />
+            <mat-datepicker-toggle matSuffix [for]="dpIni"></mat-datepicker-toggle>
+            <mat-datepicker #dpIni></mat-datepicker>
+            <mat-error *ngIf="temporadaForm.get('finicioclase')?.hasError('required')">Campo obligatorio</mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="col-12 col-sm-6 col-md-4">
+          <!-- Fecha cierre clases -->
+          <mat-form-field appearance="outline">
+            <mat-label>Fecha de cierre clases</mat-label>
+            <input matInput [matDatepicker]="dpCierreClases" formControlName="fcierreclase" />
+            <mat-datepicker-toggle matSuffix [for]="dpCierreClases"></mat-datepicker-toggle>
+            <mat-datepicker #dpCierreClases></mat-datepicker>
+            <mat-error *ngIf="temporadaForm.get('fcierreclase')?.hasError('required')">Campo obligatorio</mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="col-12 col-sm-6 col-md-2">
+          <mat-form-field appearance="outline">
+            <mat-label>Año de temporada</mat-label>
+            <mat-select formControlName="anio">
+              <mat-option *ngFor="let a of anios" [value]="a.idAnio">
+                {{ a.descripcion }}
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="temporadaForm.get('anio')?.hasError('required')">Campo obligatorio</mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="col-12 col-sm-6 col-md-2">
+          <!-- Estado -->
+          <mat-form-field appearance="outline">
+            <mat-label>Estado de temporada</mat-label>
+            <mat-select formControlName="estado">
+              <mat-option value="1">EN CURSO</mat-option>
+              <mat-option value="0">CERRADO</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <div align="end">
+        <button mat-raised-button color="primary" type="submit" class="mr-2" [disabled]="!temporadaForm.valid">
+          <mat-icon>save</mat-icon>
+          {{ idTemporada !== 0 ? "Actualizar temporada" : "Guardar" }}
+        </button>
+        <button mat-stroked-button type="button" color="primary" (click)="limpiarFormulario($event)">Cancelar</button>
+        <div class="d-flex align-items-center justify-content-center mx-2">
+          <mat-spinner *ngIf="cargar" [diameter]="25" color="primary"></mat-spinner>
+        </div>
+      </div>
+    </form>
+  </mat-card-content>
+</mat-card>

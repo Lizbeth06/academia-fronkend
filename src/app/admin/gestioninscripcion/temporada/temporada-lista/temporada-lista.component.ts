@@ -1,171 +1,66 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { Component, inject, OnInit, ViewChild } from "@angular/core";
+import { CommonModule } from "@angular/common";
 
 // Angular Material
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
-import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatNativeDateModule, DateAdapter, MAT_DATE_LOCALE, MAT_DATE_FORMATS } from '@angular/material/core';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIcon } from "@angular/material/icon";
-import { DataSource } from '@angular/cdk/table';
-
-// ⭐️ FORMATO PERSONALIZADO DD/MM/YYYY
-export const FORMATO_DDMMYYYY = {
-  parse: {
-    dateInput: 'DD/MM/YYYY'
-  },
-  display: {
-    dateInput: 'DD/MM/YYYY',
-    monthYearLabel: 'MMMM YYYY',
-    dateA11yLabel: 'DD/MM/YYYY',
-    monthYearA11yLabel: 'MMMM YYYY'
-  }
-};
+import { MAT_DATE_LOCALE, MAT_DATE_FORMATS } from "@angular/material/core";
+import { TemporadaFormComponent } from "../temporada-form/temporada-form.component";
+import { MaterialModule } from "../../../../material/material.module";
+import { MatPaginator, MatPaginatorIntl } from "@angular/material/paginator";
+import { PaginatorService } from "../../../../services/security/paginator.service";
+import { MatTableDataSource } from "@angular/material/table";
+import { TemporadaService } from "../../../../services/temporada.service";
+import { Temporada } from "../../../../model/temporada.model";
+import { MatSort } from "@angular/material/sort";
 
 @Component({
-  selector: 'app-temporada-lista',
+  selector: "app-temporada-lista",
   standalone: true,
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatSelectModule,
-    MatDatepickerModule,
-    MatNativeDateModule,
-    MatButtonModule,
-    MatIcon,
-],
-  providers: [
-    { provide: MAT_DATE_LOCALE, useValue: 'es-PE' },
-    { provide: MAT_DATE_FORMATS, useValue: FORMATO_DDMMYYYY }
-  ],
-  templateUrl: './temporada-lista.component.html',
-  styleUrl: './temporada-lista.component.css'
+  imports: [CommonModule, MaterialModule, TemporadaFormComponent],
+  templateUrl: "./temporada-lista.component.html",
+  styleUrl: "./temporada-lista.component.css",
+
+  providers: [{ provide: MatPaginatorIntl, useClass: PaginatorService }],
 })
 export class TemporadaListaComponent implements OnInit {
+  constructor() {}
+  displayedColumns = ["id", "descripcion", "fapertura", "fcierre", "finicioclase", "ffinclase", "anio", "fregistro", "acciones"];
 
-  temporadaForm: FormGroup;
+  private temporadaServicio = inject(TemporadaService);
 
-  // años disponibles
-  anios: number[] = [2024, 2025, 2026, 2027, 2028];
+  @ViewChild(TemporadaFormComponent) formulario!: TemporadaFormComponent;
 
-  // datos simulados
-  temporadas: any[] = [];
-  filteredTemporadas: any[] = [];
+  dataSource: MatTableDataSource<Temporada>;
 
-  constructor(private fb: FormBuilder, private adapter: DateAdapter<any>) {
-
-    // ⭐ Forzar formato dd/MM/yyyy
-    this.adapter.setLocale('es-PE');
-
-    this.temporadaForm = this.fb.group({
-      id: [null],
-      anio: [null, Validators.required],
-      descripcion: ['', Validators.required],
-      fechaAperturaInscripcion: [null, Validators.required],
-      fechaInicioClases: [null, Validators.required],
-      fechaCierreClases: [null, Validators.required],
-      fechaCierreInscripcion: [null, Validators.required],
-      estado: ['En curso', Validators.required]
-    });
-  }
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
+  @ViewChild(MatSort) sort!: MatSort;
 
   ngOnInit(): void {
-    // Si las temporadas se cargan aquí, asegurarse de llamar updateFiltered() después:
-    // this.cargarTemporadas();  <-- ejemplo
+    this.getAllTemporada();
   }
-
-  updateFiltered(): void {
-    this.filteredTemporadas = Array.isArray(this.temporadas) ? [...this.temporadas] : [];
-  }
-
-  aplicarFiltro(value: string): void {
-    const filter = (value || '').toString().trim().toLowerCase();
-    if (!filter) {
-      this.filteredTemporadas = [...this.temporadas];
-      return;
-    }
-    this.filteredTemporadas = (this.temporadas || []).filter(t => {
-      // Buscar en todos los valores del objeto temporada
-      return Object.values(t).some(v => {
-        if (v === null || v === undefined) return false;
-        const s = (v instanceof Date) ? (v as Date).toISOString() : String(v);
-        return s.toLowerCase().includes(filter);
-      });
+  getAllTemporada() {
+    this.temporadaServicio.findAll().subscribe((data) => {
+      console.log(data);
+      this.crearTabla(data);
     });
   }
-
-  guardarTemporada(): void {
-    if (this.temporadaForm.invalid) {
-      this.temporadaForm.markAllAsTouched();
-      return;
-    }
-
-    const formValue = this.temporadaForm.value;
-
-    // Validar solo 1 temporada por año (excepto edición)
-    const existeMismoAnio = this.temporadas.some(
-      t => t.anio === formValue.anio && t.id !== formValue.id
-    );
-
-    if (existeMismoAnio) {
-      alert('Ya existe una temporada para este año.');
-      return;
-    }
-
-    if (formValue.id) {
-      // Editar
-      const index = this.temporadas.findIndex(t => t.id === formValue.id);
-      if (index !== -1) {
-        this.temporadas[index] = { ...this.temporadas[index], ...formValue };
-      }
-    } else {
-      // Nueva
-      const nuevoId = this.temporadas.length
-        ? Math.max(...this.temporadas.map(t => t.id)) + 1
-        : 1;
-
-      this.temporadas.push({
-        ...formValue,
-        id: nuevoId
-      });
-    }
-
-    this.updateFiltered();
-    this.limpiarFormulario();
+  crearTabla(data: Temporada[]) {
+    this.dataSource = new MatTableDataSource(data);
+    this.dataSource.paginator = this.paginator;
+    this.dataSource.sort = this.sort;
   }
 
-  editarTemporada(temp: any): void {
-    this.temporadaForm.patchValue(temp);
-    window.scroll({ top: 0, behavior: 'smooth' });
+  editarTemporada(id: number) {
+    this.formulario.editarTemporada(id);
+    window.scroll({ top: 0, behavior: "smooth" });
   }
 
   eliminarTemporada(temp: any): void {
-  const confirmar = confirm(`¿Eliminar la temporada ${temp.descripcion} (${temp.anio})?`);
-
-  if (!confirmar) return;
-
-  this.temporadas = this.temporadas.filter(t => t.id !== temp.id);
-  this.updateFiltered();
-}
-
-
-  limpiarFormulario(): void {
-    this.temporadaForm.reset({
-      id: null,
-      anio: null,
-      descripcion: '',
-      fechaAperturaInscripcion: null,
-      fechaInicioClases: null,
-      fechaCierreClases: null,
-      fechaCierreInscripcion: null,
-      estado: 'En curso'
-    });
+    const confirmar = confirm(`¿Eliminar la temporada ${temp.descripcion} (${temp.anio})?`);
   }
 
+  limpiarFormulario(): void {}
 
+  aplicarFiltro(v: string) {
+    this.dataSource.filter = v.trim().toLowerCase();
+  }
 }

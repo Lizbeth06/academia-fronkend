@@ -1,0 +1,73 @@
+<mat-card class="card-personal mb-4">
+  <mat-card-header class="d-flex justify-content-center pb-4">
+    <mat-card-title> Registrar Categoría </mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <form [formGroup]="categoriaForm" (ngSubmit)="guardarCategoria($event)">
+      <div class="row">
+        <div class="col-12 col-sm-9 col-md-4">
+          <!-- Descripción -->
+          <mat-form-field appearance="outline">
+            <mat-label>Descripción de categoría</mat-label>
+            <input matInput formControlName="descripcion" placeholder="Ejemplo: Categoría 8" />
+            <mat-error *ngIf="categoriaForm.get('descripcion')?.hasError('required')">Campo obligatorio</mat-error>
+            <mat-error *ngIf="categoriaForm.get('descripcion')?.hasError('pattern')">Datos incorrectos</mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="col-12 col-sm-3 col-md-2">
+          <!-- Edad minima -->
+          <mat-form-field appearance="outline">
+            <mat-label>Edad mínima (en años)</mat-label>
+            <input matInput formControlName="edadminima" placeholder="Ejemplo: 1, 8,..." (keydown)="soloNumeros($event, 'numero')" />
+            <span matSuffix class="mr-4" *ngIf="categoriaForm.get('edadminima')?.value">Años</span>
+            <mat-error *ngIf="categoriaForm.get('edadminima')?.hasError('required')">Datos incorrectos</mat-error>
+          </mat-form-field>
+        </div>
+        <div class="col-12 col-sm-4 col-md-2">
+          <!-- Edad minima -->
+          <mat-form-field appearance="outline">
+            <mat-label>Edad máxima (en años)</mat-label>
+            <input matInput formControlName="edadmaxima" placeholder="Ejemplo: 1, 8,..." (keydown)="soloNumeros($event, 'numero')" />
+            <span matSuffix class="mr-4" *ngIf="categoriaForm.get('edadmaxima')?.value">Años</span>
+            <mat-error *ngIf="categoriaForm.get('edadmaxima')?.hasError('required')">Datos incorrectos</mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="col-12 col-sm-4 col-md-2">
+          <mat-form-field appearance="outline">
+            <mat-label>Grupo</mat-label>
+            <mat-select formControlName="grupo">
+              <mat-option *ngFor="let a of grupo" [value]="a.idCriterioparticipacion">
+                {{ a.descripcion }}
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="categoriaForm.get('grupo')?.hasError('required')">Campo obligatorio</mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="col-12 col-sm-4 col-md-2">
+          <!-- Estado -->
+          <mat-form-field appearance="outline">
+            <mat-label>Estado de categoría</mat-label>
+            <mat-select formControlName="estado">
+              <mat-option value="1">EN CURSO</mat-option>
+              <mat-option value="0">CERRADO</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <div class="d-flex justify-content-end gap-2">
+        <button mat-raised-button color="primary" type="submit" [disabled]="!categoriaForm.valid || cargar">
+          <div class="d-flex align-items-center justify-content-center gap-2">
+            <mat-icon>save</mat-icon>
+            {{ idCategoria !== 0 ? "Actualizar categoria" : "Guardar" }}
+            <mat-spinner *ngIf="cargar" [diameter]="25" color="primary"></mat-spinner>
+          </div>
+        </button>
+        <button mat-stroked-button type="button" color="primary" (click)="limpiarFormulario($event)">Cancelar</button>
+      </div>
+    </form>
+  </mat-card-content>
+</mat-card>

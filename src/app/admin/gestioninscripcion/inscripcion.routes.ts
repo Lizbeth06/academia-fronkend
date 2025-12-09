@@ -1,67 +1,66 @@
-import { Routes } from '@angular/router';
-import { ConvocatoriaComponent } from './convocatoria/convocatoria_lista/convocatoria.component';
-import { DisciplinasListaComponent } from './disciplinas/disciplinas-lista/disciplinas-lista.component';
-import { HorariosListaComponent } from './horarios/horarios-lista/horarios-lista.component';
-import { SedesListaComponent } from './sedes/sedes-lista/sedes-lista.component';
-import { ValidacioninscripcionListaComponent } from './validacioninscripcion/validacioninscripcion-lista/validacioninscripcion-lista.component';
-import { TurnosListaComponent } from './turnos/turnos-lista/turnos-lista.component';
-import { TemporadaListaComponent } from './temporada/temporada-lista/temporada-lista.component';
-import { PreInscripcionComponent } from './preinscripcion/preinscripcion-lista/preinscripcion-lista.component';
+import { Routes } from "@angular/router";
+import { ConvocatoriaComponent } from "./convocatoria/convocatoria_lista/convocatoria.component";
+import { DisciplinasListaComponent } from "./disciplinas/disciplinas-lista/disciplinas-lista.component";
+import { HorariosListaComponent } from "./horarios/horarios-lista/horarios-lista.component";
+import { SedesListaComponent } from "./sedes/sedes-lista/sedes-lista.component";
+import { ValidacioninscripcionListaComponent } from "./validacioninscripcion/validacioninscripcion-lista/validacioninscripcion-lista.component";
+import { TurnosListaComponent } from "./turnos/turnos-lista/turnos-lista.component";
+import { TemporadaListaComponent } from "./temporada/temporada-lista/temporada-lista.component";
+import { PreInscripcionComponent } from "./preinscripcion/preinscripcion-lista/preinscripcion-lista.component";
+import { CategoriaListaComponent } from "./categoria/categoria-lista/categoria-lista.component";
 
 export const inscripcionRoutes: Routes = [
+  // 👇 NUEVAS RUTAS DE PRE-INSCRIPCIÓN y CONVOCATORIA
+  {
+    path: "validacioninscripcion",
+    component: ValidacioninscripcionListaComponent,
+    title: "Validacion inscripcion",
+  },
 
+  {
+    path: "pre-inscripcion",
+    component: PreInscripcionComponent,
+    title: "pre inscripción",
+  },
 
-    // 👇 NUEVAS RUTAS DE PRE-INSCRIPCIÓN y CONVOCATORIA
-    {
-        path: 'validacioninscripcion',
-        component: ValidacioninscripcionListaComponent,
-        title: 'Validacion inscripcion'
-    },
+  {
+    path: "convocatoria",
+    component: ConvocatoriaComponent,
+    title: "convocatorias",
+  },
+  {
+    path: "categoria",
+    component: CategoriaListaComponent,
+    title: "categoria",
+  },
 
-    {
-        path: 'pre-inscripcion',
-        component: PreInscripcionComponent,
-        title: 'pre inscripción'
-    },
-    
+  {
+    path: "horarios",
+    component: HorariosListaComponent,
+    title: "horarios",
+  },
 
-    {
-        path: 'convocatoria',
-        component: ConvocatoriaComponent, 
-        title: 'convocatorias'
-    },
+  {
+    path: "turnos",
+    component: TurnosListaComponent,
+    title: "turnos",
+  },
 
+  {
+    path: "sedes",
+    component: SedesListaComponent,
+    title: "sedes",
+  },
 
-    {
-        path: 'horarios',
-        component: HorariosListaComponent, 
-        title: 'horarios'
-    },
+  {
+    path: "disciplina",
+    component: DisciplinasListaComponent,
+    title: "disciplina",
+  },
 
-    {
-        path: 'turnos',
-        component: TurnosListaComponent, 
-        title: 'turnos'
-    },
-
-    {
-        path: 'sedes',
-        component: SedesListaComponent,
-        title: 'sedes'
-    },
-
-    {
-        path: 'disciplina',
-        component: DisciplinasListaComponent, 
-        title: 'disciplina'
-    },
-
-    
-    {
-        path: 'temporada',
-        component: TemporadaListaComponent, 
-        title: 'temporada'
-    },
-  
-
- ]
+  {
+    path: "temporada",
+    component: TemporadaListaComponent,
+    title: "temporada",
+  },
+];
