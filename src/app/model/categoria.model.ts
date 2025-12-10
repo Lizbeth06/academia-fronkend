@@ -4,6 +4,7 @@ export interface Categoria {
   edadminima: number;
   edadmaxima: number;
   estado: string;
+  etapa: string;
   criterioparticipacion: Criterioparticipacion;
 }
 

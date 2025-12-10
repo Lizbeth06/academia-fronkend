@@ -27,23 +27,25 @@ export class CategoriaFormComponent implements OnInit {
   private categoriaService = inject(CategoriaService);
   private listaTemporada = inject(CategoriaListaComponent);
 
-  grupo: Criterioparticipacion[] = [];
+  modalidad: Criterioparticipacion[] = [];
   categoriaForm: FormGroup;
   cargar = false;
   idCategoria = 0;
+  etapa = [{ descripcion: "FORMACIÓN" }, { descripcion: "MASIFICACIÓN" }];
 
   private buildForm() {
     this.categoriaForm = this.formBuilder.group({
       descripcion: ["", [Validators.required, Validators.pattern("^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ0-9- ]+$")]],
       edadminima: ["", Validators.required],
       edadmaxima: ["", Validators.required],
-      grupo: [1, Validators.required],
+      modalidad: [1, Validators.required],
+      etapa: ["MASIFICACIÓN", Validators.required],
       estado: ["1", Validators.required],
     });
   }
   ngOnInit(): void {
     this.grupoService.findAll().subscribe((data) => {
-      this.grupo = data;
+      this.modalidad = data;
       console.log(data);
     });
   }
@@ -54,8 +56,9 @@ export class CategoriaFormComponent implements OnInit {
         this.categoriaForm.get("descripcion")?.setValue(data.descripcion),
           this.categoriaForm.get("edadminima")?.setValue(data.edadminima),
           this.categoriaForm.get("edadmaxima")?.setValue(data.edadmaxima);
-        this.categoriaForm.get("grupo")?.setValue(data.criterioparticipacion.idCriterioparticipacion);
+        this.categoriaForm.get("modalidad")?.setValue(data.criterioparticipacion.idCriterioparticipacion);
         this.categoriaForm.get("estado")?.setValue(data.estado);
+        this.categoriaForm.get("etapa")?.setValue(data.etapa);
       },
       error: (error) => {
         this.cargar = false;
@@ -71,7 +74,8 @@ export class CategoriaFormComponent implements OnInit {
       edadminima: Number(this.categoriaForm.get("edadminima")?.value),
       edadmaxima: Number(this.categoriaForm.get("edadmaxima")?.value),
       estado: String(this.categoriaForm.get("estado")?.value).trim(),
-      criterioparticipacion: { idCriterioparticipacion: Number(this.categoriaForm.get("grupo")?.value) },
+      etapa: String(this.categoriaForm.get("etapa")?.value).trim(),
+      criterioparticipacion: { idCriterioparticipacion: Number(this.categoriaForm.get("modalidad")?.value) },
     };
     if (this.idCategoria !== 0) {
       this.categoriaService.update(this.idCategoria, categoria).subscribe({
@@ -105,8 +109,9 @@ export class CategoriaFormComponent implements OnInit {
     e.preventDefault();
     this.cargar = false;
     this.categoriaForm.reset();
-    this.categoriaForm.get("grupo")?.setValue(1);
+    this.categoriaForm.get("modalidad")?.setValue(1);
     this.categoriaForm.get("estado")?.setValue("1");
+    this.categoriaForm.get("etapa")?.setValue("MASIFICACIÓN");
     this.idCategoria = 0;
   }
 

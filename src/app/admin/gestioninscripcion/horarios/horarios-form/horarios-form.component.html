@@ -1,1 +1,89 @@
-<p>horarios-form works!</p>
+<mat-card class="card-personal">
+  <mat-card-header class="d-flex justify-content-center pb-4">
+    <mat-card-title> Complejos deportivos </mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <form [formGroup]="complejoForm" (ngSubmit)="guardarHorario()" class="row">
+      <div class="col-12 col-md-4">
+        <mat-form-field appearance="outline">
+          <mat-label>Departamento</mat-label>
+          <mat-select formControlName="departamento" placeholder="Departamentos" (selectionChange)="onDepartamentoChange()">
+            <mat-option>Seleccione</mat-option>
+            <mat-option *ngFor="let dep of departamentos" [value]="dep">{{ dep.ubiNombre }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+      <div class="col-12 col-md-4">
+        <mat-form-field appearance="outline">
+          <mat-label>Provincia</mat-label>
+          <mat-select formControlName="provincia" (selectionChange)="onProvinciaChange()">
+            <mat-option>Seleccione</mat-option>
+            <mat-option *ngFor="let prov of provincias" [value]="prov">{{ prov.ubiNombre }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <div class="col-12 col-md-4">
+        <mat-form-field appearance="outline">
+          <mat-label>Complejo</mat-label>
+          <mat-select formControlName="sede">
+            <mat-option>Seleccione</mat-option>
+            <mat-option *ngFor="let s of sedes" [value]="s.idSede">{{ s.nombre }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+    </form>
+  </mat-card-content>
+</mat-card>
+
+<!-- <mat-card class="card-personal">
+  <mat-card-header class="d-flex justify-content-center pb-4">
+    <mat-card-title> Registro de horarios </mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <form [formGroup]="horarioForm" (ngSubmit)="guardarHorario()">
+      <mat-form-field appearance="outline">
+        <mat-label>Turno</mat-label>
+        <mat-select formControlName="turnoId"> </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Disciplina</mat-label>
+        <mat-select formControlName="disciplinaId"> </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Categoría</mat-label>
+        <mat-select formControlName="categoriaId"> </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Temporada</mat-label>
+        <mat-select formControlName="temporadaId"> </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Contador</mat-label>
+        <input matInput type="number" formControlName="contador" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>N° vacantes</mat-label>
+        <input matInput type="number" formControlName="numVacante" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Estado</mat-label>
+        <mat-select formControlName="estado">
+          <mat-option value="Activo">Activo</mat-option>
+          <mat-option value="Inactivo">Inactivo</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <div class="actions">
+        <button mat-raised-button color="primary" type="submit"><mat-icon>save</mat-icon> Guardar</button>
+
+        <button mat-stroked-button color="warn" type="button" (click)="limpiarFormulario()"><mat-icon>close</mat-icon> Cancelar</button>
+      </div>
+    </form>
+  </mat-card-content>
+</mat-card> -->
