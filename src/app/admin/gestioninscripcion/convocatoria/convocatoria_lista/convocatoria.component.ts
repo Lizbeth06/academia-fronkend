@@ -1,6 +1,7 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Convocatoria } from './../../../../model/convocatoria';
+import { Component, inject, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { trigger, transition, style, animate } from '@angular/animations';
 
 // Angular Material Modules
@@ -16,11 +17,26 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule, MatPaginator } from '@angular/material/paginator';
-
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { ConvocatoriaService } from '../../../../services/convocatoria.service';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { provideNativeDateAdapter } from '@angular/material/core';
+import { Tipoconvocatoria } from '../../../../model/tipoconvocatoria';
+import { TipoconvocatoriaService } from '../../../../services/tipoconvocatoria.service';
+import { MatListModule } from '@angular/material/list';
+import { MatDividerModule } from '@angular/material/divider';
+import { TemporadaService } from '../../../../services/temporada.service';
+import { SedeService } from '../../../../services/sede.service';
+import { DisciplinaService } from '../../../../services/disciplina.service';
+import { CategoriaService } from '../../../../services/categoria.service';
+import { Temporada } from '../../../../model/temporada.model';
+import { Sede } from '../../../../model/sede.model';
+import { Categoria } from '../../../../model/categoria.model';
+import { Disciplina } from '../../../../model/disciplina';
 /**
  * Interface actualizada con deportes y tipo
  */
-export interface Convocatoria {
+export interface ConvocatoriaInterface {
   id_convocatoria: number;
   titulo: string;
   subtitulo: string;
@@ -35,12 +51,17 @@ export interface Convocatoria {
   estado: 'activa' | 'cerrada';
   region?: string;
   sede?: string;
+  finicioinscripcion: Date | undefined;
+  ffinalinscripcion: Date | undefined;
+  finicioactividad: Date | undefined;
+  ffinactividad: Date | undefined;
   fechacreada?: Date | null;
 }
 
 @Component({
   selector: 'app-convocatoria',
   standalone: true,
+  providers: [provideNativeDateAdapter()],
   imports: [
     CommonModule,
     FormsModule,
@@ -55,7 +76,12 @@ export interface Convocatoria {
     MatTooltipModule,
     MatProgressSpinnerModule,
     MatTableModule,
-    MatPaginatorModule
+    MatPaginatorModule,
+    MatDatepickerModule,
+    MatSlideToggleModule,
+    ReactiveFormsModule,
+    MatListModule,
+    MatDividerModule
   ],
   templateUrl: './convocatoria.component.html',
   styleUrls: ['./convocatoria.component.css'],
@@ -75,14 +101,28 @@ export class ConvocatoriaComponent implements OnInit {
   // =========================
   // DATOS Y PAGINACIÓN (6 por página = 2 filas × 3 cards)
   // =========================
-  convocatorias: Convocatoria[] = [];
-  convocatoriasFiltradas: Convocatoria[] = [];
-  convocatoriasPaginadas: Convocatoria[] = [];
-  
+  convocatorias: ConvocatoriaInterface[] = [];
+  convocatoriasFiltradas: ConvocatoriaInterface[] = [];
+  convocatoriasPaginadas: ConvocatoriaInterface[] = [];
+
+  tiposConvocatoria: Tipoconvocatoria[] = [];
+  temporadas: Temporada[] = [];
+  sedes: Sede[] = [];
+  disciplinas: Disciplina[] = [];
+  categorias: Categoria[] = [];
+
   pageSize: number = 6; // 2 filas × 3 cards
   pageSizeOptions: number[] = [10, 20, 30, 50, 100, 200];
   pageIndex: number = 0;
   totalConvocatorias: number = 0;
+
+  /*Inyección de servicios */
+  convocatoriaService = inject(ConvocatoriaService);
+  tipoConvocatoriaService = inject(TipoconvocatoriaService);
+  temporadaService = inject(TemporadaService);
+  sedeService = inject(SedeService);
+  disciplinaService = inject(DisciplinaService);
+  categoriaEdadService = inject(CategoriaService);
 
   // =========================
   // FILTROS ACTUALIZADOS
@@ -94,7 +134,7 @@ export class ConvocatoriaComponent implements OnInit {
   tipoSeleccionado: string = '';
 
   regiones: string[] = [];
-  sedes: string[] = [];
+  // sedes: string[] = [];
   deportes: string[] = [
     'Rugby',
     'Tenis de campo',
@@ -105,10 +145,10 @@ export class ConvocatoriaComponent implements OnInit {
     'Atletismo',
     'Pickleball'
   ];
-  tiposConvocatoria = [
-    { value: 'deporte', label: 'Deporte' },
-    { value: 'paradeporte', label: 'Para Deporte' }
-  ];
+  // tiposConvocatoria = [
+  //   { value: 'deporte', label: 'Deporte' },
+  //   { value: 'paradeporte', label: 'Para Deporte' }
+  // ];
 
   // =========================
   // ESTADOS
@@ -118,9 +158,9 @@ export class ConvocatoriaComponent implements OnInit {
   modoGestion: boolean = false;
   mostrarFormulario: boolean = false;
   modoEdicion: boolean = false;
-  convocatoriaEditando: Convocatoria | null = null;
+  convocatoriaEditando: ConvocatoriaInterface | null = null;
   mostrarPreview: boolean = false;
-  convocatoriaPreview: Convocatoria | null = null;
+  convocatoriaPreview: ConvocatoriaInterface | null = null;
 
   // =========================
   // MENSAJES Y LOADING
@@ -140,8 +180,26 @@ export class ConvocatoriaComponent implements OnInit {
   // =========================
   // FORMULARIO
   // =========================
+
+  //Fourmuario reactivo
+  fb = inject(FormBuilder);
+  formGroup = this.fb.group({
+    titulo: '',
+    subtitulo: '',
+    descripcion: '',
+    idTipoconvocatoria: 1,
+    idOficina: undefined,
+    numvacantes: 0,
+    numdisponibles: 0,
+    finicioinscripcion: undefined,
+    ffinalinscripcion: undefined,
+    finicioactividad: undefined,
+    ffinactividad: undefined,
+    estado: 'activa'
+  });
+
   columnasTabla: string[] = ['numero', 'titulo', 'subtitulo', 'region', 'sede', 'deporte', 'numdisponibles', 'estado', 'acciones'];
-  nuevaConvocatoria: Convocatoria = this.crearConvocatoriaVacia();
+  nuevaConvocatoria: ConvocatoriaInterface = this.crearConvocatoriaVacia();
   imagenSeleccionada: File | null = null;
   imagenPreview: string = '';
   erroresFormulario: { [key: string]: boolean } = {};
@@ -150,28 +208,99 @@ export class ConvocatoriaComponent implements OnInit {
 
   ngOnInit(): void {
     this.cargarConvocatorias();
+    this.cargarTiposConvocatorias();
+    this.cargarTemporadas();
+    this.cargarSedes();
+    this.cargarDisciplinas();
+    this.cargarCategoriasEdad();
     this.actualizarEstadosPorCupos();
+    console.log("Componentes inicializados");
   }
 
+  
   // =========================
   // CARGA DE DATOS
   // =========================
   
   cargarConvocatorias(): void {
     this.cargando = true;
-
-    // TODO: Reemplazar con llamada real a API
-    setTimeout(() => {
-      this.convocatorias = this.obtenerDatosEjemplo();
+    this.convocatoriaService.findAll().subscribe((res: Convocatoria[]) => {
+      res.forEach(e => this.convocatorias.push(
+        {
+          id_convocatoria: e.idConvocatoria,
+          titulo: e.titulo, //TODO: `#deporte - Estadio Nacional`
+          subtitulo: e.subtitulo,
+          descripcion: e.descripcion,
+          urlimagen: 'https://i.imgur.com/JELgLb5.png', //TODO
+          deporte: "#deporte", //TODO
+          tipo: 'deporte', //TODO
+          frecuencia: 'Lun-Mié-Vie: 3-6 PM', //TODO
+          numvacantes: e.numvacantes,
+          numdisponibles: e.numvacantes - e.numinscritos,
+          numinscritos: e.numinscritos,
+          estado: e.estado ? 'activa' : 'cerrada',
+          region: 'Lima', //TODO
+          sede: 'Estadio Nacional', //TODO
+          finicioinscripcion: e.finicioinscripcion,
+          ffinalinscripcion: e.ffinalinscripcion,
+          finicioactividad: e.finicioactividad,
+          ffinactividad: e.ffinactividad,
+          fechacreada: e.fcreada
+        }
+      ));
       this.extraerOpcionesFiltros();
       this.aplicarFiltros();
       this.cargando = false;
-    }, 500);
-  }
+    });
+
+    // TODO: Reemplazar con llamada real a API
+    // setTimeout(() => {
+      //   this.convocatorias = this.obtenerDatosEjemplo();
+      //   this.extraerOpcionesFiltros();
+      //   this.aplicarFiltros();
+      //   this.cargando = false;
+      // }, 500);
+    }
+    
+    cargarTiposConvocatorias() {
+      this.cargando = true;
+      this.tipoConvocatoriaService.findAll().subscribe(data => {
+        this.tiposConvocatoria = data;
+        this.cargando = false
+      });
+    }
+    
+    cargarTemporadas() {
+      this.cargando = true;
+      this.temporadaService.findAll().subscribe(data => {
+        this.temporadas = data;
+        this.cargando = false
+      });
+    }
+    cargarSedes() {
+      this.cargando = true;
+      this.sedeService.findAll().subscribe(data => {
+        this.sedes = data;
+        this.cargando = false
+      });
+    }
+    cargarDisciplinas() {
+      this.cargando = true;
+      this.disciplinaService.findAll().subscribe(data => {
+        this.disciplinas = data;
+        this.cargando = false
+      });
+    }
+    cargarCategoriasEdad() {
+      this.categoriaEdadService.findAll().subscribe(data => {
+        this.categorias = data;
+        this.cargando = false;
+      })
+    }
 
   extraerOpcionesFiltros(): void {
     this.regiones = [...new Set(this.convocatorias.map(c => c.region).filter(r => r))].sort() as string[];
-    this.sedes = [...new Set(this.convocatorias.map(c => c.sede).filter(s => s))].sort() as string[];
+    // this.sedes = [...new Set(this.convocatorias.map(c => c.sede).filter(s => s))].sort() as string[];
   }
 
   // =========================
@@ -231,14 +360,14 @@ export class ConvocatoriaComponent implements OnInit {
   // ACCIONES USUARIO
   // =========================
 
-  inscribirse(convocatoria: Convocatoria): void {
+  inscribirse(convocatoria: ConvocatoriaInterface): void {
     if (convocatoria.estado === 'activa' && convocatoria.numdisponibles > 0) {
       // TODO: Navegar al formulario de pre-inscripción
       this.mostrarMensajeExito(`Redirigiendo a inscripción: ${convocatoria.titulo}`);
     }
   }
 
-  compartir(convocatoria: Convocatoria): void {
+  compartir(convocatoria: ConvocatoriaInterface): void {
     if (navigator.share) {
       navigator.share({
         title: convocatoria.titulo,
@@ -272,7 +401,7 @@ export class ConvocatoriaComponent implements OnInit {
     this.erroresFormulario = {};
   }
 
-  editarConvocatoria(convocatoria: Convocatoria): void {
+  editarConvocatoria(convocatoria: ConvocatoriaInterface): void {
     this.modoEdicion = true;
     this.convocatoriaEditando = convocatoria;
     this.nuevaConvocatoria = { ...convocatoria };
@@ -291,7 +420,7 @@ export class ConvocatoriaComponent implements OnInit {
     this.erroresFormulario = {};
   }
 
-  crearConvocatoriaVacia(): Convocatoria {
+  crearConvocatoriaVacia(): ConvocatoriaInterface {
     return {
       id_convocatoria: 0,
       titulo: '',
@@ -304,9 +433,13 @@ export class ConvocatoriaComponent implements OnInit {
       numdisponibles: 0,
       numinscritos: 0,
       estado: 'activa',
-      fechacreada: new Date(),
       region: '',
-      sede: ''
+      sede: '',
+      finicioinscripcion: undefined,
+      ffinalinscripcion: undefined,
+      finicioactividad: undefined,
+      ffinactividad: undefined,
+      fechacreada: new Date(),
     };
   }
 
@@ -357,17 +490,19 @@ export class ConvocatoriaComponent implements OnInit {
         if (index !== -1) {
           this.convocatorias[index] = { ...this.nuevaConvocatoria };
           // TODO: API call
+          console.log(this.nuevaConvocatoria);
         }
         this.mostrarMensajeExito('Convocatoria actualizada correctamente');
       } else {
         // Crear
-        this.nuevaConvocatoria.id_convocatoria = this.convocatorias.length > 0 
-          ? Math.max(...this.convocatorias.map(c => c.id_convocatoria)) + 1 
+        this.nuevaConvocatoria.id_convocatoria = this.convocatorias.length > 0
+          ? Math.max(...this.convocatorias.map(c => c.id_convocatoria)) + 1
           : 1;
         this.nuevaConvocatoria.fechacreada = new Date();
         this.convocatorias.push({ ...this.nuevaConvocatoria });
         // TODO: API call
-        
+        console.log(this.nuevaConvocatoria);
+
         this.mostrarMensajeExito('Convocatoria creada correctamente');
       }
 
@@ -380,7 +515,7 @@ export class ConvocatoriaComponent implements OnInit {
     }, 1000);
   }
 
-  eliminarConvocatoria(convocatoria: Convocatoria): void {
+  eliminarConvocatoria(convocatoria: ConvocatoriaInterface): void {
     this.mostrarDialogoConfirmacion(
       'Eliminar Convocatoria',
       `¿Está seguro de eliminar la convocatoria "${convocatoria.titulo}"?`,
@@ -392,7 +527,7 @@ export class ConvocatoriaComponent implements OnInit {
           if (index !== -1) {
             this.convocatorias.splice(index, 1);
             // TODO: API call
-            
+
             this.extraerOpcionesFiltros();
             this.aplicarFiltros();
             this.mostrarMensajeExito('Convocatoria eliminada correctamente');
@@ -402,7 +537,7 @@ export class ConvocatoriaComponent implements OnInit {
     );
   }
 
-  verPreview(convocatoria: Convocatoria): void {
+  verPreview(convocatoria: ConvocatoriaInterface): void {
     this.convocatoriaPreview = convocatoria;
     this.mostrarPreview = true;
   }
@@ -515,7 +650,7 @@ export class ConvocatoriaComponent implements OnInit {
     return estado === 'activa' ? 'Activa' : 'Cerrada';
   }
 
-  getPorcentajeCupos(convocatoria: Convocatoria): number {
+  getPorcentajeCupos(convocatoria: ConvocatoriaInterface): number {
     return Math.round((convocatoria.numinscritos / convocatoria.numvacantes) * 100);
   }
 
@@ -531,13 +666,13 @@ export class ConvocatoriaComponent implements OnInit {
   // DATOS DE EJEMPLO - ESTADIO NACIONAL
   // =========================
 
-  obtenerDatosEjemplo(): Convocatoria[] {
-    const convocatorias: Convocatoria[] = [];
+  obtenerDatosEjemplo(): ConvocatoriaInterface[] {
+    const convocatorias: ConvocatoriaInterface[] = [];
     let id = 1;
 
     // ESTADIO NACIONAL - 8 DEPORTES NORMALES - Frecuencia 1 (Lun-Mie-Vie)
     const deportesNormales = ['Rugby', 'Tenis de campo', 'Judo', 'Voleibol', 'Futbol', 'Baloncesto', 'Atletismo', 'Pickleball'];
-    
+
     deportesNormales.forEach(deporte => {
       convocatorias.push({
         id_convocatoria: id++,
@@ -554,6 +689,10 @@ export class ConvocatoriaComponent implements OnInit {
         estado: 'activa',
         region: 'Lima',
         sede: 'Estadio Nacional',
+        finicioinscripcion: undefined,
+        ffinalinscripcion: undefined,
+        finicioactividad: undefined,
+        ffinactividad: undefined,
         fechacreada: new Date()
       });
     });
@@ -575,6 +714,10 @@ export class ConvocatoriaComponent implements OnInit {
         estado: 'activa',
         region: 'Lima',
         sede: 'Estadio Nacional',
+        finicioinscripcion: undefined,
+        ffinalinscripcion: undefined,
+        finicioactividad: undefined,
+        ffinactividad: undefined,
         fechacreada: new Date()
       });
     });
@@ -603,6 +746,10 @@ export class ConvocatoriaComponent implements OnInit {
         estado: 'activa',
         region: 'Lima',
         sede: 'Estadio Nacional',
+        finicioinscripcion: undefined,
+        ffinalinscripcion: undefined,
+        finicioactividad: undefined,
+        ffinactividad: undefined,
         fechacreada: new Date()
       });
     });
@@ -623,6 +770,10 @@ export class ConvocatoriaComponent implements OnInit {
         estado: 'activa',
         region: 'Lima',
         sede: 'Complejo Chacapampa',
+        finicioinscripcion: undefined,
+        ffinalinscripcion: undefined,
+        finicioactividad: undefined,
+        ffinactividad: undefined,
         fechacreada: new Date()
       },
       {
@@ -639,6 +790,10 @@ export class ConvocatoriaComponent implements OnInit {
         estado: 'cerrada',
         region: 'Cusco',
         sede: 'Complejo Deportivo Cusco',
+        finicioinscripcion: undefined,
+        ffinalinscripcion: undefined,
+        finicioactividad: undefined,
+        ffinactividad: undefined,
         fechacreada: new Date()
       }
     );
