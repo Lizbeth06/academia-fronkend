@@ -13,7 +13,6 @@ import { Menu } from '../../model/menu';
 import { MenuAgrupado } from '../../model/MenuAgrupado';
 import { Subscription } from 'rxjs';
 import { MenuService } from '../../services/menu.service';
-import { ConfirmationService } from '../../util/confirmation.service';
 import { MatDialog } from '@angular/material/dialog';
 import Swal from 'sweetalert2';
 import { MatIconModule } from '@angular/material/icon';

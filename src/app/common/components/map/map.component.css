@@ -1,0 +1,11 @@
+#map {
+  /* height: 400px; */
+  height: 100%;
+  width: 100%;
+  /* cursor: pointer; */
+  cursor: pointer;
+}
+
+#map:active {
+  cursor: crosshair;
+}
