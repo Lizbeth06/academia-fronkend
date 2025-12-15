@@ -1,32 +1,23 @@
-import { Component, effect, inject, input, linkedSignal, output, signal, Signal, untracked } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { MatButtonModule } from '@angular/material/button';
-import { MatOptionModule } from '@angular/material/core';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
-import { UbigeoService } from '../../../../services/ubigeo.service';
-import { Ubigeo } from '../../../../model/ubigeo';
-import { SectorService } from '../../../../services/sector.service';
-import { Sector, Sede } from '../../../../model/sede.model';
-import { MapComponent } from '../../../../common/components/map/map.component';
-import { ToastrService } from 'ngx-toastr';
+import { Component, effect, inject, input, linkedSignal, output, signal, Signal, untracked } from "@angular/core";
+import { FormBuilder, ReactiveFormsModule, Validators } from "@angular/forms";
+import { MatButtonModule } from "@angular/material/button";
+import { MatOptionModule } from "@angular/material/core";
+import { MatFormFieldModule } from "@angular/material/form-field";
+import { MatIconModule } from "@angular/material/icon";
+import { MatInputModule } from "@angular/material/input";
+import { MatSelectModule } from "@angular/material/select";
+import { UbigeoService } from "../../../../services/ubigeo.service";
+import { Ubigeo } from "../../../../model/ubigeo";
+import { SectorService } from "../../../../services/sector.service";
+import { Sector, Sede } from "../../../../model/sede.model";
+import { MapComponent } from "../../../../common/components/map/map.component";
+import { ToastrService } from "ngx-toastr";
 
 @Component({
-  selector: 'app-sedes-form',
-  imports: [
-    MatFormFieldModule,
-    MatInputModule,
-    MatSelectModule,
-    MatOptionModule,
-    MatIconModule,
-    ReactiveFormsModule,
-    MatButtonModule,
-    MapComponent
-  ],
-  templateUrl: './sedes-form.component.html',
-  styleUrl: './sedes-form.component.css'
+  selector: "app-sedes-form",
+  imports: [MatFormFieldModule, MatInputModule, MatSelectModule, MatOptionModule, MatIconModule, ReactiveFormsModule, MatButtonModule, MapComponent],
+  templateUrl: "./sedes-form.component.html",
+  styleUrl: "./sedes-form.component.css",
 })
 export class SedesFormComponent {
   //inputs
@@ -46,23 +37,23 @@ export class SedesFormComponent {
   provincias: Ubigeo[] = [];
   distritos: Ubigeo[] = [];
   sectores: Sector[] = [];
-  coordenada = signal<{ lat: number, lng: number }>({
+  coordenada = signal<{ lat: number; lng: number }>({
     lat: -12.0464,
-    lng: -77.0428
+    lng: -77.0428,
   });
 
   fb = inject(FormBuilder);
   sedeForm = this.fb.group({
-    nombre: ['', Validators.required],
+    nombre: ["", Validators.required],
     id_sector: [1, Validators.required],
-    ubiDpto: ['', Validators.required],
-    ubiProvincia: ['', Validators.required],
-    idUbigeo: [<number|undefined> undefined, Validators.required],
-    direccion: ['', Validators.required],
-    lat: [{value: this.coordenada().lat, disabled: true}, Validators.required],
-    lng: [{value: this.coordenada().lat, disabled: true}, Validators.required],
+    ubiDpto: ["", Validators.required],
+    ubiProvincia: ["", Validators.required],
+    idUbigeo: [<number | undefined>undefined, Validators.required],
+    direccion: ["", Validators.required],
+    lat: [{ value: this.coordenada().lat, disabled: true }, Validators.required],
+    lng: [{ value: this.coordenada().lat, disabled: true }, Validators.required],
     capacidad: [0, [Validators.min(0)]],
-    estado: [1, Validators.required]
+    estado: [1, Validators.required],
   });
 
   constructor() {
@@ -71,7 +62,7 @@ export class SedesFormComponent {
       untracked(() => {
         this.coordenada.set({
           lat: this.sedeActual()?.latitud ?? -12.0464,
-          lng: this.sedeActual()?.longitud ?? -77.0428
+          lng: this.sedeActual()?.longitud ?? -77.0428,
         });
       });
       if (this.sedeActual()) {
@@ -80,12 +71,12 @@ export class SedesFormComponent {
         this.limpiarFormulario();
       }
     });
-    
+
     effect(() => {
       this.coordenada();
       this.sedeForm.patchValue({
         lat: this.coordenada().lat,
-        lng: this.coordenada().lng
+        lng: this.coordenada().lng,
       });
     });
   }
@@ -98,11 +89,11 @@ export class SedesFormComponent {
   // Cargando datos
   cargarDatos() {
     // Departamentos
-    this.ubigeoService.findAllDepartments().subscribe(data => {
+    this.ubigeoService.findAllDepartments().subscribe((data) => {
       this.departamentos = data;
     });
     // Secores
-    this.sectorService.findAll().subscribe(data => {
+    this.sectorService.findAll().subscribe((data) => {
       this.sectores = data;
     });
   }
@@ -113,18 +104,18 @@ export class SedesFormComponent {
       id_sector: this.sedeActual()?.sector!.idSector!,
       direccion: this.sedeActual()?.direccion,
       capacidad: this.sedeActual()?.capacidad,
-      estado: this.sedeActual()?.estado
+      estado: this.sedeActual()?.estado,
     });
-    this.ubigeoService.findById(this.sedeActual()?.codubi!).subscribe(data => {
+    this.ubigeoService.findById(this.sedeActual()?.codubi!).subscribe((data) => {
       this.sedeForm.patchValue({
         ubiDpto: data.ubiDpto,
         ubiProvincia: data.ubiProvincia,
         idUbigeo: data.idUbigeo,
-      })
-      this.ubigeoService.findProvinciasByDepartments(data.ubiDpto!).subscribe(data => {
+      });
+      this.ubigeoService.findProvincias(data.ubiDpto!).subscribe((data) => {
         this.provincias = data;
       });
-      this.ubigeoService.findAllDistritosByProvAndDept(data.ubiDpto!, data.ubiProvincia!).subscribe(data => {
+      this.ubigeoService.findDistritos(data.ubiDpto!, data.ubiProvincia!).subscribe((data) => {
         this.distritos = data;
       });
     });
@@ -136,14 +127,9 @@ export class SedesFormComponent {
       return;
     }
     const formValue = this.sedeForm.value;
-    const ubicacion = `${
-      this.departamentos.find(dep=>dep.ubiDpto==formValue.ubiDpto)?.ubiNombre
-    }/${
-      this.provincias.find(prov=>prov.ubiDpto==formValue.ubiDpto)?.ubiNombre
-
-    }/${
-      this.distritos.find(dis=>dis.idUbigeo==formValue.idUbigeo)?.ubiNombre
-    }`;
+    const ubicacion = `${this.departamentos.find((dep) => dep.ubiDpto == formValue.ubiDpto)?.ubiNombre}/${
+      this.provincias.find((prov) => prov.ubiDpto == formValue.ubiDpto)?.ubiNombre
+    }/${this.distritos.find((dis) => dis.idUbigeo == formValue.idUbigeo)?.ubiNombre}`;
     const datos: Sede = {
       idSede: this.sedeActual()?.idSede,
       nombre: formValue.nombre!.toUpperCase(),
@@ -156,8 +142,8 @@ export class SedesFormComponent {
       estado: formValue.estado!,
       sector: {
         idSector: formValue.id_sector!,
-      } as Sector
-    }
+      } as Sector,
+    };
     this.limpiarFormulario();
     this.registrar.emit(datos);
   }
@@ -169,34 +155,34 @@ export class SedesFormComponent {
 
   limpiarFormulario(): void {
     this.sedeForm.reset({
-      nombre: '',
+      nombre: "",
       id_sector: 1,
-      ubiDpto: '',
-      ubiProvincia: '',
+      ubiDpto: "",
+      ubiProvincia: "",
       idUbigeo: undefined,
-      direccion: '',
+      direccion: "",
       capacidad: 0,
-      estado: 1
+      estado: 1,
     });
     this.provincias = [];
     this.distritos = [];
   }
 
   seleccionarDepartamento() {
-    this.ubigeoService.findProvinciasByDepartments(this.sedeForm.getRawValue().ubiDpto!).subscribe(data => {
+    this.ubigeoService.findProvincias(this.sedeForm.getRawValue().ubiDpto!).subscribe((data) => {
       this.provincias = data;
     });
     this.provincias = [];
     this.distritos = [];
-    this.sedeForm.get('ubiProvincia')?.patchValue('');
-    this.sedeForm.get('idUbigeo')?.patchValue(0);
+    this.sedeForm.get("ubiProvincia")?.patchValue("");
+    this.sedeForm.get("idUbigeo")?.patchValue(0);
   }
 
   seleccionarProvincia() {
-    this.ubigeoService.findAllDistritosByProvAndDept(this.sedeForm.getRawValue().ubiDpto!, this.sedeForm.getRawValue().ubiProvincia!).subscribe(data => {
+    this.ubigeoService.findDistritos(this.sedeForm.getRawValue().ubiDpto!, this.sedeForm.getRawValue().ubiProvincia!).subscribe((data) => {
       this.distritos = data;
     });
     this.distritos = [];
-    this.sedeForm.get('idUbigeo')?.patchValue(0);
+    this.sedeForm.get("idUbigeo")?.patchValue(0);
   }
 }
