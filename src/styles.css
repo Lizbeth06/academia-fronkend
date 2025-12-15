@@ -177,3 +177,6 @@ body {
   width: 100%;
   overflow-x: auto;
 }
+.mat-mdc-form-field-error-wrapper {
+  padding: 0 !important;
+}

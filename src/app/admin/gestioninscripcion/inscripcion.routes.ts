@@ -1,7 +1,5 @@
 import { Routes } from "@angular/router";
-import { ConvocatoriaComponent } from "./convocatoria/convocatoria_lista/convocatoria.component";
 import { DisciplinasListaComponent } from "./disciplinas/disciplinas-lista/disciplinas-lista.component";
-import { HorariosListaComponent } from "./horarios/horarios-lista/horarios-lista.component";
 import { SedesListaComponent } from "./sedes/sedes-lista/sedes-lista.component";
 import { ValidacioninscripcionListaComponent } from "./validacioninscripcion/validacioninscripcion-lista/validacioninscripcion-lista.component";
 import { TurnosListaComponent } from "./turnos/turnos-lista/turnos-lista.component";
@@ -25,8 +23,13 @@ export const inscripcionRoutes: Routes = [
 
   {
     path: "convocatoria",
-    component: ConvocatoriaComponent,
     title: "convocatorias",
+    children: [
+      {
+        path: "",
+        loadChildren: () => import("./convocatoria/convocatoria.routes").then((m) => m.convocatoria_routes),
+      },
+    ],
   },
   {
     path: "categoria",

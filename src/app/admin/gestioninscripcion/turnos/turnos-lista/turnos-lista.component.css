@@ -48,6 +48,7 @@
 .mat-column-horario,
 .mat-column-hora_inicio,
 .mat-column-hora_fin,
-.mat-column-acciones {
+.mat-column-acciones,
+.mat-column-dias {
   text-align: center;
 }

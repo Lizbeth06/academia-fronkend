@@ -1,6 +1,15 @@
-<form [formGroup]="turnoForm" (ngSubmit)="guardarTurno()" class="row">
-  <div class="col-12 col-sm-6 col-md-3">
-    <!-- id_horario -->
+<form [formGroup]="turnoForm" (ngSubmit)="guardarTurno($event)" class="row">
+  <div class="col-12 col-sm-12 col-md-6">
+    <mat-form-field appearance="outline">
+      <mat-label>Frecuencia</mat-label>
+      <mat-select formControlName="dias" placeholder="Seleccione los días" multiple>
+        <mat-option *ngFor="let d of dias" [value]="d">{{ d.descripcion }}</mat-option>
+      </mat-select>
+      <mat-error *ngIf="turnoForm.get('dias')?.hasError('required')"> Campo obligatorio </mat-error>
+    </mat-form-field>
+  </div>
+  <div class="col-12 col-sm-4 col-md-2">
+    <!-- horario -->
     <mat-form-field appearance="outline">
       <mat-label>Horario</mat-label>
       <mat-select formControlName="turno">
@@ -13,7 +22,7 @@
       <mat-error *ngIf="turnoForm.get('turno')?.hasError('required')"> Campo obligatorio </mat-error>
     </mat-form-field>
   </div>
-  <div class="col-12 col-sm-6 col-md-3">
+  <div class="col-12 col-sm-4 col-md-2">
     <mat-form-field appearance="outline">
       <mat-label>Hora inicio</mat-label>
       <input
@@ -25,7 +34,7 @@
         (keypress)="soloNumerosYPunto($event)"
         (input)="formatearHora($event, 'horainicio')"
       />
-      <span matSuffix class="mx-4">{{ amPmHora(turnoForm.get("horainicio")?.value) }}</span>
+      <span matSuffix class="mr-2">{{ amPmHora(turnoForm.get("horainicio")?.value) }}</span>
       <mat-autocomplete #autoInicio="matAutocomplete">
         <mat-option *ngFor="let hora of horasFiltradasInicio | async" [value]="hora">
           {{ hora }}
@@ -34,9 +43,8 @@
       <mat-error *ngIf="turnoForm.get('horainicio')?.hasError('required')"> Campo obligatorio </mat-error>
     </mat-form-field>
   </div>
-
   <!-- Hora fin -->
-  <div class="col-12 col-sm-6 col-md-3">
+  <div class="col-12 col-sm-4 col-md-2">
     <mat-form-field appearance="outline">
       <mat-label>Hora fin</mat-label>
       <input
@@ -48,7 +56,7 @@
         (keypress)="soloNumerosYPunto($event)"
         (input)="formatearHora($event, 'horafin')"
       />
-      <span matSuffix class="mx-4">{{ amPmHora(turnoForm.get("horafin")?.value) }}</span>
+      <span matSuffix class="mr-2">{{ amPmHora(turnoForm.get("horafin")?.value) }}</span>
       <mat-autocomplete #autoFin="matAutocomplete">
         <mat-option *ngFor="let hora of horasFiltradasFin | async" [value]="hora">
           {{ hora }}
@@ -59,28 +67,14 @@
     </mat-form-field>
   </div>
 
-  <div class="col-12 col-sm-6 col-md-3">
-    <mat-form-field appearance="outline">
-      <mat-label>Estado</mat-label>
-      <mat-select formControlName="estado">
-        @for (e of estado; track e.id) {
-        <mat-option [value]="e.id">
-          {{ e.estado }}
-        </mat-option>
-        }
-      </mat-select>
-    </mat-form-field>
-  </div>
-  <div class="row g-1 justify-content-center">
-    <div class="col-6 col-sm-6 col-md-6 d-flex justify-content-center">
-      <button mat-raised-button color="primary" type="submit" [disabled]="!turnoForm.valid"><mat-icon>save</mat-icon> Guardar</button>
-      <div class="d-flex align-items-center justify-content-center mx-2">
+  <div class="d-flex justify-content-end gap-2">
+    <button mat-raised-button color="primary" type="submit" [disabled]="!turnoForm.valid || cargar">
+      <div class="d-flex align-items-center justify-content-center gap-2">
+        <mat-icon>save</mat-icon>
+        {{ idTurno !== 0 ? "Actualizar categoria" : "Guardar" }}
         <mat-spinner *ngIf="cargar" [diameter]="25" color="primary"></mat-spinner>
       </div>
-    </div>
-
-    <div class="col-6 col-sm-6 col-md-6 d-flex justify-content-center">
-      <button mat-stroked-button color="warn" type="button" (click)="limpiarFormulario()"><mat-icon>close</mat-icon> Cancelar</button>
-    </div>
+    </button>
+    <button mat-stroked-button type="button" color="primary" (click)="limpiarFormulario($event)">Cancelar</button>
   </div>
 </form>

@@ -1,0 +1,189 @@
+:host ::ng-deep .mat-mdc-tab-body-content {
+  overflow: hidden !important;
+  padding: 0 24px;
+}
+.capa-image {
+  padding: 0 12px;
+}
+.image-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-color: #ccc;
+  border-radius: 2.5px;
+  border-width: 1px;
+  border-style: dashed;
+  padding: 0px;
+  min-height: 56px;
+  max-width: auto;
+  overflow: hidden;
+  position: relative;
+}
+.image-container p {
+  margin-bottom: 0;
+}
+.image-container img {
+  margin: 0 !important;
+  width: 400px;
+  height: 400px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.image-input {
+  display: none;
+}
+/*DISCIPLINA*/
+.seccion-left {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  border: 1px solid rgb(211, 211, 211);
+}
+.seccion-right {
+  padding: 0;
+  border: 1px solid rgb(211, 211, 211);
+  border-left: none;
+}
+.seccion-superior {
+  padding: 24px 0;
+  border: 1px solid rgb(211, 211, 211);
+  border-bottom: none;
+}
+.seccion-inferior {
+  padding: 24px 0;
+  border: 1px solid rgb(211, 211, 211);
+}
+.card-disciplinas:not(:last-child) {
+  width: 100%;
+  border-bottom: 1px solid rgb(211, 211, 211);
+}
+.card-title {
+  padding: 0 16px;
+  font-size: 16px;
+  font-weight: 400;
+}
+
+.table-horario {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.mat-table-horario {
+  width: 100%;
+  min-width: 900px;
+}
+
+th.mat-header-cell {
+  background: #3f51b5;
+  color: white;
+  font-weight: 600;
+  text-align: center;
+}
+
+td.mat-cell {
+  text-align: center;
+  padding: 12px;
+}
+
+tr.mat-row:hover {
+  background-color: #f5f5f5;
+  transition: background-color 0.3s;
+}
+
+/*HORARIO*/
+.tabla-turno {
+  margin: 0 12px;
+}
+.mat-mdc-table {
+  padding: 0;
+  width: 100%;
+  background: rgb(211, 211, 211);
+}
+.select-turno {
+  font-size: 14px;
+}
+
+.mat-column-id {
+  max-width: 50px !important;
+}
+
+/*LOADING*/
+.loader {
+  position: relative;
+  width: 2.5em;
+  height: 2.5em;
+  transform: rotate(165deg);
+}
+
+.loader:before,
+.loader:after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: block;
+  width: 0.5em;
+  height: 0.5em;
+  border-radius: 0.25em;
+  transform: translate(-50%, -50%);
+}
+
+.loader:before {
+  animation: before8 2s infinite;
+}
+
+.loader:after {
+  animation: after6 2s infinite;
+}
+
+@keyframes before8 {
+  0% {
+    width: 0.5em;
+    box-shadow: 1em -0.5em rgba(225, 20, 98, 0.75), -1em 0.5em rgba(111, 202, 220, 0.75);
+  }
+
+  35% {
+    width: 2.5em;
+    box-shadow: 0 -0.5em rgba(225, 20, 98, 0.75), 0 0.5em rgba(111, 202, 220, 0.75);
+  }
+
+  70% {
+    width: 0.5em;
+    box-shadow: -1em -0.5em rgba(225, 20, 98, 0.75), 1em 0.5em rgba(111, 202, 220, 0.75);
+  }
+
+  100% {
+    box-shadow: 1em -0.5em rgba(225, 20, 98, 0.75), -1em 0.5em rgba(111, 202, 220, 0.75);
+  }
+}
+
+@keyframes after6 {
+  0% {
+    height: 0.5em;
+    box-shadow: 0.5em 1em rgba(61, 184, 143, 0.75), -0.5em -1em rgba(233, 169, 32, 0.75);
+  }
+
+  35% {
+    height: 2.5em;
+    box-shadow: 0.5em 0 rgba(61, 184, 143, 0.75), -0.5em 0 rgba(233, 169, 32, 0.75);
+  }
+
+  70% {
+    height: 0.5em;
+    box-shadow: 0.5em -1em rgba(61, 184, 143, 0.75), -0.5em 1em rgba(233, 169, 32, 0.75);
+  }
+
+  100% {
+    box-shadow: 0.5em 1em rgba(61, 184, 143, 0.75), -0.5em -1em rgba(233, 169, 32, 0.75);
+  }
+}
+
+.loader {
+  position: absolute;
+  top: calc(50% - 1.25em);
+  left: calc(50% - 1.25em);
+}

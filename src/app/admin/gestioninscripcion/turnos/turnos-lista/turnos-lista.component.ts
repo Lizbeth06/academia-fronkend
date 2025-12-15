@@ -4,11 +4,12 @@ import { MatTableDataSource } from "@angular/material/table";
 
 import { MaterialModule } from "../../../../material/material.module";
 import { TurnosFormComponent } from "../turnos-form/turnos-form.component";
-import { Turno } from "../../../../model/turno.model";
+import { Listadia, Turno } from "../../../../model/turno.model";
 import { TurnoService } from "../../../../services/turno.service";
 import { MatPaginator, MatPaginatorIntl } from "@angular/material/paginator";
 import { MatSort } from "@angular/material/sort";
 import { PaginatorService } from "../../../../services/security/paginator.service";
+import { Dias } from "../../../../model/dias.model";
 
 @Component({
   selector: "app-turno",
@@ -26,7 +27,7 @@ export class TurnosListaComponent implements OnInit {
   @ViewChild(MatSort) sort!: MatSort;
   @ViewChild(TurnosFormComponent) formulario!: TurnosFormComponent;
 
-  displayedColumns = ["id", "horario", "hora_inicio", "hora_fin", "acciones"];
+  displayedColumns = ["id", "horario", "dias", "hora_inicio", "hora_fin", "acciones"];
 
   ngOnInit(): void {
     this.getAllSede();
@@ -34,6 +35,7 @@ export class TurnosListaComponent implements OnInit {
   getAllSede() {
     this.turnoServicio.findAll().subscribe((data) => {
       this.crearTabla(data);
+      console.log(data);
     });
   }
   crearTabla(data: Turno[]) {
@@ -45,6 +47,9 @@ export class TurnosListaComponent implements OnInit {
   editarTurno(id: number) {
     this.formulario.editarTurno(id);
     window.scroll({ top: 0, behavior: "smooth" });
+  }
+  mostrarDias(dias: Listadia[]): string {
+    return dias.map((d) => d.dias.descripcion).join(" - ");
   }
 
   eliminarTurno(row: any) {

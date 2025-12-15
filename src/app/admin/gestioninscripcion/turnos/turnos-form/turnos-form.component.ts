@@ -5,11 +5,13 @@ import { TipoturnoService } from "../../../../services/tipoturno.service";
 import { Tipoturno } from "../../../../model/tipoturno.model";
 import { map, Observable, startWith } from "rxjs";
 import { CommonModule } from "@angular/common";
-import { Turno } from "../../../../model/turno.model";
+import { Listadia, Turno } from "../../../../model/turno.model";
 import { TurnoService } from "../../../../services/turno.service";
 import { ToastrService } from "ngx-toastr";
 import { Router } from "@angular/router";
 import { TurnosListaComponent } from "../turnos-lista/turnos-lista.component";
+import { Dias } from "../../../../model/dias.model";
+import { DiasService } from "../../../../services/dias.service";
 
 @Component({
   selector: "app-turnos-form",
@@ -29,6 +31,7 @@ export class TurnosFormComponent implements OnInit {
   private tipoturnoService = inject(TipoturnoService);
   private turnoService = inject(TurnoService);
   private formLista = inject(TurnosListaComponent);
+  private diasServicio = inject(DiasService);
 
   turnoForm: FormGroup;
 
@@ -36,11 +39,14 @@ export class TurnosFormComponent implements OnInit {
   horaFinControl = new FormControl("");
 
   cargar = false;
-  idEditar = 0;
+  idTurno = 0;
   horas: string[] = [];
   horasFiltradasInicio!: Observable<string[]>;
   horasFiltradasFin!: Observable<string[]>;
   tipoturno: Tipoturno[] = [];
+  dias: Dias[] = [];
+
+  listadias: Listadia[] = [];
 
   private buildForm() {
     this.turnoForm = this.formBuilder.group(
@@ -48,12 +54,14 @@ export class TurnosFormComponent implements OnInit {
         turno: [1, Validators.required],
         horainicio: ["", [Validators.required, Validators.pattern(/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/)]],
         horafin: ["", [Validators.required, Validators.pattern(/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/)]],
-        estado: [1, Validators.required],
+        dias: ["", Validators.required],
+        // estado: [1, Validators.required],
       },
       { validators: this.validarHoras.bind(this) }
     );
   }
   ngOnInit(): void {
+    this.diasServicio.findAll().subscribe((data) => (this.dias = data));
     this.tipoturnoService.findAll().subscribe((data: any) => {
       this.tipoturno = data;
       console.log(data);
@@ -70,13 +78,14 @@ export class TurnosFormComponent implements OnInit {
     );
   }
   editarTurno(id: Number) {
-    this.idEditar = Number(id);
+    this.idTurno = Number(id);
     this.turnoService.findById(Number(id)).subscribe({
       next: (data) => {
         this.turnoForm.get("turno")?.setValue(data.tipoturno.idTipoturno),
           this.turnoForm.get("horainicio")?.setValue(data.horainicio.slice(0, 5)),
           this.turnoForm.get("horafin")?.setValue(data.horafin.slice(0, 5));
         this.turnoForm.get("estado")?.setValue(Number(data.estado));
+        this.turnoForm.get("dias")?.setValue(this.dias.filter((d) => data.listadia.some((g) => g.dias.idDias === d.idDias)));
       },
       error: (error) => {
         this.cargar = false;
@@ -84,21 +93,23 @@ export class TurnosFormComponent implements OnInit {
       },
     });
   }
-  guardarTurno() {
+  guardarTurno(event: MouseEvent) {
+    this._listarDias();
     const turno: Turno = {
       horainicio: String(this.turnoForm.get("horainicio")!.value.trim() + ":00").trim(),
       horafin: String(this.turnoForm.get("horafin")!.value.trim() + ":00").trim(),
-      estado: String(this.turnoForm.get("estado")!.value),
+      estado: "1",
       tipoturno: {
         idTipoturno: Number(this.turnoForm.get("turno")!.value),
       },
+      listadia: this.listadias,
     };
-    if (this.idEditar !== 0) {
-      this.turnoService.update(this.idEditar, turno).subscribe({
+    if (this.idTurno !== 0) {
+      this.turnoService.update(this.idTurno, turno).subscribe({
         next: () => {
           this.toastrService.success("Se actualizaron los datos correctamente.", "Exitoso", { timeOut: 3200 });
           this.cargar = false;
-          this.limpiarFormulario();
+          this.limpiarFormulario(event);
           this.formLista.getAllSede();
         },
         error: (error) => {
@@ -111,7 +122,7 @@ export class TurnosFormComponent implements OnInit {
         next: () => {
           this.toastrService.success("Se guardaron los datos correctamente.", "Exitoso", { timeOut: 3200 });
           this.cargar = false;
-          this.limpiarFormulario();
+          this.limpiarFormulario(event);
           this.formLista.getAllSede();
         },
         error: (error) => {
@@ -121,9 +132,22 @@ export class TurnosFormComponent implements OnInit {
       });
     }
   }
-  limpiarFormulario() {
+  private _listarDias() {
+    const data = this.turnoForm.get("dias")?.value;
+    data.forEach((dia: Dias) => {
+      const lista: Listadia = {
+        estado: "1",
+        dias: {
+          idDias: dia.idDias,
+        },
+      };
+      this.listadias.push(lista);
+    });
+  }
+  limpiarFormulario(e: MouseEvent) {
+    e.preventDefault();
     this.turnoForm.reset();
-
+    this.idTurno = 0;
     Object.values(this.turnoForm.controls).forEach((control) => {
       control.markAsPristine();
       control.markAsUntouched();
@@ -169,7 +193,9 @@ export class TurnosFormComponent implements OnInit {
     }
   }
   private _filtrarHoras(value: string): string[] {
-    return this.horas.filter((hora) => hora.startsWith(value));
+    if (!value) return this.horas;
+    const normalizado = value.length === 1 ? value.padStart(2, "0") : value;
+    return this.horas.filter((h) => h.startsWith(normalizado));
   }
 
   soloNumerosYPunto(event: KeyboardEvent) {
@@ -186,18 +212,12 @@ export class TurnosFormComponent implements OnInit {
     return hora >= 12 ? "PM" : "AM";
   }
 
-  formatearHora(event: Event, controlName: string) {
-    const input = event.target as HTMLInputElement;
-    let valor = input.value.replace(/\D/g, "");
-
-    if (valor.length > 4) {
-      valor = valor.substring(0, 4);
+  formatearHora(event: any, controlName: string) {
+    let v = event.target.value.replace(/\D/g, "");
+    if (v.length <= 2) {
+      this.turnoForm.get(controlName)?.setValue(v, { emitEvent: true });
+      return;
     }
-
-    if (valor.length >= 3) {
-      valor = valor.substring(0, 2) + ":" + valor.substring(2);
-    }
-    input.value = valor;
-    this.turnoForm.get(controlName)?.setValue(valor, { emitEvent: false });
+    this.turnoForm.get(controlName)?.setValue(v.slice(0, 2) + ":" + v.slice(2, 4), { emitEvent: true });
   }
 }

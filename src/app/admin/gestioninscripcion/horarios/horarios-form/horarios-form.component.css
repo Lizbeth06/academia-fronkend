@@ -1,0 +1,32 @@
+.subtitulo-disciplina {
+  font-size: 16px;
+  font-weight: 400;
+}
+
+mat-expansion-panel {
+  margin-bottom: 16px;
+  /* border: 0px; */
+  border-radius: 0px !important;
+  box-shadow: none !important;
+  background: transparent;
+}
+
+.mat-expansion-panel.mat-expansion-panel-animations-enabled {
+  border-bottom: 1px solid rgb(211, 211, 211);
+}
+
+.seccion-superior {
+  padding: 24px 0;
+  border: 1px solid rgb(211, 211, 211);
+  border-bottom: none;
+}
+.seccion-inferior {
+  padding: 24px 0;
+  border: 1px solid rgb(211, 211, 211);
+}
+mat-table {
+  background: rgb(211, 211, 211);
+}
+.select-turno {
+  font-size: 14px;
+}
