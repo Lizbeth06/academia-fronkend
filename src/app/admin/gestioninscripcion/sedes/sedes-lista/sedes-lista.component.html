@@ -10,99 +10,22 @@
     sector, ubicación, dirección y capacidad.
   </div>
 
-  <!-- CARD: FORMULARIO -->
-  <div class="card-modern">
-    <h3 class="subtitle">Registro de sedes</h3>
-
-    <form [formGroup]="sedeForm" (ngSubmit)="guardarSede()" class="row">
-      <div class="col-12 col-sm-6 col-md-3">
-        <!-- Código -->
-        <mat-form-field appearance="outline">
-          <mat-label>Código</mat-label>
-          <input matInput formControlName="codigo" />
-        </mat-form-field>
-      </div>
-      <div class="col-12 col-sm-6 col-md-3">
-        <!-- Nombre -->
-        <mat-form-field appearance="outline">
-          <mat-label>Nombre de la sede*</mat-label>
-          <input matInput formControlName="nombre" />
-        </mat-form-field>
-      </div>
-      <div class="col-12 col-sm-6 col-md-3">
-        <!-- Sector -->
-        <mat-form-field appearance="outline">
-          <mat-label>Sector*</mat-label>
-          <mat-select formControlName="id_sector"> </mat-select>
-        </mat-form-field>
-      </div>
-      <div class="col-12 col-sm-6 col-md-3">
-        <!-- Ubigeo -->
-        <mat-form-field appearance="outline">
-          <mat-label>Ubigeo</mat-label>
-          <input
-            matInput
-            formControlName="id_ubigeo"
-            placeholder="Ej. Lima - Cercado"
-          />
-        </mat-form-field>
-      </div>
-      <div class="col-12 col-sm-6 col-md-3">
-        <!-- Capacidad -->
-        <mat-form-field appearance="outline">
-          <mat-label>Capacidad (aforo)</mat-label>
-          <input matInput type="number" formControlName="capacidad" min="0" />
-        </mat-form-field>
-      </div>
-      <div class="col-12 col-sm-6 col-md-3">
-        <!-- Estado -->
-        <mat-form-field appearance="outline">
-          <mat-label>Estado</mat-label>
-          <mat-select formControlName="estado">
-            <mat-option value="Activo">Activo</mat-option>
-            <mat-option value="Inactivo">Inactivo</mat-option>
-          </mat-select>
-        </mat-form-field>
-      </div>
-      <div class="col-12 col-sm-6 col-md-3">
-        <!-- Dirección (toma todo el ancho) -->
-        <mat-form-field appearance="outline" class="full-column">
-          <mat-label>Dirección</mat-label>
-          <textarea matInput formControlName="direccion" rows="2"></textarea>
-        </mat-form-field>
-      </div>
-      <!-- Botones -->
-      <div class="actions full-column">
-        <button mat-raised-button color="primary" type="submit">
-          <mat-icon>save</mat-icon>
-          {{ sedeForm.get("id")?.value ? "Actualizar sede" : "Guardar" }}
-        </button>
-        <button
-          mat-stroked-button
-          color="warn"
-          type="button"
-          (click)="limpiarFormulario()"
-        >
-          <mat-icon>close</mat-icon>
-          Cancelar
-        </button>
-      </div>
-    </form>
-  </div>
-
+  @if(!hiddenForm){
+  <app-sedes-form [sedeActual]="sedeActual" (registrar)="guardarSede($event)" (cancelar)="manejarCancelacion()"></app-sedes-form>
+  }
   <!-- CARD: TABLA -->
   <div class="card-modern">
     <div class="tabla-header">
-      <h3 class="subtitle">Sedes registradas</h3>
-
+      <div class="d-flex justify-content-between pb-3">
+        <h3 class="subtitle">Sedes registradas</h3>
+        <button mat-raised-button color="primary" (click)="mostrarFormAgregar()">
+          <mat-icon>add</mat-icon>
+          Agregar
+        </button>
+      </div>
       <mat-form-field appearance="outline" class="buscador">
         <mat-label>Buscar</mat-label>
-        <input
-          matInput
-          #filtro
-          (input)="aplicarFiltro($event)"
-          placeholder="Código, nombre, sector..."
-        />
+        <input matInput #filtro (input)="aplicarFiltro($event)" placeholder="Código, nombre, sector..." />
         <mat-icon matSuffix>search</mat-icon>
       </mat-form-field>
     </div>
@@ -152,11 +75,9 @@
         <ng-container matColumnDef="estado">
           <th mat-header-cell *matHeaderCellDef>Estado</th>
           <td mat-cell *matCellDef="let row">
-            <span
-              [ngClass]="
+            <span [ngClass]="
                 row.estado === 'Activo' ? 'badge-activo' : 'badge-inactivo'
-              "
-            >
+              ">
               {{ row.estado == "1" ? "Activo" : "Inactivo" }}
             </span>
           </td>
@@ -182,10 +103,6 @@
         <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
       </table>
     </div>
-    <mat-paginator
-      [pageSizeOptions]="[5, 10, 25, 100]"
-      aria-label="Select page of users"
-      showFirstLastButtons
-    ></mat-paginator>
+    <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" aria-label="Select page of users"
+      showFirstLastButtons></mat-paginator>
   </div>
-</div>

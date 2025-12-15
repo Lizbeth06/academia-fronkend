@@ -1,1 +1,115 @@
-<p>sedes-form works!</p>
+<!-- CARD: FORMULARIO -->
+<div class="row">
+    <div class="card-modern col-12 col-lg-9">
+        <h3 class="subtitle">Registro de sedes</h3>
+        <form [formGroup]="sedeForm" (ngSubmit)="confirmarRegistro()" class="row">
+            <div class="col-12">
+                <!-- Nombre -->
+                <mat-form-field appearance="outline">
+                    <mat-label>Nombre de la sede*</mat-label>
+                    <input matInput formControlName="nombre" />
+                </mat-form-field>
+            </div>
+            <!-- Localización -->
+            <div class="col-12">
+                <!-- Departamento -->
+                <mat-form-field appearance="outline">
+                    <mat-label>Departamento</mat-label>
+                    <mat-select formControlName="ubiDpto" (selectionChange)="seleccionarDepartamento()">
+                        @for (departamento of departamentos; track departamento.idUbigeo) {
+                        <mat-option [value]="departamento.ubiDpto">{{departamento.ubiNombre}}</mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
+            </div>
+
+            <div class="col-12">
+                <!-- Provincia -->
+                <mat-form-field appearance="outline">
+                    <mat-label>Provincia</mat-label>
+                    <mat-select formControlName="ubiProvincia" (selectionChange)="seleccionarProvincia()">
+                        @for (provincia of provincias; track provincia.idUbigeo) {
+                        <mat-option [value]="provincia.ubiProvincia">{{provincia.ubiNombre}}</mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
+            </div>
+
+            <div class="col-12">
+                <!-- Distrito -->
+                <mat-form-field appearance="outline">
+                    <mat-label>Distrito</mat-label>
+                    <mat-select formControlName="idUbigeo">
+                        @for (distrito of distritos; track distrito.idUbigeo) {
+                        <mat-option [value]="distrito.idUbigeo">{{distrito.ubiNombre}}</mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
+            </div>
+
+            <div class="col-12">
+                <!-- Dirección (toma todo el ancho) -->
+                <mat-form-field appearance="outline" class="full-column">
+                    <mat-label>Dirección</mat-label>
+                    <textarea matInput formControlName="direccion" rows="2"></textarea>
+                </mat-form-field>
+            </div>
+            <div class="col-6">
+                <!-- latitud -->
+                <mat-form-field appearance="outline">
+                    <mat-label>Latitud</mat-label>
+                    <input type="number" matInput formControlName="lat">
+                </mat-form-field>
+            </div>
+            <div class="col-6">
+                <!-- longitud -->
+                <mat-form-field appearance="outline">
+                    <mat-label>Longitud</mat-label>
+                    <input type="number" matInput formControlName="lng">
+                </mat-form-field>
+            </div>
+            <div class="col-12 pb-3" style="aspect-ratio: 2/1">
+                <app-map [(coordenada)]="coordenada"></app-map>
+            </div>
+            <div class="col-12">
+                <!-- Sector -->
+                <mat-form-field appearance="outline">
+                    <mat-label>Sector*</mat-label>
+                    <mat-select formControlName="id_sector">
+                        @for (sector of sectores; track sector.idSector) {
+                        <mat-option [value]="sector.idSector">{{sector.descripcion}}</mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
+            </div>
+            <div class="col-12">
+                <!-- Capacidad -->
+                <mat-form-field appearance="outline">
+                    <mat-label>Capacidad (aforo)</mat-label>
+                    <input matInput type="number" formControlName="capacidad" min="0" />
+                </mat-form-field>
+            </div>
+            <div class="col-12">
+                <!-- Estado -->
+                <mat-form-field appearance="outline">
+                    <mat-label>Estado</mat-label>
+                    <mat-select formControlName="estado">
+                        <mat-option [value]="1">Activo</mat-option>
+                        <mat-option [value]="0">Inactivo</mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+            <!-- Botones -->
+            <div class="actions full-column">
+                <button mat-raised-button color="primary" type="submit">
+                    <mat-icon>save</mat-icon>
+                    {{ (sedeActual())? "Actualizar sede" : "Guardar" }}
+                </button>
+                <button mat-stroked-button color="warn" type="button" (click)="cancelarRegistro()">
+                    <mat-icon>close</mat-icon>
+                    Cancelar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

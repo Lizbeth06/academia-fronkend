@@ -4,9 +4,9 @@ import Swal from 'sweetalert2';
 @Injectable({
   providedIn: 'root', // Hace que el servicio esté disponible en toda la aplicación
 })
-export class ConfirmationService {
+export class ModalService {
 
-  confirmAction(action: () => void, message: string = '¿Estás seguro?'): void {
+  confirm(action: () => void, message: string = '¿Está seguro de realizar esta acción?'): void {
     Swal.fire({
       title: message,
       text: '¡No podrás revertir esto!',
@@ -19,17 +19,17 @@ export class ConfirmationService {
     }).then((result) => {
       if (result.isConfirmed) {
         action(); 
-        Swal.fire({
-          title: 'Completado!',
-          text: 'La acción se realizó exitosamente.',
-          icon: 'success',
-          timer: 1000,
-        });
+        // Swal.fire({
+        //   title: 'Completado!',
+        //   text: 'La acción se realizó exitosamente.',
+        //   icon: 'success',
+        //   timer: 1000,
+        // });
       }
     });
   }
 
-  notFound(message: string = 'No se encontraron resultados'): void {
+  error(message: string = 'Error en la operación'): void {
     Swal.fire({
       title: "Error",
       text: message,

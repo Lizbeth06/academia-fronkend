@@ -1,0 +1,36 @@
+.card-modern {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 24px;
+  margin: 0 auto 24px auto;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* Subtítulo */
+.subtitle {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 18px;
+}
+
+/* Centrar subtítulos específicos: tarjeta y encabezado de tabla */
+.card-modern > .subtitle {
+  width: 100%;
+  text-align: center;
+  margin-bottom: 16px; 
+  box-sizing: border-box;
+}
+
+.tabla-header > .subtitle {
+  flex-basis: 100%; 
+  width: 100%;
+  text-align: center;
+  margin: 0 0 8px 0;
+  box-sizing: border-box;
+}
+
+.actions {
+    display: flex;
+    gap: 10px;
+    justify-content: end;
+}
