@@ -1,30 +1,15 @@
 import { Convocatoria } from "./../../../../model/convocatoria";
 import { Component, inject, OnInit, ViewChild } from "@angular/core";
 import { CommonModule } from "@angular/common";
-import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from "@angular/forms";
+import { FormBuilder } from "@angular/forms";
 import { trigger, transition, style, animate } from "@angular/animations";
 
 // Angular Material Modules
-import { MatCardModule } from "@angular/material/card";
-import { MatButtonModule } from "@angular/material/button";
-import { MatIconModule } from "@angular/material/icon";
-import { MatFormFieldModule } from "@angular/material/form-field";
-import { MatInputModule } from "@angular/material/input";
-import { MatSelectModule } from "@angular/material/select";
-import { MatChipsModule } from "@angular/material/chips";
-import { MatBadgeModule } from "@angular/material/badge";
-import { MatTooltipModule } from "@angular/material/tooltip";
-import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
-import { MatTableModule } from "@angular/material/table";
-import { MatPaginatorModule, MatPaginator } from "@angular/material/paginator";
-import { MatSlideToggleModule } from "@angular/material/slide-toggle";
+import { MatPaginator } from "@angular/material/paginator";
 import { ConvocatoriaService } from "../../../../services/convocatoria.service";
-import { MatDatepickerModule } from "@angular/material/datepicker";
 import { provideNativeDateAdapter } from "@angular/material/core";
 import { Tipoconvocatoria } from "../../../../model/tipoconvocatoria";
 import { TipoconvocatoriaService } from "../../../../services/tipoconvocatoria.service";
-import { MatListModule } from "@angular/material/list";
-import { MatDividerModule } from "@angular/material/divider";
 import { TemporadaService } from "../../../../services/temporada.service";
 import { SedeService } from "../../../../services/sede.service";
 import { DisciplinaService } from "../../../../services/disciplina.service";
@@ -33,6 +18,8 @@ import { Temporada } from "../../../../model/temporada.model";
 import { Sede } from "../../../../model/sede.model";
 import { Categoria } from "../../../../model/categoria.model";
 import { Disciplina } from "../../../../model/disciplina";
+import { MaterialModule } from "../../../../material/material.module";
+import { RouterLink } from "@angular/router";
 /**
  * Interface actualizada con deportes y tipo
  */
@@ -62,28 +49,8 @@ export interface ConvocatoriaInterface {
   selector: "app-convocatoria",
   standalone: true,
   providers: [provideNativeDateAdapter()],
-  imports: [
-    CommonModule,
-    FormsModule,
-    MatCardModule,
-    MatButtonModule,
-    MatIconModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatSelectModule,
-    MatChipsModule,
-    MatBadgeModule,
-    MatTooltipModule,
-    MatProgressSpinnerModule,
-    MatTableModule,
-    MatPaginatorModule,
-    MatDatepickerModule,
-    MatSlideToggleModule,
-    ReactiveFormsModule,
-    MatListModule,
-    MatDividerModule,
-  ],
-  templateUrl: "./convocatoria.component.html",
+  imports: [CommonModule, MaterialModule, RouterLink],
+  templateUrl: "./convocatoria-lista.component.html",
   styleUrls: ["./convocatoria-lista.component.css"],
   animations: [
     trigger("fadeIn", [
