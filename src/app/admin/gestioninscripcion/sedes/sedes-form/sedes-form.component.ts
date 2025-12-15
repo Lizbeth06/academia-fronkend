@@ -67,7 +67,6 @@ export class SedesFormComponent {
 
   constructor() {
     effect(() => {
-      console.log('inicio effect sede');
       this.sedeActual();
       untracked(() => {
         this.coordenada.set({
@@ -80,11 +79,9 @@ export class SedesFormComponent {
       } else {
         this.limpiarFormulario();
       }
-      console.log('find effect sede');
     });
     
     effect(() => {
-      console.log('inicio de effect de las coordenadas');
       this.coordenada();
       this.sedeForm.patchValue({
         lat: this.coordenada().lat,
@@ -202,12 +199,4 @@ export class SedesFormComponent {
     this.distritos = [];
     this.sedeForm.get('idUbigeo')?.patchValue(0);
   }
-
-  // actualizarCoordenada(coordenada: { lat: number, lng: number }) {
-  //   this.coordenada = coordenada;
-  //   this.sedeForm.patchValue({
-  //     lat: coordenada.lat,
-  //     lng: coordenada.lng
-  //   });
-  // }
 }

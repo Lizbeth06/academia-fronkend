@@ -82,7 +82,6 @@ export class SedesListaComponent implements OnInit {
   }
 
   editarSede(row: Sede): void {
-    // sedeForm.patchValue(row);
     this.sedeActual = row;
     this.hiddenForm = false;
     window.scroll({ top: 0, behavior: 'smooth' });
@@ -100,12 +99,6 @@ export class SedesListaComponent implements OnInit {
         }
       });
     }, `Seguro que desea eliminar: ${sede.nombre}`);
-    // if (confirm('¿Estás seguro de eliminar esta disciplina?')) {
-    //   this.dataSource.data = this.dataSource.data.filter(item => item !== row);
-    // }
-    // if (confirm('¿Estás seguro de eliminar esta disciplina?')) {
-    //   this.dataSource.data = this.dataSource.data.filter(item => item !== row);
-    // }
   }
 
   manejarCancelacion() {
@@ -125,7 +118,6 @@ export class SedesListaComponent implements OnInit {
 
   guardarSede(datos: Sede) {
     this.hiddenForm = true;
-    console.log(datos);
     if (datos.idSede!) {
       this.sedeService.update(datos.idSede, datos).subscribe({
         next: () => {
