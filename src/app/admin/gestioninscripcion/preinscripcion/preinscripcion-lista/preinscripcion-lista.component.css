@@ -1952,3 +1952,9 @@ button:disabled {
     font-size: 10px;     /* Reducido de 11px */
   }
 }
+
+@media (min-width: 992px) {
+  .custom-border-lg {
+    border-left: 1px solid #dee2e6 !important;
+  }
+}

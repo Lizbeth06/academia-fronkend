@@ -21,6 +21,11 @@ export class SedeService extends GenericService<Sede> {
     return this.http.get<Sede[]>(`${this.urlApi}/ubicacion`, { params });
   }
 
+  findAllByCodubi(codubi: number) {
+    const params = new HttpParams().set("codubi", codubi);
+    return this.http.get<Sede[]>(`${this.urlApi}`, { params });
+  }
+
   setSedeChange(data: Sede[]) {
     this.sedeChange.next(data);
   }

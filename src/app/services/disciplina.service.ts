@@ -1,9 +1,9 @@
 import { Injectable } from "@angular/core";
-import { Disciplina } from "../model/disciplina.model";
 import { Subject } from "rxjs";
 import { HttpClient } from "@angular/common/http";
 import { GenericService } from "./generic.service";
 import { environment } from "../environments/environment";
+import { Disciplina } from "../model/disciplina.model";
 
 @Injectable({
   providedIn: "root",
