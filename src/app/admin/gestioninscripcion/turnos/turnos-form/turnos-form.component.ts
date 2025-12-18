@@ -111,8 +111,10 @@ export class TurnosFormComponent implements OnInit {
           this.cargar = false;
           this.limpiarFormulario(event);
           this.formLista.getAllSede();
+          this.listadias = [];
         },
         error: (error) => {
+          this.listadias = [];
           this.cargar = false;
           this.toastrService.error(error.error.value[0].message, "Error al actualizar", { timeOut: 3200 });
         },
@@ -120,12 +122,14 @@ export class TurnosFormComponent implements OnInit {
     } else {
       this.turnoService.save(turno).subscribe({
         next: () => {
+          this.listadias = [];
           this.toastrService.success("Se guardaron los datos correctamente.", "Exitoso", { timeOut: 3200 });
           this.cargar = false;
           this.limpiarFormulario(event);
           this.formLista.getAllSede();
         },
         error: (error) => {
+          this.listadias = [];
           this.cargar = false;
           this.toastrService.error(error.error.value[0].message, "Error en guardar", { timeOut: 3200 });
         },

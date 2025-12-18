@@ -4,7 +4,7 @@ import { FormControl, FormGroup, Validators } from "@angular/forms";
 import { Tipodocumento } from "../../../../model/tipodocumento";
 import { Niveleducacion } from "../../../../model/niveleducacion";
 import { Oficina } from "../../../../model/oficina";
-import { Ubigeo } from "../../../../model/ubigeo";
+import { Ubigeo } from "../../../../model/ubigeo.model";
 import { Persona } from "../../../../model/persona";
 import { TipodocumentoService } from "../../../../services/tipodocumento.service";
 import { NiveleducacionService } from "../../../../services/niveleducacion.service";

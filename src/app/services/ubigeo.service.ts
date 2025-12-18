@@ -3,7 +3,7 @@ import { GenericService } from "./generic.service";
 import { Subject } from "rxjs";
 import { HttpClient, HttpParams } from "@angular/common/http";
 import { environment } from "../environments/environment";
-import { Ubigeo } from "../model/ubigeo";
+import { Ubigeo } from "../model/ubigeo.model";
 
 @Injectable({
   providedIn: "root",

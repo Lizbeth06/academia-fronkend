@@ -8,8 +8,8 @@ import { MatPaginator, MatPaginatorIntl } from "@angular/material/paginator";
 import { PaginatorService } from "../../../../services/security/paginator.service";
 import { MatTableDataSource } from "@angular/material/table";
 import { MatSort } from "@angular/material/sort";
-import { CategoriaService } from "../../../../services/categoria.service";
-import { Categoria } from "../../../../model/categoria.model";
+import { CategoriaedadService } from "../../../../services/categoriaedad.service";
+import { Categoriaedad } from "../../../../model/categoriaedad.model";
 
 @Component({
   selector: "app-categoria-lista",
@@ -22,13 +22,13 @@ import { Categoria } from "../../../../model/categoria.model";
 })
 export class CategoriaListaComponent implements OnInit {
   constructor() {}
-  displayedColumns = ["id", "descripcion", "edadminima", "edadmaxima", "grupo", "estado", "acciones"];
+  displayedColumns = ["id", "descripcion", "edadminima", "edadmaxima", "estado", "acciones"];
 
-  private categoriaServicio = inject(CategoriaService);
+  private categoriaServicio = inject(CategoriaedadService);
 
   @ViewChild(CategoriaFormComponent) formulario!: CategoriaFormComponent;
 
-  dataSource: MatTableDataSource<Categoria>;
+  dataSource: MatTableDataSource<Categoriaedad>;
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
@@ -42,7 +42,7 @@ export class CategoriaListaComponent implements OnInit {
       this.crearTabla(data);
     });
   }
-  crearTabla(data: Categoria[]) {
+  crearTabla(data: Categoriaedad[]) {
     this.dataSource = new MatTableDataSource(data);
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;

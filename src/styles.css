@@ -83,9 +83,9 @@ body {
 .title-modal {
   background-color: #3e8b87;
   color: white;
-  font-size: 15px;
+  font-size: 16px;
   padding: 20px 20px;
-  font-weight: 600;
+  font-weight: 700;
 }
 .mat-mdc-raised-button:not(:disabled) {
   color: #3e8b87 !important;

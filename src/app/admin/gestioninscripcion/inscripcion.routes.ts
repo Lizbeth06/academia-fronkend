@@ -36,18 +36,6 @@ export const inscripcionRoutes: Routes = [
     component: CategoriaListaComponent,
     title: "categoria",
   },
-
-  {
-    path: "horarios",
-    title: "horarios",
-    children: [
-      {
-        path: "",
-        loadChildren: () => import("./horarios/horarios.routes").then((m) => m.horarios_routes),
-      },
-    ],
-  },
-
   {
     path: "turnos",
     component: TurnosListaComponent,

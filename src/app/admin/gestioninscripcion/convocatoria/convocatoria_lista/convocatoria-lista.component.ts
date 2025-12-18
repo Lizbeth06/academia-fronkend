@@ -13,13 +13,13 @@ import { TipoconvocatoriaService } from "../../../../services/tipoconvocatoria.s
 import { TemporadaService } from "../../../../services/temporada.service";
 import { SedeService } from "../../../../services/sede.service";
 import { DisciplinaService } from "../../../../services/disciplina.service";
-import { CategoriaService } from "../../../../services/categoria.service";
+import { CategoriaedadService } from "../../../../services/categoriaedad.service";
 import { Temporada } from "../../../../model/temporada.model";
 import { Sede } from "../../../../model/sede.model";
-import { Categoria } from "../../../../model/categoria.model";
 import { Disciplina } from "../../../../model/disciplina";
 import { MaterialModule } from "../../../../material/material.module";
 import { RouterLink } from "@angular/router";
+import { Categoriaedad } from "../../../../model/categoriaedad.model";
 /**
  * Interface actualizada con deportes y tipo
  */
@@ -75,7 +75,7 @@ export class ConvocatoriaComponent implements OnInit {
   temporadas: Temporada[] = [];
   sedes: Sede[] = [];
   disciplinas: Disciplina[] = [];
-  categorias: Categoria[] = [];
+  categorias: Categoriaedad[] = [];
 
   pageSize: number = 6; // 2 filas × 3 cards
   pageSizeOptions: number[] = [10, 20, 30, 50, 100, 200];
@@ -88,7 +88,7 @@ export class ConvocatoriaComponent implements OnInit {
   temporadaService = inject(TemporadaService);
   sedeService = inject(SedeService);
   disciplinaService = inject(DisciplinaService);
-  categoriaEdadService = inject(CategoriaService);
+  categoriaEdadService = inject(CategoriaedadService);
 
   // =========================
   // FILTROS ACTUALIZADOS

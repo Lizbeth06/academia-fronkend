@@ -1,8 +1,5 @@
 import { Tipodocumento } from "./tipodocumento";
-import { Ubigeo } from "./ubigeo";
-
-
-
+import { Ubigeo } from "./ubigeo.model";
 
 export class Persona {
   idPersona: number;
@@ -16,7 +13,7 @@ export class Persona {
   direccion: string;
   urllinkeding: string;
   fNacimiento: Date | string;
-  urlFoto:string;
-  tipodocumento: Tipodocumento; 
+  urlFoto: string;
+  tipodocumento: Tipodocumento;
   ubigeo: Ubigeo;
 }

@@ -3,17 +3,17 @@ import { GenericService } from "./generic.service";
 import { Subject } from "rxjs";
 import { HttpClient } from "@angular/common/http";
 import { environment } from "../environments/environment";
-import { Categoria } from "../model/categoria.model";
+import { Categoriaedad } from "../model/categoriaedad.model";
 @Injectable({
   providedIn: "root",
 })
-export class CategoriaService extends GenericService<Categoria> {
-  private categoriaChange: Subject<Categoria[]> = new Subject<Categoria[]>();
+export class CategoriaedadService extends GenericService<Categoriaedad> {
+  private categoriaChange: Subject<Categoriaedad[]> = new Subject<Categoriaedad[]>();
 
   constructor(protected override http: HttpClient) {
     super(http, `${environment.HOST}/api/categoriaedad`);
   }
-  setCategoriaChange(data: Categoria[]) {
+  setCategoriaChange(data: Categoriaedad[]) {
     this.categoriaChange.next(data);
   }
 

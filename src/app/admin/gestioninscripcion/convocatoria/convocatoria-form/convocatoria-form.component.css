@@ -1,6 +1,6 @@
 :host ::ng-deep .mat-mdc-tab-body-content {
   overflow: hidden !important;
-  padding: 0 24px;
+  padding: 8px 2px;
 }
 .capa-image {
   padding: 0 12px;
@@ -64,6 +64,11 @@
 .card-title {
   padding: 0 16px;
   font-size: 16px;
+  font-weight: 400;
+}
+.card-subtitle {
+  padding: 0 16px;
+  font-size: 14px;
   font-weight: 400;
 }
 
