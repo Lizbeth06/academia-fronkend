@@ -11,7 +11,7 @@ export interface Apoderado{
     correo: string;
     telefono: string;
     direccion: string;
-    fNacimiento: Date;
+    fnacimiento: Date;
     tipodocumento: Tipodocumento;
     ubigeo: Ubigeo;
 }

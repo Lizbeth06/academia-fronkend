@@ -4,7 +4,6 @@ import { Observable, Subject } from "rxjs";
 import { HttpClient, HttpParams } from "@angular/common/http";
 import { environment } from "../environments/environment";
 import { Apoderado } from "../model/apoderado.model";
-import { Apoderadoparticipante } from "../model/apoderadoparticipante.model";
 
 @Injectable({
   providedIn: "root",
@@ -17,14 +16,10 @@ export class ApoderadoService extends GenericService<Apoderado> {
   }
 
   findByDocumento(idTipodocumento: number, numDocumento: string): Observable<Apoderado> {
-    const params = new HttpParams();
-    params.set("idTipodocumento", idTipodocumento);
-    params.set('numDocumento', numDocumento);
+    const params = new HttpParams()
+      .set("idTipodocumento", idTipodocumento)
+      .set('numDocumento', numDocumento);
     return this.http.get<Apoderado>(`${this.url}/documento`, { params });
-  }
-
-  findRelacionParticipante(idApoderado: number, idParticipante: number): Observable<Apoderadoparticipante>{
-    return this.http.get<Apoderadoparticipante>(`${this.url}/${idApoderado}/participante/${idParticipante}`);
   }
 
   setApoderadoChange(data: Apoderado[]) {

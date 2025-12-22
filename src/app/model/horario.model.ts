@@ -11,6 +11,7 @@ export interface Horario {
   listadisciplina: Listadisciplina;
   temporada: Temporada;
   categoriaedad: Categoriaedad;
+  nivel?: Nivel;
 }
 
 export interface Categoriaedad {
@@ -107,3 +108,10 @@ export interface Tipoturno {
   abreviatura?: string;
   descripcion?: string;
 }
+
+export interface Nivel {
+  idNivel?: number;
+  codigo?: string;
+  descripcion?: string;
+}
+

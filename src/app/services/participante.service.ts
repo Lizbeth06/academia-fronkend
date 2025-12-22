@@ -16,9 +16,9 @@ export class ParticipanteService extends GenericService<Participante> {
   }
 
   findByDocumento(idTipodocumento: number, numDocumento: string): Observable<Participante> {
-    const params = new HttpParams();
-    params.set("idTipodocumento", idTipodocumento);
-    params.set('numDocumento', numDocumento);
+    const params = new HttpParams()
+      .set("idTipodocumento", idTipodocumento)
+      .set('numDocumento', numDocumento);
     return this.http.get<Participante>(`${this.url}/documento`, { params });
   }
 
