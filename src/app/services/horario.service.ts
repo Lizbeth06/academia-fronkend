@@ -31,6 +31,10 @@ export class HorarioService extends GenericService<Horario> {
     return this.http.get<ListaAgrupada[]>(`${environment.HOST}/api/horario/listagrupada/${idSede}`);
   }
 
+  getHorarioxsede(idSede: Number) {
+    return this.http.get<Horario[]>(`${environment.HOST}/api/horario/horariosxsede/${idSede}`);
+  }
+
   setHorarioChange(data: Horario[]) {
     this.horarioChange.next(data);
   }

@@ -1,0 +1,40 @@
+<form [formGroup]="filtroForm" class="row m-2">
+  <div class="col-12 col-md-3">
+    <mat-form-field appearance="outline">
+      <mat-label>Departamento</mat-label>
+      <mat-select formControlName="departamento" placeholder="Departamentos" (selectionChange)="onDepartamentoChange()">
+        <mat-option *ngFor="let dep of departamentos" [value]="dep">{{ dep.ubiNombre }}</mat-option>
+      </mat-select>
+      <mat-error *ngIf="filtroForm.get('departamento')?.hasError('required')">Campo obligatorio </mat-error>
+    </mat-form-field>
+  </div>
+  <div class="col-12 col-md-3">
+    <mat-form-field appearance="outline">
+      <mat-label>Provincia</mat-label>
+      <mat-select formControlName="provincia" placeholder="Provincias" (selectionChange)="onProvinciaChange()">
+        <mat-option *ngFor="let prov of provincias" [value]="prov">{{ prov.ubiNombre }}</mat-option>
+      </mat-select>
+      <mat-error *ngIf="filtroForm.get('provincia')?.hasError('required')">Campo obligatorio </mat-error>
+    </mat-form-field>
+  </div>
+
+  <div class="col-12 col-md-3">
+    <mat-form-field appearance="outline">
+      <mat-label>Distrito</mat-label>
+      <mat-select formControlName="distrito" placeholder="Distritos" (selectionChange)="onDistritoChange()">
+        <mat-option *ngFor="let dist of distritos" [value]="dist">{{ dist.ubiNombre }}</mat-option>
+      </mat-select>
+      <mat-error *ngIf="filtroForm.get('distrito')?.hasError('required')">Campo obligatorio </mat-error>
+    </mat-form-field>
+  </div>
+
+  <div class="col-12 col-md-3">
+    <mat-form-field appearance="outline">
+      <mat-label>Complejo</mat-label>
+      <mat-select formControlName="sede" placeholder="Sedes" (selectionChange)="onSedeChange()">
+        <mat-option *ngFor="let s of sedes" [value]="s.idSede">{{ s.nombre }}</mat-option>
+      </mat-select>
+      <mat-error *ngIf="filtroForm.get('sede')?.hasError('required')">Campo obligatorio</mat-error>
+    </mat-form-field>
+  </div>
+</form>

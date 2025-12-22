@@ -121,10 +121,14 @@ export class TurnosFormComponent implements OnInit {
       });
     } else {
       this.turnoService.save(turno).subscribe({
-        next: () => {
+        next: (response: any) => {
           this.listadias = [];
-          this.toastrService.success("Se guardaron los datos correctamente.", "Exitoso", { timeOut: 3200 });
           this.cargar = false;
+          if (!response.hasSucceeded) {
+            this.toastrService.error(response.value.message, "Error en guardar", { timeOut: 3200 });
+            return;
+          }
+          this.toastrService.success("Se guardaron los datos correctamente.", "Exitoso", { timeOut: 3200 });
           this.limpiarFormulario(event);
           this.formLista.getAllSede();
         },

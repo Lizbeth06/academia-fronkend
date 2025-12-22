@@ -74,7 +74,6 @@ export class HorariosFormComponent implements OnInit {
 
       modalidad: ["", Validators.required],
       nivel: ["", Validators.required],
-      temporada: ["", Validators.required],
       categoria: ["", Validators.required],
       turno: [""],
     });
@@ -90,7 +89,6 @@ export class HorariosFormComponent implements OnInit {
     this.turnoService.findAll().subscribe((data) => (this.turno = data));
     // this.idDisciplina = Number(localStorage.getItem("idDisciplina"));
     if (this.dialogData.idEditHorario !== 0) {
-      console.log(this.dialogData.idEditHorario);
       this.editarHorario();
     }
   }
@@ -141,7 +139,6 @@ export class HorariosFormComponent implements OnInit {
         this.horarioForm.get("numpreiscripcion")?.setValue(data.limitePreinscripcion);
         this.horarioForm.get("modalidad")?.setValue(data.modalidad.idModalidad);
         this.horarioForm.get("nivel")?.setValue(data.nivel.idNivel);
-        this.horarioForm.get("temporada")?.setValue(data.temporada.idTemporada);
         this.horarioForm.get("categoria")?.setValue(data.categoriaedad.idCategoriaedad);
         this.horarioForm.get("turno")?.setValue(data.turno);
         this.contador = data.contador;
@@ -179,9 +176,6 @@ export class HorariosFormComponent implements OnInit {
             disciplina: {
               idDisciplina: Number(this.dialogData.idDisciplina),
             },
-          },
-          temporada: {
-            idTemporada: Number(this.horarioForm.get("temporada")!.value),
           },
           categoriaedad: {
             idCategoriaedad: Number(this.horarioForm.get("categoria")!.value),
@@ -235,9 +229,6 @@ export class HorariosFormComponent implements OnInit {
         disciplina: {
           idDisciplina: Number(this.idDisciplina),
         },
-      },
-      temporada: {
-        idTemporada: Number(this.horarioForm.get("temporada")!.value),
       },
       categoriaedad: {
         idCategoriaedad: Number(this.horarioForm.get("categoria")!.value),

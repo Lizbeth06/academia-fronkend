@@ -2,7 +2,6 @@ import { Component, inject, OnInit, ViewChild } from "@angular/core";
 import { CommonModule } from "@angular/common";
 
 // Angular Material
-import { MAT_DATE_LOCALE, MAT_DATE_FORMATS } from "@angular/material/core";
 import { TemporadaFormComponent } from "../temporada-form/temporada-form.component";
 import { MaterialModule } from "../../../../material/material.module";
 import { MatPaginator, MatPaginatorIntl } from "@angular/material/paginator";
@@ -39,7 +38,6 @@ export class TemporadaListaComponent implements OnInit {
   }
   getAllTemporada() {
     this.temporadaServicio.findAll().subscribe((data) => {
-      console.log(data);
       this.crearTabla(data);
     });
   }

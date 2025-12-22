@@ -10,7 +10,6 @@ export interface Horario {
   estado: string;
   turno: Turno;
   listadisciplina: Listadisciplina;
-  temporada: Temporada;
   modalidad: Modalidad;
   categoriaedad: Categoriaedad;
   nivel: Nivel;
@@ -67,23 +66,6 @@ export interface Sede {
 
 export interface Sector {
   idSector: number;
-  descripcion: string;
-}
-
-export interface Temporada {
-  idTemporada: number;
-  descripcion?: string;
-  faperturainscripcion?: Date;
-  finicioclases?: Date;
-  fcierreclases?: Date;
-  fcierreinscripcion?: Date;
-  fregistro?: Date;
-  estado?: string;
-  anio?: Anio;
-}
-
-export interface Anio {
-  idAnio: number;
   descripcion: string;
 }
 

@@ -1,9 +1,9 @@
 <form [formGroup]="horarioForm" (ngSubmit)="guardarHorario()">
   <div class="seccion-superior p-4 row">
     <div class="row">
-      <h3 class="fs-6 fw-400 mb-4" align="start">Categoría y temporada</h3>
+      <h3 class="fs-6 fw-400 mb-4" align="start">Categoría y modalidad</h3>
     </div>
-    <div class="col-12 col-sm-6 col-md-6">
+    <div class="col-12 col-sm-4 col-md-4">
       <mat-form-field appearance="outline">
         <mat-label>Modalidad</mat-label>
         <mat-select formControlName="modalidad">
@@ -13,7 +13,7 @@
         <mat-error *ngIf="horarioForm.get('modalidad')?.hasError('required')"> Campo obligatorio </mat-error>
       </mat-form-field>
     </div>
-    <div class="col-12 col-sm-6 col-md-6">
+    <div class="col-12 col-sm-4 col-md-4">
       <mat-form-field appearance="outline">
         <mat-label>Etapa</mat-label>
         <mat-select formControlName="nivel">
@@ -23,17 +23,8 @@
         <mat-error *ngIf="horarioForm.get('nivel')?.hasError('required')"> Campo obligatorio </mat-error>
       </mat-form-field>
     </div>
-    <div class="col-12 col-sm-6 col-md-6">
-      <mat-form-field appearance="outline">
-        <mat-label>Temporada</mat-label>
-        <mat-select formControlName="temporada">
-          <mat-option>Seleccione temporada</mat-option>
-          <mat-option *ngFor="let tem of temporada" [value]="tem.idTemporada">{{ tem.descripcion }}</mat-option>
-        </mat-select>
-        <mat-error *ngIf="horarioForm.get('temporada')?.hasError('required')"> Campo obligatorio </mat-error>
-      </mat-form-field>
-    </div>
-    <div class="col-12 col-sm-6 col-md-6">
+
+    <div class="col-12 col-sm-4 col-md-4">
       <mat-form-field appearance="outline">
         <mat-label>Categoría</mat-label>
         <mat-select formControlName="categoria">
@@ -118,7 +109,6 @@
       </mat-form-field>
     </div>
     <div class="d-flex justify-content-end">
-      <!-- <button matButton="outlined" color="warn" (click)="prevTab($event, 'horario')" class="mr-3"> -->
       <button matButton="outlined" color="warn" class="mr-3" mat-dialog-close>
         <mat-icon>close</mat-icon>
         Cancelar
