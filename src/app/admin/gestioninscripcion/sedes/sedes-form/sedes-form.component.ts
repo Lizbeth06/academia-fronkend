@@ -7,7 +7,7 @@ import { MatIconModule } from "@angular/material/icon";
 import { MatInputModule } from "@angular/material/input";
 import { MatSelectModule } from "@angular/material/select";
 import { UbigeoService } from "../../../../services/ubigeo.service";
-import { Ubigeo } from "../../../../model/ubigeo";
+import { Ubigeo } from "../../../../model/ubigeo.model";
 import { SectorService } from "../../../../services/sector.service";
 import { Sector, Sede } from "../../../../model/sede.model";
 import { MapComponent } from "../../../../common/components/map/map.component";

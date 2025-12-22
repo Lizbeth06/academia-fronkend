@@ -1,11 +1,10 @@
 import { Convocatoria } from "./../../../../model/convocatoria";
 import { Component, inject, OnInit, ViewChild } from "@angular/core";
 import { CommonModule } from "@angular/common";
-import { FormBuilder } from "@angular/forms";
 import { trigger, transition, style, animate } from "@angular/animations";
 
 // Angular Material Modules
-import { MatPaginator } from "@angular/material/paginator";
+import { MatPaginator, MatPaginatorIntl } from "@angular/material/paginator";
 import { ConvocatoriaService } from "../../../../services/convocatoria.service";
 import { provideNativeDateAdapter } from "@angular/material/core";
 import { Tipoconvocatoria } from "../../../../model/tipoconvocatoria";
@@ -13,82 +12,54 @@ import { TipoconvocatoriaService } from "../../../../services/tipoconvocatoria.s
 import { TemporadaService } from "../../../../services/temporada.service";
 import { SedeService } from "../../../../services/sede.service";
 import { DisciplinaService } from "../../../../services/disciplina.service";
-import { CategoriaService } from "../../../../services/categoria.service";
+import { CategoriaedadService } from "../../../../services/categoriaedad.service";
 import { Temporada } from "../../../../model/temporada.model";
 import { Sede } from "../../../../model/sede.model";
-import { Categoria } from "../../../../model/categoria.model";
 import { Disciplina } from "../../../../model/disciplina";
 import { MaterialModule } from "../../../../material/material.module";
 import { RouterLink } from "@angular/router";
+import { Categoriaedad } from "../../../../model/categoriaedad.model";
+import { ListahorarioService } from "../../../../services/listahorario.service";
+import { ListarHorConv } from "../../../../model/Listarlistadohorario.model";
+import { MatTableDataSource } from "@angular/material/table";
+import { MatSort } from "@angular/material/sort";
+import { PaginatorService } from "../../../../services/security/paginator.service";
 /**
  * Interface actualizada con deportes y tipo
  */
-export interface ConvocatoriaInterface {
-  id_convocatoria: number;
-  titulo: string;
-  subtitulo: string;
-  descripcion: string;
-  urlimagen: string;
-  deporte: string;
-  tipo: "deporte" | "paradeporte";
-  frecuencia?: string;
-  numvacantes: number;
-  numdisponibles: number;
-  numinscritos: number;
-  estado: "activa" | "cerrada";
-  region?: string;
-  sede?: string;
-  finicioinscripcion: Date | undefined;
-  ffinalinscripcion: Date | undefined;
-  finicioactividad: Date | undefined;
-  ffinactividad: Date | undefined;
-  fechacreada?: Date | null;
-}
 
 @Component({
   selector: "app-convocatoria",
   standalone: true,
-  providers: [provideNativeDateAdapter()],
   imports: [CommonModule, MaterialModule, RouterLink],
   templateUrl: "./convocatoria-lista.component.html",
   styleUrls: ["./convocatoria-lista.component.css"],
-  animations: [
-    trigger("fadeIn", [
-      transition(":enter", [
-        style({ opacity: 0, transform: "translateY(20px)" }),
-        animate("400ms ease-out", style({ opacity: 1, transform: "translateY(0)" })),
-      ]),
-    ]),
-  ],
+  providers: [{ provide: MatPaginatorIntl, useClass: PaginatorService }],
 })
 export class ConvocatoriaComponent implements OnInit {
-  @ViewChild(MatPaginator) paginator!: MatPaginator;
+  constructor() {}
+  listaCovocatoria: MatTableDataSource<ListarHorConv>;
 
-  // =========================
-  // DATOS Y PAGINACIÓN (6 por página = 2 filas × 3 cards)
-  // =========================
-  convocatorias: ConvocatoriaInterface[] = [];
-  convocatoriasFiltradas: ConvocatoriaInterface[] = [];
-  convocatoriasPaginadas: ConvocatoriaInterface[] = [];
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
+  @ViewChild(MatSort) sort!: MatSort;
+
+  convocatoriasFiltradas: ListarHorConv[] = [];
+  listaconvocatoriaCard: ListarHorConv[] = [];
 
   tiposConvocatoria: Tipoconvocatoria[] = [];
   temporadas: Temporada[] = [];
   sedes: Sede[] = [];
   disciplinas: Disciplina[] = [];
-  categorias: Categoria[] = [];
-
-  pageSize: number = 6; // 2 filas × 3 cards
-  pageSizeOptions: number[] = [10, 20, 30, 50, 100, 200];
-  pageIndex: number = 0;
-  totalConvocatorias: number = 0;
+  categorias: Categoriaedad[] = [];
 
   /*Inyección de servicios */
+  listahorarioService = inject(ListahorarioService);
   convocatoriaService = inject(ConvocatoriaService);
   tipoConvocatoriaService = inject(TipoconvocatoriaService);
   temporadaService = inject(TemporadaService);
   sedeService = inject(SedeService);
   disciplinaService = inject(DisciplinaService);
-  categoriaEdadService = inject(CategoriaService);
+  categoriaEdadService = inject(CategoriaedadService);
 
   // =========================
   // FILTROS ACTUALIZADOS
@@ -115,9 +86,9 @@ export class ConvocatoriaComponent implements OnInit {
   modoGestion: boolean = false;
   mostrarFormulario: boolean = false;
   modoEdicion: boolean = false;
-  convocatoriaEditando: ConvocatoriaInterface | null = null;
+  convocatoriaEditando: Convocatoria | null = null;
   mostrarPreview: boolean = false;
-  convocatoriaPreview: ConvocatoriaInterface | null = null;
+  convocatoriaPreview: Convocatoria | null = null;
 
   // =========================
   // MENSAJES Y LOADING
@@ -134,88 +105,35 @@ export class ConvocatoriaComponent implements OnInit {
   mensajeConfirmacion: string = "";
   accionConfirmacion: (() => void) | null = null;
 
-  // =========================
-  // FORMULARIO
-  // =========================
-
-  //Fourmuario reactivo
-  fb = inject(FormBuilder);
-  formGroup = this.fb.group({
-    titulo: "",
-    subtitulo: "",
-    descripcion: "",
-    idTipoconvocatoria: 1,
-    idOficina: undefined,
-    numvacantes: 0,
-    numdisponibles: 0,
-    finicioinscripcion: undefined,
-    ffinalinscripcion: undefined,
-    finicioactividad: undefined,
-    ffinactividad: undefined,
-    estado: "activa",
-  });
-
   columnasTabla: string[] = ["numero", "titulo", "subtitulo", "region", "sede", "deporte", "numdisponibles", "estado", "acciones"];
-  nuevaConvocatoria: ConvocatoriaInterface = this.crearConvocatoriaVacia();
+  nuevaConvocatoria: Convocatoria = this.crearConvocatoriaVacia();
   imagenSeleccionada: File | null = null;
   imagenPreview: string = "";
   erroresFormulario: { [key: string]: boolean } = {};
 
-  constructor() {}
-
   ngOnInit(): void {
-    this.cargarConvocatorias();
+    this.getAllConvocatoria();
     this.cargarTiposConvocatorias();
     this.cargarTemporadas();
     this.cargarSedes();
     this.cargarDisciplinas();
     this.cargarCategoriasEdad();
     this.actualizarEstadosPorCupos();
-    console.log("Componentes inicializados");
   }
 
-  // =========================
-  // CARGA DE DATOS
-  // =========================
-
-  cargarConvocatorias(): void {
+  getAllConvocatoria() {
     this.cargando = true;
-    this.convocatoriaService.findAll().subscribe((res: Convocatoria[]) => {
-      res.forEach((e) =>
-        this.convocatorias.push({
-          id_convocatoria: e.idConvocatoria,
-          titulo: e.titulo, //TODO: #deporte - Estadio Nacional
-          subtitulo: e.subtitulo,
-          descripcion: e.descripcion,
-          urlimagen: "https://i.imgur.com/JELgLb5.png", //TODO
-          deporte: "#deporte", //TODO
-          tipo: "deporte", //TODO
-          frecuencia: "Lun-Mié-Vie: 3-6 PM", //TODO
-          numvacantes: e.numvacantes,
-          numdisponibles: e.numvacantes - e.numinscritos,
-          numinscritos: e.numinscritos,
-          estado: e.estado ? "activa" : "cerrada",
-          region: "Lima", //TODO
-          sede: "Estadio Nacional", //TODO
-          finicioinscripcion: e.finicioinscripcion,
-          ffinalinscripcion: e.ffinalinscripcion,
-          finicioactividad: e.finicioactividad,
-          ffinactividad: e.ffinactividad,
-          fechacreada: e.fcreada,
-        })
-      );
-      this.extraerOpcionesFiltros();
-      this.aplicarFiltros();
-      this.cargando = false;
+    this.listahorarioService.findAll().subscribe({
+      next: (data) => {
+        this.crearTabla(data);
+        this.listaconvocatoriaCard = data;
+      },
     });
-
-    // TODO: Reemplazar con llamada real a API
-    // setTimeout(() => {
-    //   this.convocatorias = this.obtenerDatosEjemplo();
-    //   this.extraerOpcionesFiltros();
-    //   this.aplicarFiltros();
-    //   this.cargando = false;
-    // }, 500);
+  }
+  crearTabla(data: ListarHorConv[]) {
+    this.listaCovocatoria = new MatTableDataSource(data);
+    this.listaCovocatoria.paginator = this.paginator;
+    this.listaCovocatoria.sort = this.sort;
   }
 
   cargarTiposConvocatorias() {
@@ -255,33 +173,24 @@ export class ConvocatoriaComponent implements OnInit {
   }
 
   extraerOpcionesFiltros(): void {
-    this.regiones = [...new Set(this.convocatorias.map((c) => c.region).filter((r) => r))].sort() as string[];
+    // this.regiones = [...new Set(this.convocatorias.map((c) => c.region).filter((r) => r))].sort() as string[];
     // this.sedes = [...new Set(this.convocatorias.map(c => c.sede).filter(s => s))].sort() as string[];
   }
 
-  // =========================
-  // FILTROS
-  // =========================
-
   aplicarFiltros(): void {
-    this.convocatoriasFiltradas = this.convocatorias.filter((conv) => {
+    this.convocatoriasFiltradas = this.listaCovocatoria.data.filter((conv) => {
       const matchBusqueda =
         this.busqueda === "" ||
-        conv.titulo.toLowerCase().includes(this.busqueda.toLowerCase()) ||
-        conv.descripcion.toLowerCase().includes(this.busqueda.toLowerCase()) ||
-        conv.subtitulo.toLowerCase().includes(this.busqueda.toLowerCase());
+        conv.convocatoria.titulo.toLowerCase().includes(this.busqueda.toLowerCase()) ||
+        conv.convocatoria.descripcion.toLowerCase().includes(this.busqueda.toLowerCase()) ||
+        conv.convocatoria.subtitulo.toLowerCase().includes(this.busqueda.toLowerCase());
 
-      const matchRegion = this.regionSeleccionada === "" || conv.region === this.regionSeleccionada;
-      const matchSede = this.sedeSeleccionada === "" || conv.sede === this.sedeSeleccionada;
-      const matchDeporte = this.deporteSeleccionado === "" || conv.deporte === this.deporteSeleccionado;
-      const matchTipo = this.tipoSeleccionado === "" || conv.tipo === this.tipoSeleccionado;
-
-      return matchBusqueda && matchRegion && matchSede && matchDeporte && matchTipo;
+      // const matchRegion = this.regionSeleccionada === "" || conv.region === this.regionSeleccionada;
+      // const matchSede = this.sedeSeleccionada === "" || conv.sede === this.sedeSeleccionada;
+      // const matchDeporte = this.deporteSeleccionado === "" || conv.deporte === this.deporteSeleccionado;
+      // const matchTipo = this.tipoSeleccionado === "" || conv.tipo === this.tipoSeleccionado;
+      // return matchBusqueda && matchRegion && matchSede && matchDeporte && matchTipo;
     });
-
-    this.totalConvocatorias = this.convocatoriasFiltradas.length;
-    this.pageIndex = 0;
-    this.actualizarPaginacion();
   }
 
   limpiarFiltros(): void {
@@ -296,35 +205,14 @@ export class ConvocatoriaComponent implements OnInit {
   toggleFiltros(): void {
     this.mostrarFiltros = !this.mostrarFiltros;
   }
-
-  // =========================
-  // PAGINACIÓN
-  // =========================
-
-  actualizarPaginacion(): void {
-    const startIndex = this.pageIndex * this.pageSize;
-    const endIndex = startIndex + this.pageSize;
-    this.convocatoriasPaginadas = this.convocatoriasFiltradas.slice(startIndex, endIndex);
+  inscribirse(convocatoria: Convocatoria): void {
+    // if (convocatoria.estado === "activa" && convocatoria.numdisponibles > 0) {
+    //   // TODO: Navegar al formulario de pre-inscripción
+    //   // this.mostrarMensajeExito(Redirigiendo a inscripción: ${convocatoria.titulo});
+    // }
   }
 
-  onPageChange(event: any): void {
-    this.pageIndex = event.pageIndex;
-    this.pageSize = event.pageSize;
-    this.actualizarPaginacion();
-  }
-
-  // =========================
-  // ACCIONES USUARIO
-  // =========================
-
-  inscribirse(convocatoria: ConvocatoriaInterface): void {
-    if (convocatoria.estado === "activa" && convocatoria.numdisponibles > 0) {
-      // TODO: Navegar al formulario de pre-inscripción
-      // this.mostrarMensajeExito(Redirigiendo a inscripción: ${convocatoria.titulo});
-    }
-  }
-
-  compartir(convocatoria: ConvocatoriaInterface): void {
+  compartir(convocatoria: Convocatoria): void {
     if (navigator.share) {
       navigator.share({
         title: convocatoria.titulo,
@@ -338,12 +226,10 @@ export class ConvocatoriaComponent implements OnInit {
     }
   }
 
-  // =========================
-  // GESTIÓN
-  // =========================
-
+  /* Gestionar */
   toggleModoGestion(): void {
     this.modoGestion = !this.modoGestion;
+    console.log(this.modoGestion);
     if (!this.modoGestion) {
       this.cerrarFormulario();
     }
@@ -358,11 +244,11 @@ export class ConvocatoriaComponent implements OnInit {
     this.erroresFormulario = {};
   }
 
-  editarConvocatoria(convocatoria: ConvocatoriaInterface): void {
+  editarConvocatoria(convocatoria: Convocatoria): void {
     this.modoEdicion = true;
     this.convocatoriaEditando = convocatoria;
     this.nuevaConvocatoria = { ...convocatoria };
-    this.imagenPreview = convocatoria.urlimagen;
+    // this.imagenPreview = convocatoria.urlimagen;
     this.mostrarFormulario = true;
     this.imagenSeleccionada = null;
     this.erroresFormulario = {};
@@ -377,26 +263,16 @@ export class ConvocatoriaComponent implements OnInit {
     this.erroresFormulario = {};
   }
 
-  crearConvocatoriaVacia(): ConvocatoriaInterface {
+  crearConvocatoriaVacia(): Convocatoria {
     return {
-      id_convocatoria: 0,
+      idConvocatoria: 0,
       titulo: "",
       subtitulo: "",
       descripcion: "",
-      urlimagen: "",
-      deporte: "",
-      tipo: "deporte",
-      numvacantes: 0,
-      numdisponibles: 0,
-      numinscritos: 0,
+      urlImagen: "",
       estado: "activa",
-      region: "",
-      sede: "",
-      finicioinscripcion: undefined,
-      ffinalinscripcion: undefined,
-      finicioactividad: undefined,
-      ffinactividad: undefined,
-      fechacreada: new Date(),
+      temporada: { idTemporada: 1 },
+      // fechacreada: new Date(),
     };
   }
 
@@ -416,14 +292,14 @@ export class ConvocatoriaComponent implements OnInit {
       this.erroresFormulario["descripcion"] = true;
       esValido = false;
     }
-    if (!this.nuevaConvocatoria.numvacantes || this.nuevaConvocatoria.numvacantes <= 0) {
-      this.erroresFormulario["numvacantes"] = true;
-      esValido = false;
-    }
-    if (this.nuevaConvocatoria.numdisponibles < 0) {
-      this.erroresFormulario["numdisponibles"] = true;
-      esValido = false;
-    }
+    // if (!this.nuevaConvocatoria.numvacantes || this.nuevaConvocatoria.numvacantes <= 0) {
+    //   this.erroresFormulario["numvacantes"] = true;
+    //   esValido = false;
+    // }
+    // if (this.nuevaConvocatoria.numdisponibles < 0) {
+    //   this.erroresFormulario["numdisponibles"] = true;
+    //   esValido = false;
+    // }
 
     return esValido;
   }
@@ -438,24 +314,24 @@ export class ConvocatoriaComponent implements OnInit {
 
     setTimeout(() => {
       // Calcular inscritos y actualizar estado
-      this.nuevaConvocatoria.numinscritos = this.nuevaConvocatoria.numvacantes - this.nuevaConvocatoria.numdisponibles;
-      this.nuevaConvocatoria.estado = this.nuevaConvocatoria.numdisponibles === 0 ? "cerrada" : "activa";
+      // this.nuevaConvocatoria.numinscritos = this.nuevaConvocatoria.numvacantes - this.nuevaConvocatoria.numdisponibles;
+      // this.nuevaConvocatoria.estado = this.nuevaConvocatoria.numdisponibles === 0 ? "cerrada" : "activa";
 
       if (this.modoEdicion && this.convocatoriaEditando) {
         // Actualizar
-        const index = this.convocatorias.findIndex((c) => c.id_convocatoria === this.convocatoriaEditando!.id_convocatoria);
-        if (index !== -1) {
-          this.convocatorias[index] = { ...this.nuevaConvocatoria };
-          // TODO: API call
-          console.log(this.nuevaConvocatoria);
-        }
+        // const index = this.convocatorias.findIndex((c) => c.id_convocatoria === this.convocatoriaEditando!.id_convocatoria);
+        // if (index !== -1) {
+        //   this.convocatorias[index] = { ...this.nuevaConvocatoria };
+        //   // TODO: API call
+        //   console.log(this.nuevaConvocatoria);
+        // }
         this.mostrarMensajeExito("Convocatoria actualizada correctamente");
       } else {
         // Crear
-        this.nuevaConvocatoria.id_convocatoria =
-          this.convocatorias.length > 0 ? Math.max(...this.convocatorias.map((c) => c.id_convocatoria)) + 1 : 1;
-        this.nuevaConvocatoria.fechacreada = new Date();
-        this.convocatorias.push({ ...this.nuevaConvocatoria });
+        // this.nuevaConvocatoria.id_convocatoria =
+        //   this.convocatorias.length > 0 ? Math.max(...this.convocatorias.map((c) => c.id_convocatoria)) + 1 : 1;
+        // this.nuevaConvocatoria.fechacreada = new Date();
+        // this.convocatorias.push({ ...this.nuevaConvocatoria });
         // TODO: API call
         console.log(this.nuevaConvocatoria);
 
@@ -471,7 +347,7 @@ export class ConvocatoriaComponent implements OnInit {
     }, 1000);
   }
 
-  // eliminarConvocatoria(convocatoria: ConvocatoriaInterface): void {
+  // eliminarConvocatoria(convocatoria: Convocatoria): void {
   //   this.mostrarDialogoConfirmacion(
   //     'Eliminar Convocatoria',
   //     ¿Está seguro de eliminar la convocatoria "${convocatoria.titulo}"?,
@@ -493,7 +369,7 @@ export class ConvocatoriaComponent implements OnInit {
   //   );
   // }
 
-  verPreview(convocatoria: ConvocatoriaInterface): void {
+  verPreview(convocatoria: Convocatoria): void {
     this.convocatoriaPreview = convocatoria;
     this.mostrarPreview = true;
   }
@@ -523,7 +399,7 @@ export class ConvocatoriaComponent implements OnInit {
       const reader = new FileReader();
       reader.onload = (e: any) => {
         this.imagenPreview = e.target.result;
-        this.nuevaConvocatoria.urlimagen = e.target.result;
+        this.nuevaConvocatoria.urlImagen = e.target.result;
       };
       reader.readAsDataURL(file);
 
@@ -589,25 +465,18 @@ export class ConvocatoriaComponent implements OnInit {
   // =========================
 
   actualizarEstadosPorCupos(): void {
-    this.convocatorias.forEach((conv) => {
-      if (conv.numdisponibles === 0) {
-        conv.estado = "cerrada";
-      } else {
-        conv.estado = "activa";
-      }
-    });
+    // this.convocatorias.forEach((conv) => {
+    //   if (conv.numdisponibles === 0) {
+    //     conv.estado = "cerrada";
+    //   } else {
+    //     conv.estado = "activa";
+    //   }
+    // });
   }
 
-  getEstadoClass(estado: string): string {
-    return estado === "activa" ? "estado-activa" : "estado-cerrada";
-  }
-
-  getEstadoTexto(estado: string): string {
-    return estado === "activa" ? "Activa" : "Cerrada";
-  }
-
-  getPorcentajeCupos(convocatoria: ConvocatoriaInterface): number {
-    return Math.round((convocatoria.numinscritos / convocatoria.numvacantes) * 100);
+  getPorcentajeCupos(convocatoria: Convocatoria): number {
+    // return Math.round((convocatoria.numinscritos / convocatoria.numvacantes) * 100);
+    return 1;
   }
 
   getTipoTexto(tipo: string): string {
@@ -622,8 +491,8 @@ export class ConvocatoriaComponent implements OnInit {
   // DATOS DE EJEMPLO - ESTADIO NACIONAL
   // =========================
 
-  // obtenerDatosEjemplo(): ConvocatoriaInterface[] {
-  //   const convocatorias: ConvocatoriaInterface[] = [];
+  // obtenerDatosEjemplo(): Convocatoria[] {
+  //   const convocatorias: Convocatoria[] = [];
   //   let id = 1;
 
   //   // ESTADIO NACIONAL - 8 DEPORTES NORMALES - Frecuencia 1 (Lun-Mie-Vie)

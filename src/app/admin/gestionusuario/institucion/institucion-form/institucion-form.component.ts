@@ -3,7 +3,7 @@ import { FormBuilder, FormControl, FormGroup, Validators } from "@angular/forms"
 
 import { MaterialModule } from "../../../../material/material.module";
 import { Tipodocumento } from "../../../../model/tipodocumento";
-import { Ubigeo } from "../../../../model/ubigeo";
+import { Ubigeo } from "../../../../model/ubigeo.model";
 import { Institucion } from "../../../../model/institucion";
 import { Persona } from "../../../../model/persona";
 import { TipodocumentoService } from "../../../../services/tipodocumento.service";

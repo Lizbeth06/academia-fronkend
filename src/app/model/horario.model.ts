@@ -2,14 +2,15 @@ export interface Horario {
   idHorario?: number;
   contador: number;
   numVacante: number;
-  usuarioCrea: string;
-  fechaCrea: string;
-  usuarioModifica?: string | null;
-  fechaModifica?: string | null;
+  limitePreinscripcion: number;
+  usuariocrea?: string;
+  fechacreada?: string | null;
+  usuariomodifica?: string | null;
+  fechamodificada?: string | null;
   estado: string;
   turno: Turno;
   listadisciplina: Listadisciplina;
-  temporada: Temporada;
+  modalidad: Modalidad;
   categoriaedad: Categoriaedad;
   nivel?: Nivel;
 }
@@ -19,14 +20,18 @@ export interface Categoriaedad {
   descripcion?: string;
   edadminima?: number;
   edadmaxima?: number;
-  etapa?: string;
   estado?: string;
-  criterioparticipacion?: Criterioparticipacion;
 }
 
-export interface Criterioparticipacion {
-  idCriterioparticipacion: number;
-  descripcion: string;
+export interface Modalidad {
+  idModalidad: number;
+  descripcion?: string;
+}
+
+export interface Nivel {
+  idNivel?: number;
+  codigo?: string;
+  descripcion?: string;
 }
 
 export interface Listadisciplina {
@@ -61,23 +66,6 @@ export interface Sede {
 
 export interface Sector {
   idSector: number;
-  descripcion: string;
-}
-
-export interface Temporada {
-  idTemporada: number;
-  descripcion?: string;
-  faperturainscripcion?: Date;
-  finicioclases?: Date;
-  fcierreclases?: Date;
-  fcierreinscripcion?: Date;
-  fregistro?: Date;
-  estado?: string;
-  anio?: Anio;
-}
-
-export interface Anio {
-  idAnio: number;
   descripcion: string;
 }
 

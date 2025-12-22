@@ -1,5 +1,5 @@
 import { Tipodocumento } from "./tipodocumento";
-import { Ubigeo } from "./ubigeo";
+import { Ubigeo } from "./ubigeo.model";
 
 export interface Apoderado{
     idApoderado?: number;

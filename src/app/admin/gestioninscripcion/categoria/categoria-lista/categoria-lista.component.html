@@ -44,10 +44,6 @@
               <th mat-header-cell *matHeaderCellDef>Edad Máxima</th>
               <td mat-cell *matCellDef="let element">{{ `${element.edadmaxima} AÑOS` }}</td>
             </ng-container>
-            <ng-container matColumnDef="grupo">
-              <th mat-header-cell *matHeaderCellDef>Grupo</th>
-              <td mat-cell *matCellDef="let element">{{ element.criterioparticipacion.descripcion }}</td>
-            </ng-container>
             <ng-container matColumnDef="estado">
               <th mat-header-cell *matHeaderCellDef>Estado</th>
               <td mat-cell *matCellDef="let element">{{ element.estado === "1" ? "EN CURSO" : "CERRADO" }}</td>
