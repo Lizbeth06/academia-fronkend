@@ -1,0 +1,166 @@
+<div class="mb-4" align="end">
+  <button matButton="elevated" color="warn" (click)="volverConvocatoria()"><mat-icon>subdirectory_arrow_left</mat-icon>Volver a convocatorias</button>
+</div>
+<div>
+  <div class="search-filter-section">
+    <div class="search-container">
+      <mat-form-field appearance="outline" class="search-field">
+        <mat-label>Buscar convocatorias</mat-label>
+        <input matInput [(ngModel)]="busqueda" (ngModelChange)="aplicarFiltros()" placeholder="Título, organización, descripción..." />
+        <mat-icon matPrefix>search</mat-icon>
+        @if (busqueda) {
+        <button mat-icon-button matSuffix (click)="busqueda = ''; aplicarFiltros()">
+          <mat-icon>close</mat-icon>
+        </button>
+        }
+      </mat-form-field>
+      <button mat-raised-button color="primary" class="btn-filtros" (click)="toggleFiltros()">
+        <mat-icon>filter_list</mat-icon>
+        {{ mostrarFiltros ? "Ocultar Filtros" : "Mostrar Filtros" }}
+      </button>
+    </div>
+    <div class="filtros-panel" [class.expanded]="mostrarFiltros">
+      <div class="filtros-grid">
+        <mat-form-field appearance="outline">
+          <mat-label>Región</mat-label>
+          <mat-select [(ngModel)]="regionSeleccionada" (ngModelChange)="aplicarFiltros()">
+            <mat-option value="">Todas las regiones</mat-option>
+            @for (region of regiones; track region) {
+            <mat-option [value]="region">
+              {{ region }}
+            </mat-option>
+            }
+          </mat-select>
+          <mat-icon matPrefix>location_on</mat-icon>
+        </mat-form-field>
+        <!-- Filtro Sede -->
+        <mat-form-field appearance="outline">
+          <mat-label>Sede</mat-label>
+          <mat-select [(ngModel)]="sedeSeleccionada" (ngModelChange)="aplicarFiltros()">
+            <mat-option value="">Todas las sedes</mat-option>
+            @for (sede of sedes; track sede) {
+            <mat-option [value]="sede">
+              {{ sede }}
+            </mat-option>
+            }
+          </mat-select>
+          <mat-icon matPrefix>stadium</mat-icon>
+        </mat-form-field>
+        <!-- Filtro Deporte (NUEVO) -->
+        <mat-form-field appearance="outline">
+          <mat-label>Deporte</mat-label>
+          <mat-select [(ngModel)]="deporteSeleccionado" (ngModelChange)="aplicarFiltros()">
+            <mat-option value="">Todos los deportes</mat-option>
+            @for (deporte of deportes; track deporte) {
+            <mat-option [value]="deporte">
+              {{ deporte }}
+            </mat-option>
+            }
+          </mat-select>
+          <mat-icon matPrefix>sports_soccer</mat-icon>
+        </mat-form-field>
+        <!-- Filtro Tipo Convocatoria (NUEVO) -->
+        <mat-form-field appearance="outline">
+          <mat-label>Tipo Convocatoria</mat-label>
+          <mat-select [(ngModel)]="tipoSeleccionado" (ngModelChange)="aplicarFiltros()">
+            <mat-option value="">Todos los tipos</mat-option>
+            @for (tipo of tiposConvocatoria; track tipo) {
+            <mat-option [value]="tipo.idTipoconvocatoria">
+              {{ tipo.descripcion }}
+            </mat-option>
+            }
+          </mat-select>
+          <mat-icon matPrefix>category</mat-icon>
+        </mat-form-field>
+        <!-- Botón limpiar -->
+        <button mat-raised-button class="btn-limpiar" (click)="limpiarFiltros()">
+          <mat-icon>clear_all</mat-icon>
+          Limpiar Filtros
+        </button>
+      </div>
+    </div>
+  </div>
+  <!-- Loader -->
+  @if (cargando) {
+  <div class="loader-container">
+    <mat-spinner diameter="50"></mat-spinner>
+    <p>Cargando convocatorias...</p>
+  </div>
+  }
+
+  <div class="convocatorias-home-grid" *ngIf="listaconvocatoriaCard.length > 0">
+    <mat-card class="convocatoria-card-home" *ngFor="let conv of listaconvocatoriaCard">
+      <div class="card-image-container">
+        <img
+          mat-card-image
+          [src]="conv.convocatoria.urlImagen === null ? 'assets/images/placeholder-convocatoria.jpg' : conv.convocatoria.urlImagen"
+          alt="imagen convocatoria"
+        />
+
+        <!-- <div class="estado-badge" [ngClass]="conv.horario.modalidad.idModalidad === 2 ? 'tipo-paradeporte' : 'tipo-deporte'"> -->
+        <div class="estado-badge">
+          <mat-icon class="estado-icon">
+            {{ conv.convocatoria.estado === "1" ? "check_circle" : "cancel" }}
+          </mat-icon>
+          {{ conv.horario.modalidad.descripcion }}
+        </div>
+
+        <!--<div class="tipo-badge" [ngClass]="getTipoClass(conv.tipo)">
+            {{ getTipoTexto(conv.tipo) }}
+          </div>
+          <div class="card-overlay">
+            <button mat-mini-fab color="primary" (click)="verPreview(conv)" matTooltip="Ver detalles">
+              <mat-icon>visibility</mat-icon>
+            </button>
+            <button mat-mini-fab color="accent" (click)="compartir(conv)" matTooltip="Compartir">
+              <mat-icon>share</mat-icon>
+            </button>
+          </div> -->
+      </div>
+      <mat-card-content>
+        <h3 class="card-title">{{ conv.convocatoria.titulo }}</h3>
+        <p class="card-organizacion">
+          <mat-icon class="org-icon">business</mat-icon>
+          {{ conv.convocatoria.subtitulo }}
+        </p>
+      </mat-card-content>
+      <!--<div class="cupos-container-compact">
+            <div class="cupos-header">
+              <span class="cupos-label">Cupos disponibles</span>
+              <span class="cupos-number">
+                <strong>{{ conv.numdisponibles }}</strong> / {{ conv.numvacantes }}
+              </span>
+            </div>
+            <div class="progress-bar">
+              <div
+                class="progress-fill"
+                [style.width.%]="getPorcentajeCupos(conv)"
+                [ngClass]="{
+                  'progress-low': getPorcentajeCupos(conv) < 50,
+                  'progress-medium': getPorcentajeCupos(conv) >= 50 && getPorcentajeCupos(conv) < 80,
+                  'progress-high': getPorcentajeCupos(conv) >= 80
+                }"
+              ></div>
+            </div>
+          </div>
+          <button
+            mat-raised-button
+            color="primary"
+            class="btn-inscribir"
+            (click)="inscribirse(conv)"
+            [disabled]="conv.estado !== 'activa' || conv.numdisponibles === 0"
+          >
+            <mat-icon>how_to_reg</mat-icon>
+            {{ conv.estado === "activa" && conv.numdisponibles > 0 ? "Inscribirse Ahora" : "No disponible" }}
+          </button>
+        </mat-card-content> -->
+    </mat-card>
+  </div>
+
+  <div class="no-results">
+    <mat-icon>search_off</mat-icon>
+    <h3>No se encontraron convocatorias</h3>
+    <p>Intenta ajustar los filtros de búsqueda</p>
+    <button mat-raised-button color="primary" (click)="limpiarFiltros()">Limpiar filtros</button>
+  </div>
+</div>

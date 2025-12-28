@@ -27,10 +27,13 @@ import { ListaHorario, Listahorariobloque } from "../../../../model/listahorario
 import { ImageService } from "../../../../services/image.service";
 import { ListahorarioService } from "../../../../services/listahorario.service";
 import { MatCheckboxChange } from "@angular/material/checkbox";
+import { ListahorarioComponent } from "../listahorario/listahorario.component";
+import { ConvocatoriaService } from "../../../../services/convocatoria.service";
+import { Router } from "@angular/router";
 
 @Component({
   selector: "app-convocatoria-form",
-  imports: [CommonModule, MaterialModule, HorariosFormComponent, SelecthorarioFormComponent],
+  imports: [CommonModule, MaterialModule, HorariosFormComponent, SelecthorarioFormComponent, ListahorarioComponent],
   templateUrl: "./convocatoria-form.component.html",
   styleUrl: "./convocatoria-form.component.css",
   providers: [DatePipe],
@@ -40,12 +43,14 @@ export class ConvocatoriaFormComponent implements OnInit {
     private formBuild: FormBuilder,
     private dialogService: DialogService,
     private datePipe: DatePipe,
-    private toastrService: ToastrService
+    private toastrService: ToastrService,
+    private router: Router
   ) {
     this.buildForm();
   }
   private ubigeoService = inject(UbigeoService);
   private listahorarioService = inject(ListahorarioService);
+  private convocatoriaService = inject(ConvocatoriaService);
   private sedeService = inject(SedeService);
   private temporadaService = inject(TemporadaService);
   private disciplinaService = inject(DisciplinaService);
@@ -63,6 +68,7 @@ export class ConvocatoriaFormComponent implements OnInit {
 
   imagenPreview: string = "";
   listaHorario: ListaHorario[] = [];
+  listaverHorario: Horario[] = [];
   selectedImage: string | null = null;
   selectedFile: File;
   urlImage = "";
@@ -85,6 +91,7 @@ export class ConvocatoriaFormComponent implements OnInit {
 
   loading: boolean = false;
   idEditHorario = 0;
+  idEditConvocatoria = 0;
 
   listaDisciplinas: ListaAgrupada[] = [];
   expandedIndex: number | null = null;
@@ -94,6 +101,8 @@ export class ConvocatoriaFormComponent implements OnInit {
   habilitar = false;
   desabilitar = false;
   numeroHorarios = 0;
+  fcreada = "";
+  ucreado = "";
 
   private buildForm() {
     this.convocatoriaForm = this.formBuild.group({
@@ -106,7 +115,6 @@ export class ConvocatoriaFormComponent implements OnInit {
       finicioinscripcion: [{ value: "", disabled: true }],
       fcierreinscripcion: [{ value: "", disabled: true }],
       imagen: [""],
-      estado: ["", Validators.required],
     });
     this.complejoForm = this.formBuild.group({
       departamento: ["", Validators.required],
@@ -120,6 +128,11 @@ export class ConvocatoriaFormComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    if (Number(localStorage.getItem("editConvocatoria")) !== 0) {
+      const id = Number(localStorage.getItem("editConvocatoria"));
+      this.idEditConvocatoria = id;
+      this.editarConvocatoria(id);
+    }
     this.validarConvocatoria();
     this.disciplinaService.findAll().subscribe({
       next: (data) => {
@@ -142,7 +155,31 @@ export class ConvocatoriaFormComponent implements OnInit {
   }
   /*Convocatoria*/
 
-  crearConvocatoria() {}
+  editarConvocatoria(id: number) {
+    this.convocatoriaService.getIdConvocatoria(id).subscribe({
+      next: (data) => {
+        this.fcreada = data.convocatoria.fechacreada!;
+        this.ucreado = data.convocatoria.usuariocrea!;
+        const horarios = data.listaHorarios.map((item) => item.horario);
+        this.listaHorarioEditar(horarios);
+        data.listaHorarios.filter((h) => this.insertarHorario(h.horario));
+
+        this.convocatoriaForm.get("titulo")?.setValue(data.convocatoria.titulo),
+          this.convocatoriaForm.get("subtitulo")?.setValue(data.convocatoria.subtitulo);
+        this.convocatoriaForm.get("descripcion")?.setValue(data.convocatoria.descripcion);
+        this.convocatoriaForm.get("temporada")?.setValue(data.convocatoria.temporada);
+        this.convocatoriaForm.get("finicioclase")?.setValue(this.datePipe.transform(data.convocatoria.temporada.finicioclases, "dd-MM-yyyy")),
+          this.convocatoriaForm.get("fcierreclase")?.setValue(this.datePipe.transform(data.convocatoria.temporada.fcierreclases, "dd-MM-yyyy")),
+          this.convocatoriaForm
+            .get("finicioinscripcion")
+            ?.setValue(this.datePipe.transform(data.convocatoria.temporada.fcierreinscripcion, "dd-MM-yyyy")),
+          this.convocatoriaForm.get("fcierreinscripcion")?.setValue(this.datePipe.transform(data.convocatoria.temporada.fcierreclases, "dd-MM-yyyy")),
+          (this.selectedImage = data.convocatoria.urlImagen!);
+        this.convocatoriaForm.get("estado")?.setValue(data.convocatoria.estado);
+      },
+    });
+    localStorage.clear();
+  }
 
   onImage(event: any) {
     this.loading = true;
@@ -163,6 +200,7 @@ export class ConvocatoriaFormComponent implements OnInit {
   }
 
   cargarImage() {
+    console.log("entro publicar");
     this.desabilitar = true;
     if (!this.selectedFile) {
       this.toastrService.error("No hay imagen seleccionada", "Error", { timeOut: 3200 });
@@ -172,7 +210,11 @@ export class ConvocatoriaFormComponent implements OnInit {
       next: (response) => {
         console.log(response);
         this.publicarConvocatoria(response.url);
-        this.toastrService.success("Subio correctamente los datos", "Éxitoso", { timeOut: 3200 });
+        if (this.idEditConvocatoria !== 0) {
+          this.toastrService.success("Se actualizaron correctamente los datos", "Éxitoso", { timeOut: 3200 });
+        } else {
+          this.toastrService.success("Subio correctamente los datos", "Éxitoso", { timeOut: 3200 });
+        }
       },
       error: (err) => {
         this.toastrService.error("Error al cargar los datos", "Error", { timeOut: 3200 });
@@ -184,7 +226,7 @@ export class ConvocatoriaFormComponent implements OnInit {
     const disciplina = data.listadisciplina.disciplina.descripcion;
     const dias = data.turno.listadia?.map((l) => l.dias?.codigo).join(", ");
     const hora = `${data.turno.horainicio} a ${data.turno.horafin} `;
-    return `${disciplina} los ${dias} de ${hora}`;
+    return `${disciplina} LOS ${dias} DE ${hora}`;
   }
   compararSeleccion() {
     const numSeleccion = this.selection.selected.length;
@@ -195,11 +237,15 @@ export class ConvocatoriaFormComponent implements OnInit {
   seleccionarTodas() {
     if (this.compararSeleccion()) {
       this.selection.clear();
-      this.numeroHorarios = this.numeroHorarios - this.dataHorario.data.length;
+      this.dataHorario.data.forEach((row) => {
+        this.quitarHorario(row);
+      });
       return;
     }
     this.selection.select(...this.dataHorario.data);
-    this.numeroHorarios += this.dataHorario.data.length;
+    this.dataHorario.data.forEach((row) => {
+      this.insertarHorario(row);
+    });
   }
 
   marcarCasilla(fila?: Horario): string {
@@ -216,62 +262,96 @@ export class ConvocatoriaFormComponent implements OnInit {
       finicioinscripcion: this.datePipe.transform(this.convocatoriaForm.get("temporada")!.value.faperturainscripcion, "dd-MM-yyyy"),
       fcierreinscripcion: this.datePipe.transform(this.convocatoriaForm.get("temporada")!.value.fcierreinscripcion, "dd-MM-yyyy"),
     });
-    console.log(this.convocatoriaForm.get("temporada")!.value);
+  }
+  actualizarConvocatoria() {
+    if (!this.selectedFile) {
+      console.log("entro actualizar");
+      this.publicarConvocatoria(this.selectedImage!);
+    } else {
+      this.cargarImage();
+    }
   }
   publicarConvocatoria(urlImage: string) {
     // this.listarHorarios();
+    console.log(this.idEditConvocatoria);
     const dataListahorario: Listahorariobloque = {
       convocatoria: {
         titulo: String(this.convocatoriaForm.get("titulo")!.value.trim()),
         subtitulo: String(this.convocatoriaForm.get("subtitulo")!.value.trim()),
         descripcion: String(this.convocatoriaForm.get("descripcion")!.value.trim()),
-        urlImagen: this.selectedImage == "" ? "" : urlImage,
+        urlImagen: urlImage,
         estado: "1",
-        fechamodificada: "",
-        usuariomodifica: "",
-        fechacreada: String(this.datePipe.transform(new Date(), "yyyy-MM-ddTHH:mm:ss")).trim(),
-        usuariocrea: "1",
+        fechamodificada: this.idEditConvocatoria !== 0 ? String(this.datePipe.transform(new Date(), "yyyy-MM-ddTHH:mm:ss")).trim() : "",
+        usuariomodifica: this.idEditConvocatoria !== 0 ? "1" : "",
+        fechacreada: this.idEditConvocatoria !== 0 ? this.fcreada : String(this.datePipe.transform(new Date(), "yyyy-MM-ddTHH:mm:ss")).trim(),
+        usuariocrea: this.idEditConvocatoria !== 0 ? this.ucreado : "1",
         temporada: { idTemporada: Number(this.convocatoriaForm.get("temporada")!.value.idTemporada) },
       },
       listaHorarios: this.listaHorario,
     };
     console.log(dataListahorario);
-    this.listahorarioService.crearConvocatoria(dataListahorario).subscribe({
-      next: () => {
-        this.desabilitar = false;
-        this.habilitar = false;
-        this.formSelect.resetFormulario();
-        this.dataHorario.data = [];
-        this.selection.clear();
-      },
-      error: (error) => {
-        this.toastrService.error("Error al cargar los datos", "Error", { timeOut: 3200 });
-      },
-    });
+    if (this.idEditConvocatoria !== 0) {
+      this.listahorarioService.actualizarConvocatoria(this.idEditConvocatoria, dataListahorario).subscribe({
+        next: () => {
+          this.desabilitar = false;
+          this.habilitar = false;
+          this.formSelect.resetFormulario();
+          this.dataHorario.data = [];
+          this.selection.clear();
+          this.router.navigate(["/admin/inscripcion/convocatoria"]);
+          if (!this.selectedFile) {
+            this.toastrService.success("Actualización correcta", "Éxitoso", { timeOut: 3200 });
+          }
+        },
+        error: (error) => {
+          this.toastrService.error("Error al actualizar", "Error", { timeOut: 3200 });
+        },
+      });
+    } else {
+      this.listahorarioService.crearConvocatoria(dataListahorario).subscribe({
+        next: () => {
+          this.desabilitar = false;
+          this.habilitar = false;
+          this.formSelect.resetFormulario();
+          this.dataHorario.data = [];
+          this.selection.clear();
+          this.router.navigate(["/admin/inscripcion/convocatoria"]);
+        },
+        error: (error) => {
+          this.toastrService.error("Error al cargar los datos", "Error", { timeOut: 3200 });
+        },
+      });
+    }
   }
   onCheckboxChange(event: MatCheckboxChange, row: Horario) {
     if (event.checked) {
       this.selection.select(row);
-
-      // Agregar a listaHorario solo si no existe
-      if (!this.listaHorario.some((h) => h.horario.idHorario === row.idHorario)) {
-        this.listaHorario.push({
-          intervaloHora: row.turno.horainicio + " - " + row.turno.horafin,
-          turno: String(row.turno.tipoturno?.descripcion),
-          estado: "1",
-          horario: { idHorario: row.idHorario! },
-        });
-        this.numeroHorarios += 1;
-        console.log("entro   " + this.numeroHorarios);
-      }
+      this.insertarHorario(row);
     } else {
-      this.numeroHorarios -= 1;
       this.selection.deselect(row);
-      this.listaHorario = this.listaHorario.filter((h) => h.horario.idHorario !== row.idHorario);
+      this.quitarHorario(row);
     }
   }
+  insertarHorario(row: Horario) {
+    if (!this.listaHorario.some((h) => h.horario.idHorario === row.idHorario)) {
+      this.listaverHorario.push(row);
+      this.listaHorario.push({
+        intervaloHora: row.turno.horainicio + " - " + row.turno.horafin,
+        turno: String(row.turno.tipoturno?.descripcion),
+        estado: "1",
+        horario: { idHorario: row.idHorario! },
+      });
+      this.numeroHorarios++;
+    }
+  }
+
+  quitarHorario(row: Horario) {
+    this.listaHorario = this.listaHorario.filter((h) => h.horario.idHorario !== row.idHorario);
+    this.listaverHorario = this.listaverHorario.filter((h) => h.idHorario !== row.idHorario);
+    this.numeroHorarios--;
+  }
+
   recuperarHorarios() {
-    console.log(this.dataHorario.data.length);
     this.dataHorario.data.forEach((horario) => {
       if (this.listaHorario.some((d) => d.horario.idHorario === horario.idHorario)) {
         this.selection.select(horario);
@@ -280,7 +360,7 @@ export class ConvocatoriaFormComponent implements OnInit {
   }
 
   validarConvocatoria() {
-    if (this.dataHorario.data.length !== 0) {
+    if (this.dataHorario.data.length !== 0 || this.idEditConvocatoria) {
       this.convocatoriaForm.enable();
       this.convocatoriaForm.get("finicioclase")?.disable();
       this.convocatoriaForm.get("fcierreclase")?.disable();
@@ -390,6 +470,15 @@ export class ConvocatoriaFormComponent implements OnInit {
       template,
     });
   }
+  modalVerListado(template: TemplateRef<any>, event: MouseEvent) {
+    event.preventDefault();
+    this.matDialogRef = this.dialogService.openDialogCustom({
+      template,
+      data: {
+        listaverHorario: this.listaverHorario,
+      },
+    });
+  }
 
   modalIrHorario(template: TemplateRef<any>, lista: ListaAgrupada, idEditHorario: number) {
     const idSede = this.complejoForm.get("sede")!.value;
@@ -462,9 +551,18 @@ export class ConvocatoriaFormComponent implements OnInit {
     this.validarConvocatoria();
     this.desabilitar = false;
   }
+  listaHorarioEditar(lista: Horario[]) {
+    this.dataHorario = new MatTableDataSource(lista);
+    this.selection.select(...this.dataHorario.data);
+    this.recuperarHorarios();
+    this.validarConvocatoria();
+    this.habilitar = true;
+  }
 
-  /*Los compara los select*/
-  compareTurno(c1: any, c2: any): boolean {
-    return c1 && c2 ? c1.idTurno === c2.idTurno : c1 === c2;
+  compareTemporada(c1: any, c2: any): boolean {
+    return c1 && c2 ? c1.idTemporada === c2.idTemporada : c1 === c2;
+  }
+  volverConvocatoria() {
+    this.router.navigate(["/admin/inscripcion/convocatoria"]);
   }
 }

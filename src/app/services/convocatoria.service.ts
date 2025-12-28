@@ -6,6 +6,7 @@ import { environment } from "../environments/environment";
 import { Observable, of, Subject } from "rxjs";
 import { Listahorariobloque } from "../model/listahorario.model";
 import { TokenService } from "./token.service";
+import { ConvocatoriaAgrupada } from "../model/convocatoriaagrupada.model";
 
 @Injectable({
   providedIn: "root",
@@ -16,6 +17,24 @@ export class ConvocatoriaService extends GenericService<Convocatoria> {
 
   constructor(protected override http: HttpClient, private tokenService: TokenService) {
     super(http, `${environment.HOST}/api/convocatoria`);
+  }
+  urlApi = `${environment.HOST}/api/convocatoria`;
+
+  getIdConvocatoria(IdConvocatoria: Number) {
+    const token: string = this.tokenService.getToken() ?? "";
+    return this.http.get<ConvocatoriaAgrupada>(`${this.urlApi}/${IdConvocatoria}/listaconvocatoria`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  }
+  getAllConvocatoria(): Observable<ConvocatoriaAgrupada[]> {
+    const token: string = this.tokenService.getToken() ?? "";
+    return this.http.get<ConvocatoriaAgrupada[]>(`${this.urlApi}/listaconvocatorias`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
   }
 
   setConvocatoriaChange(data: Convocatoria[]) {

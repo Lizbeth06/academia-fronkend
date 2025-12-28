@@ -1,5 +1,5 @@
 import { Convocatoria } from "./../../../../model/convocatoria";
-import { Component, inject, OnInit, ViewChild } from "@angular/core";
+import { AfterViewInit, Component, inject, OnInit, TemplateRef, ViewChild } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { trigger, transition, style, animate } from "@angular/animations";
 
@@ -17,13 +17,18 @@ import { Temporada } from "../../../../model/temporada.model";
 import { Sede } from "../../../../model/sede.model";
 import { Disciplina } from "../../../../model/disciplina";
 import { MaterialModule } from "../../../../material/material.module";
-import { RouterLink } from "@angular/router";
+import { Router, RouterLink } from "@angular/router";
 import { Categoriaedad } from "../../../../model/categoriaedad.model";
 import { ListahorarioService } from "../../../../services/listahorario.service";
 import { ListarHorConv } from "../../../../model/Listarlistadohorario.model";
 import { MatTableDataSource } from "@angular/material/table";
 import { MatSort } from "@angular/material/sort";
 import { PaginatorService } from "../../../../services/security/paginator.service";
+import { DialogcustomComponent } from "../../../dialogcustom/dialogcustom.component";
+import { MatDialogRef } from "@angular/material/dialog";
+import { DialogService } from "../../../../services/dialog/dialog.service";
+import { ToastrService } from "ngx-toastr";
+import { ConvocatoriaAgrupada } from "../../../../model/convocatoriaagrupada.model";
 /**
  * Interface actualizada con deportes y tipo
  */
@@ -37,13 +42,16 @@ import { PaginatorService } from "../../../../services/security/paginator.servic
   providers: [{ provide: MatPaginatorIntl, useClass: PaginatorService }],
 })
 export class ConvocatoriaComponent implements OnInit {
-  constructor() {}
-  listaCovocatoria: MatTableDataSource<ListarHorConv>;
+  constructor(private router: Router, private dialogService: DialogService, private toastrService: ToastrService) {}
+
+  private matDialogRef!: MatDialogRef<DialogcustomComponent>;
+
+  listaCovocatoria: MatTableDataSource<ConvocatoriaAgrupada>;
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
-  convocatoriasFiltradas: ListarHorConv[] = [];
+  convocatoriasFiltradas: ConvocatoriaAgrupada[] = [];
   listaconvocatoriaCard: ListarHorConv[] = [];
 
   tiposConvocatoria: Tipoconvocatoria[] = [];
@@ -61,51 +69,28 @@ export class ConvocatoriaComponent implements OnInit {
   disciplinaService = inject(DisciplinaService);
   categoriaEdadService = inject(CategoriaedadService);
 
-  // =========================
-  // FILTROS ACTUALIZADOS
-  // =========================
-  busqueda: string = "";
-  regionSeleccionada: string = "";
-  sedeSeleccionada: string = "";
-  deporteSeleccionado: string = "";
-  tipoSeleccionado: string = "";
-
   regiones: string[] = [];
   // sedes: string[] = [];
-  deportes: string[] = ["Rugby", "Tenis de campo", "Judo", "Voleibol", "Futbol", "Baloncesto", "Atletismo", "Pickleball"];
-  // tiposConvocatoria = [
-  //   { value: 'deporte', label: 'Deporte' },
-  //   { value: 'paradeporte', label: 'Para Deporte' }
-  // ];
 
-  // =========================
-  // ESTADOS
-  // =========================
   cargando: boolean = true;
   mostrarFiltros: boolean = false;
-  modoGestion: boolean = false;
   mostrarFormulario: boolean = false;
   modoEdicion: boolean = false;
   convocatoriaEditando: Convocatoria | null = null;
   mostrarPreview: boolean = false;
   convocatoriaPreview: Convocatoria | null = null;
 
-  // =========================
-  // MENSAJES Y LOADING
-  // =========================
   mostrarMensajeCentral: boolean = false;
   tipoMensaje: "success" | "error" | "loading" = "success";
   textoMensaje: string = "";
 
-  // =========================
-  // CONFIRMACIÓN PERSONALIZADA
-  // =========================
+  idDeleteConvocatoria = 0;
   mostrarConfirmacion: boolean = false;
   tituloConfirmacion: string = "";
   mensajeConfirmacion: string = "";
   accionConfirmacion: (() => void) | null = null;
 
-  columnasTabla: string[] = ["numero", "titulo", "subtitulo", "region", "sede", "deporte", "numdisponibles", "estado", "acciones"];
+  columnasTabla: string[] = ["numero", "titulo", "subtitulo", "region", "sede", "estado", "acciones"];
   nuevaConvocatoria: Convocatoria = this.crearConvocatoriaVacia();
   imagenSeleccionada: File | null = null;
   imagenPreview: string = "";
@@ -123,19 +108,26 @@ export class ConvocatoriaComponent implements OnInit {
 
   getAllConvocatoria() {
     this.cargando = true;
-    this.listahorarioService.findAll().subscribe({
+    this.convocatoriaService.getAllConvocatoria().subscribe({
       next: (data) => {
         this.crearTabla(data);
-        this.listaconvocatoriaCard = data;
+        console.log(data);
       },
     });
   }
-  crearTabla(data: ListarHorConv[]) {
+
+  crearTabla(data: ConvocatoriaAgrupada[]) {
     this.listaCovocatoria = new MatTableDataSource(data);
     this.listaCovocatoria.paginator = this.paginator;
     this.listaCovocatoria.sort = this.sort;
   }
-
+  getCardConvocatoria() {
+    this.listahorarioService.findAll().subscribe({
+      next: (data) => {
+        this.listaconvocatoriaCard = data;
+      },
+    });
+  }
   cargarTiposConvocatorias() {
     this.cargando = true;
     this.tipoConvocatoriaService.findAll().subscribe((data) => {
@@ -171,40 +163,16 @@ export class ConvocatoriaComponent implements OnInit {
       this.cargando = false;
     });
   }
+  mostrarSedes(convocatoria: ConvocatoriaAgrupada): string {
+    const sedes = [...new Set(convocatoria.listaHorarios.map((lh) => lh.horario.listadisciplina.sede.nombre))];
+    return sedes.join(", ");
+  }
 
   extraerOpcionesFiltros(): void {
     // this.regiones = [...new Set(this.convocatorias.map((c) => c.region).filter((r) => r))].sort() as string[];
     // this.sedes = [...new Set(this.convocatorias.map(c => c.sede).filter(s => s))].sort() as string[];
   }
 
-  aplicarFiltros(): void {
-    this.convocatoriasFiltradas = this.listaCovocatoria.data.filter((conv) => {
-      const matchBusqueda =
-        this.busqueda === "" ||
-        conv.convocatoria.titulo.toLowerCase().includes(this.busqueda.toLowerCase()) ||
-        conv.convocatoria.descripcion.toLowerCase().includes(this.busqueda.toLowerCase()) ||
-        conv.convocatoria.subtitulo.toLowerCase().includes(this.busqueda.toLowerCase());
-
-      // const matchRegion = this.regionSeleccionada === "" || conv.region === this.regionSeleccionada;
-      // const matchSede = this.sedeSeleccionada === "" || conv.sede === this.sedeSeleccionada;
-      // const matchDeporte = this.deporteSeleccionado === "" || conv.deporte === this.deporteSeleccionado;
-      // const matchTipo = this.tipoSeleccionado === "" || conv.tipo === this.tipoSeleccionado;
-      // return matchBusqueda && matchRegion && matchSede && matchDeporte && matchTipo;
-    });
-  }
-
-  limpiarFiltros(): void {
-    this.busqueda = "";
-    this.regionSeleccionada = "";
-    this.sedeSeleccionada = "";
-    this.deporteSeleccionado = "";
-    this.tipoSeleccionado = "";
-    this.aplicarFiltros();
-  }
-
-  toggleFiltros(): void {
-    this.mostrarFiltros = !this.mostrarFiltros;
-  }
   inscribirse(convocatoria: Convocatoria): void {
     // if (convocatoria.estado === "activa" && convocatoria.numdisponibles > 0) {
     //   // TODO: Navegar al formulario de pre-inscripción
@@ -227,12 +195,8 @@ export class ConvocatoriaComponent implements OnInit {
   }
 
   /* Gestionar */
-  toggleModoGestion(): void {
-    this.modoGestion = !this.modoGestion;
-    console.log(this.modoGestion);
-    if (!this.modoGestion) {
-      this.cerrarFormulario();
-    }
+  verConvocatoriaCard(): void {
+    this.router.navigate(["/admin/inscripcion/convocatoria/cards"]);
   }
 
   abrirFormularioNueva(): void {
@@ -244,14 +208,9 @@ export class ConvocatoriaComponent implements OnInit {
     this.erroresFormulario = {};
   }
 
-  editarConvocatoria(convocatoria: Convocatoria): void {
-    this.modoEdicion = true;
-    this.convocatoriaEditando = convocatoria;
-    this.nuevaConvocatoria = { ...convocatoria };
-    // this.imagenPreview = convocatoria.urlimagen;
-    this.mostrarFormulario = true;
-    this.imagenSeleccionada = null;
-    this.erroresFormulario = {};
+  editarConvocatoria(id: number): void {
+    localStorage.setItem("editConvocatoria", id.toString());
+    this.router.navigate(["/admin/inscripcion/convocatoria/editar"]);
   }
 
   cerrarFormulario(): void {
@@ -339,7 +298,6 @@ export class ConvocatoriaComponent implements OnInit {
       }
 
       this.extraerOpcionesFiltros();
-      this.aplicarFiltros();
 
       setTimeout(() => {
         this.cerrarFormulario();
@@ -487,142 +445,26 @@ export class ConvocatoriaComponent implements OnInit {
     return tipo === "paradeporte" ? "tipo-paradeporte" : "tipo-deporte";
   }
 
-  // =========================
-  // DATOS DE EJEMPLO - ESTADIO NACIONAL
-  // =========================
-
-  // obtenerDatosEjemplo(): Convocatoria[] {
-  //   const convocatorias: Convocatoria[] = [];
-  //   let id = 1;
-
-  //   // ESTADIO NACIONAL - 8 DEPORTES NORMALES - Frecuencia 1 (Lun-Mie-Vie)
-  //   const deportesNormales = ['Rugby', 'Tenis de campo', 'Judo', 'Voleibol', 'Futbol', 'Baloncesto', 'Atletismo', 'Pickleball'];
-
-  //   deportesNormales.forEach(deporte => {
-  //     convocatorias.push({
-  //       id_convocatoria: id++,
-  //       titulo: ${deporte} - Estadio Nacional,
-  //       subtitulo: 'Academia IPD - Temporada 2025',
-  //       descripcion: Inscripciones abiertas para ${deporte}. ¡Totalmente gratuito! Horario: Lunes, Miércoles y Viernes de 3:00 PM a 6:00 PM.,
-  //       urlimagen: 'https://i.imgur.com/JELgLb5.png',
-  //       deporte: deporte,
-  //       tipo: 'deporte',
-  //       frecuencia: 'Lun-Mié-Vie: 3-6 PM',
-  //       numvacantes: 30,
-  //       numdisponibles: 20,
-  //       numinscritos: 10,
-  //       estado: 'activa',
-  //       region: 'Lima',
-  //       sede: 'Estadio Nacional',
-  //       finicioinscripcion: undefined,
-  //       ffinalinscripcion: undefined,
-  //       finicioactividad: undefined,
-  //       ffinactividad: undefined,
-  //       fechacreada: new Date()
-  //     });
-  //   });
-
-  //   // ESTADIO NACIONAL - 8 DEPORTES NORMALES - Frecuencia 2 (Mar-Jue)
-  //   deportesNormales.forEach(deporte => {
-  //     convocatorias.push({
-  //       id_convocatoria: id++,
-  //       titulo: ${deporte} - Estadio Nacional (Turno 2),
-  //       subtitulo: 'Academia IPD - Temporada 2025',
-  //       descripcion: Inscripciones abiertas para ${deporte}. ¡Totalmente gratuito! Horario: Martes y Jueves de 3:00 PM a 6:00 PM.,
-  //       urlimagen: 'https://i.imgur.com/Vep18ZR.png',
-  //       deporte: deporte,
-  //       tipo: 'deporte',
-  //       frecuencia: 'Mar-Jue: 3-6 PM',
-  //       numvacantes: 30,
-  //       numdisponibles: 15,
-  //       numinscritos: 15,
-  //       estado: 'activa',
-  //       region: 'Lima',
-  //       sede: 'Estadio Nacional',
-  //       finicioinscripcion: undefined,
-  //       ffinalinscripcion: undefined,
-  //       finicioactividad: undefined,
-  //       ffinactividad: undefined,
-  //       fechacreada: new Date()
-  //     });
-  //   });
-
-  //   // ESTADIO NACIONAL - PARA DEPORTES
-  //   const paraDeportes = [
-  //     { deporte: 'Atletismo', nombre: 'Para Atletismo (Atletismo Adaptado)' },
-  //     { deporte: 'Tenis de campo', nombre: 'Tenis de Campo para Discapacidad Intelectual' },
-  //     { deporte: 'Futbol', nombre: 'Futbol de Ciego' },
-  //     { deporte: 'Judo', nombre: 'Para Judo' }
-  //   ];
-
-  //   paraDeportes.forEach(pd => {
-  //     convocatorias.push({
-  //       id_convocatoria: id++,
-  //       titulo: pd.nombre,
-  //       subtitulo: 'Academia IPD Para Deporte - Temporada 2025',
-  //       descripcion: Programa inclusivo de ${pd.nombre} para personas con discapacidad. Horario: Lunes, Miércoles y Viernes de 3:00 PM a 6:00 PM.,
-  //       urlimagen: 'https://i.imgur.com/NyPGE4B.png',
-  //       deporte: pd.deporte,
-  //       tipo: 'paradeporte',
-  //       frecuencia: 'Lun-Mié-Vie: 3-6 PM',
-  //       numvacantes: 25,
-  //       numdisponibles: 18,
-  //       numinscritos: 7,
-  //       estado: 'activa',
-  //       region: 'Lima',
-  //       sede: 'Estadio Nacional',
-  //       finicioinscripcion: undefined,
-  //       ffinalinscripcion: undefined,
-  //       finicioactividad: undefined,
-  //       ffinactividad: undefined,
-  //       fechacreada: new Date()
-  //     });
-  //   });
-
-  //   // OTRAS SEDES - Ejemplos adicionales
-  //   convocatorias.push(
-  //     {
-  //       id_convocatoria: id++,
-  //       titulo: 'Vóley IPD Chacapampa',
-  //       subtitulo: 'ACADEMIA IPD',
-  //       descripcion: 'Inscripciones abiertas para vóley.',
-  //       urlimagen: 'https://i.imgur.com/Vep18ZR.png',
-  //       deporte: 'Voleibol',
-  //       tipo: 'deporte',
-  //       numvacantes: 60,
-  //       numdisponibles: 42,
-  //       numinscritos: 18,
-  //       estado: 'activa',
-  //       region: 'Lima',
-  //       sede: 'Complejo Chacapampa',
-  //       finicioinscripcion: undefined,
-  //       ffinalinscripcion: undefined,
-  //       finicioactividad: undefined,
-  //       ffinactividad: undefined,
-  //       fechacreada: new Date()
-  //     },
-  //     {
-  //       id_convocatoria: id++,
-  //       titulo: 'Cusco Multideporte 2024',
-  //       subtitulo: 'ACADEMIA IPD',
-  //       descripcion: 'Programa multideportivo.',
-  //       urlimagen: 'https://i.imgur.com/bYRBpjX.png',
-  //       deporte: 'Futbol',
-  //       tipo: 'deporte',
-  //       numvacantes: 150,
-  //       numdisponibles: 0,
-  //       numinscritos: 150,
-  //       estado: 'cerrada',
-  //       region: 'Cusco',
-  //       sede: 'Complejo Deportivo Cusco',
-  //       finicioinscripcion: undefined,
-  //       ffinalinscripcion: undefined,
-  //       finicioactividad: undefined,
-  //       ffinactividad: undefined,
-  //       fechacreada: new Date()
-  //     }
-  //   );
-
-  //   return convocatorias;
-  // }
+  modalEliminar(template: TemplateRef<any>, idDelete: number) {
+    this.idDeleteConvocatoria = idDelete;
+    this.matDialogRef = this.dialogService.openDialogCustom({
+      template,
+    });
+  }
+  deleteConvocatoria() {
+    this.listahorarioService.eliminarConvocatoria(this.idDeleteConvocatoria).subscribe({
+      next: () => {
+        this.idDeleteConvocatoria = 0;
+        this.getAllConvocatoria();
+        this.matDialogRef.close();
+        this.toastrService.success("Se elimino corectamente", "Éxitoso", { timeOut: 3200 });
+      },
+      error: (err) => {
+        this.idDeleteConvocatoria = 0;
+        this.matDialogRef.close();
+        this.toastrService.error("Error al eliminar", "Error", { timeOut: 3200 });
+      },
+    });
+    console.log(this.idDeleteConvocatoria);
+  }
 }

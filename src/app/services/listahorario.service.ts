@@ -27,6 +27,22 @@ export class ListahorarioService extends GenericService<ListarHorConv> {
       },
     });
   }
+  actualizarConvocatoria(idConvocatoria: number, data: Listahorariobloque) {
+    const token: string = this.tokenService.getToken() ?? "";
+    return this.http.put<Listahorariobloque>(`${this.urlApi}/actualizar-bloque/${idConvocatoria}`, data, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  }
+  eliminarConvocatoria(idEliminar: number) {
+    const token: string = this.tokenService.getToken() ?? "";
+    return this.http.delete<Listahorariobloque>(`${this.urlApi}/eliminar/${idEliminar}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  }
   setListahorarioChange(data: ListarHorConv[]) {
     this.listahorarioChange.next(data);
   }

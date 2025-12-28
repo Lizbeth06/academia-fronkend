@@ -2,6 +2,9 @@
   overflow: hidden !important;
   padding: 8px 2px;
 }
+::ng-deep .mdc-tab__text-label {
+  font-size: 24px !important;
+}
 .capa-image {
   padding: 0 12px;
 }
