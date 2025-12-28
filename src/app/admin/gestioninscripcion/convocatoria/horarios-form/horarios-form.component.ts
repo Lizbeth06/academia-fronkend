@@ -138,7 +138,7 @@ export class HorariosFormComponent implements OnInit {
         this.horarioForm.get("numvacante")?.setValue(data.numVacante);
         this.horarioForm.get("numpreiscripcion")?.setValue(data.limitePreinscripcion);
         this.horarioForm.get("modalidad")?.setValue(data.modalidad.idModalidad);
-        this.horarioForm.get("nivel")?.setValue(data.nivel.idNivel);
+        this.horarioForm.get("nivel")?.setValue(data.nivel?.idNivel);
         this.horarioForm.get("categoria")?.setValue(data.categoriaedad.idCategoriaedad);
         this.horarioForm.get("turno")?.setValue(data.turno);
         this.contador = data.contador;

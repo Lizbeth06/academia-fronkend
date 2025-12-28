@@ -3,8 +3,9 @@ import { environment } from "../environments/environment";
 import { ListarHorConv } from "../model/Listarlistadohorario.model";
 import { GenericService } from "./generic.service";
 import { Subject } from "rxjs";
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpParams } from "@angular/common/http";
 import { Listahorariobloque } from "../model/listahorario.model";
+import { Listahorario } from "../model/listahorario";
 import { TokenService } from "./token.service";
 
 @Injectable({
@@ -42,6 +43,13 @@ export class ListahorarioService extends GenericService<ListarHorConv> {
         Authorization: `Bearer ${token}`,
       },
     });
+  }
+  findDisponibles(edad: number, idModalidad: number, idSede: number) {
+    const params = new HttpParams();
+    params.set("edad", edad);
+    params.set("idModalidad", idModalidad);
+    params.set("idSede", idSede);
+    return this.http.get<Listahorario[]>(`${this.url}/disponibles`, { params });
   }
   setListahorarioChange(data: ListarHorConv[]) {
     this.listahorarioChange.next(data);

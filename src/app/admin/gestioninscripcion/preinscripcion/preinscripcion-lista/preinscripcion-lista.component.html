@@ -38,8 +38,7 @@
                   <mat-label>Número de Documento</mat-label>
                   <input matInput formControlName="numeroDocumento" (keypress)="soloNumerosApoderado($event)">
                   <button mat-icon-button matSuffix type="button" (click)="buscarApoderado()"
-                    [disabled]="disabledSearchButtonApoderado()"
-                    matTooltip="Buscar en RENIEC">
+                    [disabled]="disabledSearchButtonApoderado()" matTooltip="Buscar en RENIEC">
                     @if (!cargandoApoderado) {
                     <mat-icon>search</mat-icon>
                     }
@@ -178,18 +177,19 @@
           <span class="participantes-hint">Haga clic para ver o editar los datos</span>
         </div>
         <mat-accordion class="participantes-accordion">
-          @for (participante of participantes; track participante.idParticipante) {
+          @for (participante of participantes; track participante.numeroDocumento) {
           <mat-expansion-panel class="participante-panel">
             <mat-expansion-panel-header>
               <mat-panel-title>
                 <div class="participante-resumen">
                   <div class="participante-info">
                     <span class="participante-nombre">
-                      {{ participante.nombres }} {{ participante.apaterno }} {{ participante.amaterno }}
+                      {{ participante.nombres }} {{ participante.apellidoPaterno }} {{ participante.apellidoMaterno }}
                     </span>
                     <span class="participante-datos">
-                      DNI: {{ participante.numDocumento }} |
-                      {{ (participante.genero==1) ? 'Masculino' : 'Femenino'}} |
+                      DNI: {{ participante.numeroDocumento }} |
+                      {{ (participante.sexo ==1) ? 'Masculino' : 'Femenino'}} |
+                      {{calcularEdad(participante.fechaNacimiento)}} años
                       <!-- <span [class.modalidad-digital]="participante.modalidadEnvio === 'digital'"
                         [class.modalidad-presencial]="participante.modalidadEnvio === 'presencial'">
                         {{ participante.modalidadEnvio === 'digital' ? 'Digital' : 'Presencial' }}
@@ -207,14 +207,14 @@
                     <strong>Documento:</strong>
                     <!-- TODO: Añadir el tipo de documento -->
                     <span>DNI - {{
-                      participante.numDocumento }}</span>
+                      participante.numeroDocumento }}</span>
                   </div>
                 </div>
                 <div class="detalle-item">
                   <mat-icon>cake</mat-icon>
                   <div>
                     <strong>Fecha de Nacimiento:</strong>
-                    <span>{{ formatearFecha(participante.fNacimiento) }}</span>
+                    <span>{{ formatearFecha(participante.fechaNacimiento) }}</span>
                   </div>
                 </div>
               </div>
@@ -232,8 +232,8 @@
                   <mat-icon>accessible</mat-icon>
                   <div>
                     <strong>Discapacidad:</strong>
-                    <span [class.tiene-discapacidad]="participante.presentaDiscapacidad">
-                      {{ participante.presentaDiscapacidad ? 'Sí' : 'No' }}
+                    <span [class.tiene-discapacidad]="participante.tieneDiscapacidad">
+                      {{ participante.tieneDiscapacidad ? 'Sí' : 'No' }}
                     </span>
                   </div>
                 </div>
@@ -297,8 +297,7 @@
                     <mat-label>Número de Documento</mat-label>
                     <input matInput formControlName="numeroDocumento" (keypress)="soloNumerosAlumno($event)">
                     <button mat-icon-button matSuffix type="button" (click)="buscarAlumno()"
-                      [disabled]="disabledSearchButtonAlumno()"
-                      matTooltip="Buscar en RENIEC">
+                      [disabled]="disabledSearchButtonAlumno()" matTooltip="Buscar en RENIEC">
                       @if (!cargandoAlumno) {
                       <mat-icon>search</mat-icon>
                       }
@@ -363,7 +362,8 @@
                   <mat-form-field appearance="outline" class="col-12">
                     <mat-label>Relación del apoderado con el participante</mat-label>
                     <mat-select formControlName="tipoRelacionApoderado">
-                      @for (tipoRelacionApoderado of tiposRelacionApoderado; track tipoRelacionApoderado.idTiporelacion) {
+                      @for (tipoRelacionApoderado of tiposRelacionApoderado; track tipoRelacionApoderado.idTiporelacion)
+                      {
                       <mat-option [value]="tipoRelacionApoderado.idTiporelacion">
                         {{ tipoRelacionApoderado.descripcion }}
                       </mat-option>
@@ -443,6 +443,13 @@
     <!-- ========================================== -->
     <mat-step>
       <ng-template matStepLabel>Asignación de Horarios</ng-template>
+      <!--  Advertencia: Debe asignar horarios -->
+      @if (horariosAsignados.length === 0) {
+      <div class="advertencia-participantes mb-3">
+        <mat-icon>warning</mat-icon>
+        <span>Debe asignar al menos un horario a un participante para finalizar</span>
+      </div>
+      }
       <!--  HORARIOS AGREGADOS (Cards colapsables arriba) -->
       @if (horariosAsignados.length > 0) {
       <div class="horarios-agregados">
@@ -541,9 +548,9 @@
                 <mat-label>Seleccionar Participante</mat-label>
                 <mat-select formControlName="participante" (selectionChange)="onParticipanteChange()">
                   <mat-option value="">--Seleccionar--</mat-option>
-                  @for (p of participantes; track p.numDocumento) {
-                  <mat-option [value]="p.numDocumento">
-                    {{ p.nombres }} {{ p.apaterno }} {{ p.amaterno }}
+                  @for (p of participantes; track p.numeroDocumento) {
+                  <mat-option [value]="p.numeroDocumento" [disabled]="yaExisteHorarioAsignado(p.numeroDocumento)">
+                    {{ p.nombres }} {{ p.apellidoPaterno }} {{ p.apellidoMaterno }}
                   </mat-option>
                   }
                 </mat-select>
@@ -626,16 +633,16 @@
                 <mat-label>Deporte</mat-label>
                 <mat-select formControlName="deporte" (selectionChange)="onDeporteChange()">
                   <mat-option value="">--Seleccionar--</mat-option>
-                  @for (deporte of deportes; track deporte.codigo) {
-                  <mat-option [value]="deporte.idDisciplina">
-                    {{ deporte.descripcion }}
+                  @for (deporte of deportes; track deporte) {
+                  <mat-option [value]="deporte">
+                    {{ deporte }}
                   </mat-option>
                   }
                 </mat-select>
                 <mat-error>Campo obligatorio</mat-error>
               </mat-form-field>
               <!-- Tabla de Horarios -->
-              @if (horarios.length > 0) {
+              @if (horariosFiltrados.length > 0) {
               <div class="horarios-tabla-container">
                 <p class="horarios-titulo">Horarios según la edad del participante con vacantes disponibles:</p>
                 <table class="horarios-tabla">
@@ -649,7 +656,7 @@
                     </tr>
                   </thead>
                   <tbody>
-                    @for (horario of horarios; track horario.idHorario) {
+                    @for (horario of horariosFiltrados; track horario.idHorario) {
                     <tr [class.selected]="esHorarioSeleccionado(horario)">
                       <td>{{ horario.edad }}</td>
                       <td>{{ horario.etapa }}</td>
@@ -692,13 +699,7 @@
           <mat-icon>check_circle</mat-icon>
         </button>
       </div>
-      <!--  Advertencia: Debe asignar horarios -->
-      @if (horariosAsignados.length === 0) {
-      <div class="advertencia-participantes">
-        <mat-icon>warning</mat-icon>
-        <span>Debe asignar al menos un horario a un participante para finalizar</span>
-      </div>
-      }
+
     </mat-step>
   </mat-stepper>
   }
@@ -720,7 +721,7 @@
         <p><strong>Su pre-inscripción ha sido registrada exitosamente para {{ modalInformativoActual.modalidad ===
             'digital' ? 'la' : 'el' }} participante:</strong></p>
         <p class="participante-nombre-modal">{{ modalInformativoActual.participante.nombres }} {{
-          modalInformativoActual.participante.apaterno }} {{ modalInformativoActual.participante.amaterno
+          modalInformativoActual.participante.apellidoPaterno }} {{ modalInformativoActual.participante.apellidoMaterno
           }}</p>
         <div class="modal-seccion">
           <p><strong>A continuación podrá:</strong></p>
@@ -778,23 +779,36 @@
             Para descargar su ficha de pre-inscripción y/o declaración jurada, haga clic en los siguientes iconos de
             cada participante:
           </p>
+          <div class="modalidad-mensaje-presencial">
+            <mat-icon>info</mat-icon>
+            <p>Podrá presentar los documentos requeridos de manera presencial en el complejo deportivo seleccionado,
+              dentro del horario de atención de lunes a viernes, de 8:00 a. m. a 5:00 p. m., o, si lo prefiere, de forma
+              virtual a través del enlace proporcionado en su correo electrónico.</p>
+          </div>
           <!--  Lista de participantes con iconos PDF -->
           <div class="lista-participantes-pdf">
-            @for (participante of participantes; track participante.numDocumento; let i = $index) {
+            @for (ficha of fichasInscripcion; track ficha.idInscripcion; let i = $index) {
             <div class="participante-pdf-item">
               <div class="participante-pdf-header">
                 <span class="participante-numero">Participante {{ i + 1 }}:</span>
-                <span class="participante-nombre-pdf">{{ participante.nombres }} {{ participante.apaterno }} {{
-                  participante.amaterno }}</span>
+                <span class="participante-nombre-pdf">{{ ficha.nombres }} {{ ficha.apellidoPaterno }} {{
+                  ficha.apellidoMaterno }}</span>
               </div>
               <div class="participante-pdf-cards">
                 <!-- Ficha de Pre-inscripción (TODOS) -->
-                <div class="pdf-card" (click)="generarFichaPreinscripcion(participante)">
+                <div class="pdf-card" (click)="generarFichaPreinscripcion(ficha)">
                   <div class="pdf-card-icon">
                     <mat-icon class="pdf-icon-large">picture_as_pdf</mat-icon>
                   </div>
                   <div class="pdf-card-title">Ficha de Pre-inscripción</div>
-                  <div class="pdf-card-subtitle">{{ participante.nombres }} {{ participante.apaterno }}</div>
+                  <div class="pdf-card-subtitle">{{ ficha.nombres }} {{ ficha.apellidoPaterno }}</div>
+                </div>
+                <div class="pdf-card" (click)="generarFichaPreinscripcion(ficha)">
+                  <div class="pdf-card-icon">
+                    <mat-icon class="pdf-icon-large">picture_as_pdf</mat-icon>
+                  </div>
+                  <div class="pdf-card-title">Declaración Jurada</div>
+                  <div class="pdf-card-subtitle">{{ ficha.nombres }} {{ ficha.apellidoPaterno }}</div>
                 </div>
                 <!-- Declaración Jurada (solo PRESENCIAL) -->
                 <!-- @if (participante.modalidadEnvio === 'presencial') {
@@ -840,59 +854,59 @@
           </div>
           }
           <!--  Datos de la ficha actual -->
-          @if (participantes[fichaActual]; as participante) {
+          @if (fichasInscripcion[fichaActual]; as ficha) {
           <div class="ficha-datos">
             <div class="ficha-item">
               <strong>Código:</strong>
-              <span>{{ modalesInformativos[fichaActual]?.codigoRegistro || '------' }}</span>
+              <span>{{ ficha.codigo || '------' }}</span>
             </div>
             <div class="ficha-item">
               <strong>Nombre:</strong>
-              <span>{{ participante.nombres }}</span>
+              <span>{{ ficha.nombres }}</span>
             </div>
             <div class="ficha-item">
               <strong>Ape. Paterno:</strong>
-              <span>{{ participante.apaterno }}</span>
+              <span>{{ ficha.apellidoPaterno }}</span>
             </div>
             <div class="ficha-item">
               <strong>Ape. Materno:</strong>
-              <span>{{ participante.amaterno }}</span>
+              <span>{{ ficha.apellidoMaterno }}</span>
             </div>
-            <div class="ficha-item">
+            <!-- <div class="ficha-item">
               <strong>Distrito:</strong>
               <span>{{ getLabelFromValue(distritos, apoderadoForm.value.distrito) }}</span>
-            </div>
+            </div> -->
             <div class="ficha-item">
               <strong>Domicilio:</strong>
-              <span>{{ apoderadoForm.value.direccion }}</span>
+              <span>{{ ficha.domicilio }}</span>
             </div>
             <div class="ficha-item">
               <strong>F.Nacimiento:</strong>
-              <span>{{ formatearFecha(participante.fNacimiento) }}</span>
+              <span>{{ ficha.fechaNacimiento }}</span>
             </div>
             <div class="ficha-item">
-              <strong>DNI:</strong>
-              <span>{{ participante.numDocumento }}</span>
+              <strong>DNI/CE:</strong>
+              <span>{{ ficha.documento }}</span>
             </div>
             <div class="ficha-item">
               <strong>Edad:</strong>
-              <span>{{ calcularEdad(participante.fNacimiento) }}</span>
+              <span>{{ ficha.edad }}</span>
             </div>
             <div class="ficha-item">
-              <strong>Deporte:</strong>
-              <span>FUTBOL</span>
+              <strong>Disciplina:</strong>
+              <span>{{ficha.disciplina}}</span>
             </div>
             <div class="ficha-item">
               <strong>Etapa:</strong>
-              <span>INICIO</span>
+              <span>{{ficha.etapa}}</span>
             </div>
             <div class="ficha-item">
               <strong>Complejo:</strong>
-              <span>ESSTADIO NACIONAL</span>
+              <span>{{ficha.complejo}}</span>
             </div>
             <div class="ficha-item">
               <strong>Horario:</strong>
-              <span>LUN - MIE - VIE de 10.00 AM A 12.00 PM</span>
+              <span>{{ficha.horario}}</span>
             </div>
             <!-- <div class="ficha-item">
               <strong>Deporte:</strong>
@@ -916,7 +930,7 @@
           <!-- Indicadores de posición -->
           @if (participantes.length > 1) {
           <div class="carousel-indicators">
-            @for (p of participantes; track p.numDocumento; let i = $index) {
+            @for (p of participantes; track p.numeroDocumento; let i = $index) {
             <span class="indicator" [class.active]="i === fichaActual" (click)="fichaActual = i">
             </span>
             }
