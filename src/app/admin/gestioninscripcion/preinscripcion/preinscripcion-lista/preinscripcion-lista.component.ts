@@ -979,14 +979,14 @@ export class PreInscripcionComponent implements OnInit {
     this.horariosFiltrados = [];
     // this.horarios = [];
     const participante: ParticipanteView = this.participantes.find(p => p.numeroDocumento === this.participanteSeleccionadoId)!;
-    // this.listahorarioService.findDisponibles(
-    //   this.calcularEdad(participante.fechaNacimiento),
-    //   participante.tieneDiscapacidad ? 1 : 2,
-    //   complejoId,
+    this.listahorarioService.findDisponibles(
+      this.calcularEdad(participante.fechaNacimiento),
+      participante.tieneDiscapacidad ? 1 : 2,
+      complejoId,
+    )
+    // this.listahorarioService.findAll(
     // )
-
-    this.listahorarioService.findAll(
-    ).subscribe(data => {
+    .subscribe(data => {
       this.horarios = data.map<HorarioView>(lh => {
         this.deportes.add(lh.horario.listadisciplina.disciplina.descripcion ?? '');
         return {
