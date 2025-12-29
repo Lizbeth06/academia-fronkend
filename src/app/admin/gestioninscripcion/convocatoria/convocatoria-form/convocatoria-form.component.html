@@ -6,15 +6,15 @@
     </div>
     <div class="seccion-inferior">
       <h3 class="fs-6 fw-400 mb-4 pl-4" align="start">Información de convocatorias</h3>
-      <form [formGroup]="convocatoriaForm" (ngSubmit)="crearConvocatoria()" class="row m-2">
-        <div class="col-12 col-md-3">
+      <form [formGroup]="convocatoriaForm" class="row m-2">
+        <div class="col-12 col-md-5">
           <mat-form-field appearance="outline" class="full-width mat-body">
             <mat-label class="mat-body">Título</mat-label>
             <input matInput formControlName="titulo" placeholder="Ingrese título" />
             <mat-error><ng-container *ngIf="convocatoriaForm.get('titulo')?.hasError('required')">Campo obligatorio</ng-container></mat-error>
           </mat-form-field>
         </div>
-        <div class="col-12 col-md-3">
+        <div class="col-12 col-md-4">
           <mat-form-field appearance="outline" class="full-width mat-body">
             <mat-label class="mat-body">Subtítulo</mat-label>
             <input matInput formControlName="subtitulo" placeholder="Ingrese un subtítulo" />
@@ -25,21 +25,15 @@
         <div class="col-12 col-md-3">
           <mat-form-field appearance="outline" class="full-width mat-body">
             <mat-label class="mat-body">Temporada</mat-label>
-            <mat-select formControlName="temporada" placeholder="Seleccione temporada" (selectionChange)="onSelecciontemporada()">
+            <mat-select
+              formControlName="temporada"
+              placeholder="Seleccione temporada"
+              (selectionChange)="onSelecciontemporada()"
+              [compareWith]="compareTemporada"
+            >
               <mat-option *ngFor="let temp of temporada" [value]="temp">{{ temp.descripcion }}</mat-option>
             </mat-select>
             <mat-error><ng-container *ngIf="convocatoriaForm.get('temporada')?.hasError('required')">Campo obligatorio</ng-container></mat-error>
-          </mat-form-field>
-        </div>
-
-        <div class="col-12 col-md-3">
-          <mat-form-field appearance="outline" class="full-width mat-body">
-            <mat-label class="mat-body">Estado</mat-label>
-            <mat-select formControlName="estado" placeholder="Seleccione estado">
-              <mat-option [value]="1">EN CURSO</mat-option>
-              <mat-option [value]="0">CERRADO</mat-option>
-            </mat-select>
-            <mat-error><ng-container *ngIf="convocatoriaForm.get('estado')?.hasError('required')">Campo obligatorio</ng-container></mat-error>
           </mat-form-field>
         </div>
 
@@ -78,7 +72,14 @@
         <div class="col-12 col-md-12 mb-4" *ngIf="habilitar">
           <h3 class="fs-6 text-center my-2">Lista de horarios a seleccionar</h3>
           <div class="mb-2" align="end">
-            <button matButton="elevated" [matBadge]="numeroHorarios"><mat-icon>list_alt</mat-icon>Ver</button>
+            <button
+              matButton="elevated"
+              [matBadge]="numeroHorarios"
+              (click)="modalVerListado(listaHorarios, $event)"
+              [disabled]="numeroHorarios === 0"
+            >
+              <mat-icon>list_alt</mat-icon>Ver horarios agregados
+            </button>
           </div>
           <table mat-table [dataSource]="dataHorario" class="mat-elevation-z8">
             <!-- Checkbox Column -->
@@ -150,17 +151,20 @@
         <button
           matButton="filled"
           color="warn"
-          (click)="cargarImage()"
+          (click)="idEditConvocatoria === 0 ? cargarImage() : actualizarConvocatoria()"
           type="submit"
           [disabled]="convocatoriaForm.invalid || selection.selected.length === 0 || desabilitar"
         >
           <div class="loader d-flex" *ngIf="desabilitar"></div>
-          <mat-icon>save</mat-icon>Publicar
+          <mat-icon>save</mat-icon>{{ idEditConvocatoria === 0 ? "Publicar" : "Actualizar" }}
         </button>
       </div>
     </div>
 
     <div class="mt-4" align="end">
+      <button matButton="elevated" color="warn" class="mr-3" (click)="volverConvocatoria()">
+        <mat-icon>subdirectory_arrow_left</mat-icon>Volver a convocatorias
+      </button>
       <button matButton="outlined" color="warn" class="mr-3" (click)="nextTab('horario')">
         <mat-icon>subdirectory_arrow_right</mat-icon>Ir a agregar horarios
       </button>
@@ -376,5 +380,15 @@
   <div mat-dialog-actions align="end" class="footerDialog d-flex">
     <button mat-flat-button color="primary" class="loadButton" type="button" (click)="deleteHorario()">SI</button>
     <button type="button" mat-raised-button color="secondary" class="loadButton btnCancelar" mat-dialog-close>Cancelar</button>
+  </div>
+</ng-template>
+
+<ng-template #listaHorarios let-dialogListahorario>
+  <div class="title-modal" cdkFocusInitial>Lista de horarios seleccionados</div>
+  <div mat-dialog-content align="center">
+    <app-listahorario [dialogListahorario]="dialogListahorario" (eliminar)="quitarHorario($event)" [selection]="selection"></app-listahorario>
+  </div>
+  <div mat-dialog-actions align="end" class="footerDialog d-flex">
+    <button type="button" mat-raised-button color="secondary" class="loadButton btnCancelar" mat-dialog-close>Salir</button>
   </div>
 </ng-template>
