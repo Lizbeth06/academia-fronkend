@@ -204,12 +204,12 @@ export class PreInscripcionComponent implements OnInit {
     seguroMedico: File | null;
     declaracionJurada: File | null;
   } = {
-    dniMenor: null,
-    dniApoderado: null,
-    conadis: null,
-    seguroMedico: null,
-    declaracionJurada: null,
-  };
+      dniMenor: null,
+      dniApoderado: null,
+      conadis: null,
+      seguroMedico: null,
+      declaracionJurada: null,
+    };
 
   //  NUEVO: Modales informativos
   modalesInformativos: ModalInformativo[] = [];
@@ -308,11 +308,13 @@ export class PreInscripcionComponent implements OnInit {
   selectedConfig: DocumentConfig | null = null;
   selectedConfigAlumno: DocumentConfig | null = null;
 
-  constructor(private fb: FormBuilder, private sanitizer: DomSanitizer) {}
+  constructor(private fb: FormBuilder, private sanitizer: DomSanitizer) { }
 
   ngOnInit(): void {
     this.inicializarFormularios();
     this.cargarDatosIniciales();
+    this.inscripcionService.findById(1).subscribe(data => console.log(data));
+    this.inscripcionService.findAll().subscribe(data => console.log(data));
   }
 
   inicializarFormularios(): void {
@@ -836,18 +838,47 @@ export class PreInscripcionComponent implements OnInit {
   // }
 
   //  NUEVO: Generar Declaración Jurada desde formulario (antes de agregar)
-  generarDeclaracionJuradaFormulario(): void {
-    const datosFormulario = this.alumnoForm.value;
-    console.log("Generando Declaración Jurada para formulario:", datosFormulario);
-    alert("Generando Declaración Jurada. En producción se generará el PDF con los datos del apoderado y participante.");
-    // TODO: Implementar generación de PDF con datos del apoderado y participante del formulario
+  generarDeclaracionJuradaFormulario(ficha: FichaView): void {
+    // console.log('Generando Ficha de Pre-inscripción para:', `${ficha.nombres} `);
+    // TODO: Implementar generación de PDF
+    // alert(`Generando Ficha de Pre-inscripción para ${participante.nombres} ${participante.apellidoPaterno}...`);
+    this.inscripcionService.generarDeclaracionJurada(ficha.idInscripcion).subscribe({
+      next: (blob) => {
+        const url = window.URL.createObjectURL(blob);
+
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'ficha-inscripcion.pdf'; // nombre del archivo
+        a.click();
+
+        window.URL.revokeObjectURL(url);
+      },
+      error: (err) => {
+        alert(`Error al descargar: ${err}`);
+      }
+    });
   }
 
   // NUEVO: Generar Declaración Jurada
-  generarDeclaracionJurada(participante: Participante): void {
-    console.log("Generando Declaración Jurada para:", participante);
-    // TODO: Implementar generación de PDF con datos del apoderado y participante
-    alert(`Generando Declaración Jurada para ${participante.nombres} ${participante.apaterno}...`);
+  generarDeclaracionJurada(ficha: FichaView): void {
+    // console.log('Generando Ficha de Pre-inscripción para:', `${ficha.nombres} `);
+    // TODO: Implementar generación de PDF
+    // alert(`Generando Ficha de Pre-inscripción para ${participante.nombres} ${participante.apellidoPaterno}...`);
+    this.inscripcionService.generarDeclaracionJurada(ficha.idInscripcion).subscribe({
+      next: (blob) => {
+        const url = window.URL.createObjectURL(blob);
+
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'declaracion-jurada.pdf'; // nombre del archivo
+        a.click();
+
+        window.URL.revokeObjectURL(url);
+      },
+      error: (err) => {
+        alert(`Error al descargar: ${err}`);
+      }
+    });
   }
 
   // Continúa en siguiente parte...
@@ -947,13 +978,13 @@ export class PreInscripcionComponent implements OnInit {
     this.deportes.clear();
     this.horariosFiltrados = [];
     // this.horarios = [];
-    const participante: ParticipanteView = this.participantes.find(p=>p.numeroDocumento === this.participanteSeleccionadoId)!;
+    const participante: ParticipanteView = this.participantes.find(p => p.numeroDocumento === this.participanteSeleccionadoId)!;
     // this.listahorarioService.findDisponibles(
     //   this.calcularEdad(participante.fechaNacimiento),
     //   participante.tieneDiscapacidad ? 1 : 2,
     //   complejoId,
     // )
-    
+
     this.listahorarioService.findAll(
     ).subscribe(data => {
       this.horarios = data.map<HorarioView>(lh => {
@@ -1265,39 +1296,51 @@ export class PreInscripcionComponent implements OnInit {
 
     this.inscripcionService.saveAll(inscripciones).subscribe({
       next: (data) => {
-        this.fichasInscripcion = data.map<FichaView>((e) => {
-          return {
-            idInscripcion: e.idInscripcion,
-            codigo: '345231',
-            nombres: e.apoderadoparticipante.participante.nombres,
-            apellidoPaterno: e.apoderadoparticipante.participante.apaterno,
-            apellidoMaterno: e.apoderadoparticipante.participante.apaterno,
-            domicilio: e.apoderadoparticipante.apoderado.direccion,
-            fechaNacimiento: this.formatearFecha(e.apoderadoparticipante.participante.fnacimiento),
-            documento: e.apoderadoparticipante.participante.numDocumento,
-            edad: this.calcularEdad(e.apoderadoparticipante.participante.fnacimiento),
-            disciplina: e.listahorario.horario?.listadisciplina?.disciplina.descripcion ?? '',
-            etapa: e.listahorario.horario?.nivel ?? '',
-            sede: e.listahorario.horario?.listadisciplina?.sede.ubicacion ?? '',
-            complejo: e.listahorario.horario?.listadisciplina?.sede.nombre ?? '',
-            horario: (e.listahorario.horario?.turno.listadia?.map(ld => ld.dias?.descripcion?.toUpperCase().slice(0, 3)).join(' - ') ?? '') + `de ${e.listahorario.horario?.turno.horainicio?.slice(0, 5)} a ${e.listahorario.horario?.turno.horafin?.slice(0, 5)}`
-          } as FichaView
+        this.inscripcionService.findAllbyId(data.map(d => d.idInscripcion!)).subscribe({
+          next: (data) => {
+            this.fichasInscripcion = data.map<FichaView>((e) => {
+              return {
+                idInscripcion: e.idInscripcion,
+                codigo: '345231',
+                nombres: e.apoderadoparticipante.participante.nombres,
+                apellidoPaterno: e.apoderadoparticipante.participante.apaterno,
+                apellidoMaterno: e.apoderadoparticipante.participante.apaterno,
+                domicilio: e.apoderadoparticipante.apoderado.direccion,
+                fechaNacimiento: this.formatearFecha(e.apoderadoparticipante.participante.fnacimiento),
+                documento: e.apoderadoparticipante.participante.numDocumento,
+                edad: this.calcularEdad(e.apoderadoparticipante.participante.fnacimiento),
+                disciplina: e.listahorario.horario?.listadisciplina?.disciplina.descripcion ?? '',
+                etapa: e.listahorario.horario?.nivel?.descripcion ?? '',
+                sede: e.listahorario.horario?.listadisciplina?.sede.ubicacion ?? '',
+                complejo: e.listahorario.horario?.listadisciplina?.sede.nombre ?? '',
+                horario: (e.listahorario.horario?.turno.listadia?.map(ld => ld.dias?.descripcion?.toUpperCase().slice(0, 3)).join(' - ') ?? '') + `de ${e.listahorario.horario?.turno.horainicio?.slice(0, 5)} a ${e.listahorario.horario?.turno.horafin?.slice(0, 5)}`
+              } as FichaView
+            });
+            console.log("inscripción exitosa");
+            console.log('Modales a mostrar:', this.modalesInformativos.length);
+
+            data.forEach(d=>{
+              this.inscripcionService.notificarCorreo(d.idInscripcion!).subscribe(d=>{console.log(d)});
+            });
+
+            // Primero mostrar la confirmación
+            this.mostrarConfirmacion = true;
+
+            // Luego mostrar el primer modal después de un pequeño delay
+            setTimeout(() => {
+              this.indiceModalActual = 0;
+              this.mostrarSiguienteModal();
+            }, 500);
+          },
+          error: (error) => {
+            console.log(error);
+            // this.modalService.error(`Error al obtener las inscripciones:${error.message}`);
+          }
         });
-        console.log("inscripción exitosa");
-        console.log('Modales a mostrar:', this.modalesInformativos.length);
-
-        // Primero mostrar la confirmación
-        this.mostrarConfirmacion = true;
-
-        // Luego mostrar el primer modal después de un pequeño delay
-        setTimeout(() => {
-          this.indiceModalActual = 0;
-          this.mostrarSiguienteModal();
-        }, 500);
       },
       error: (error) => {
-        console.log("inscripción fallida");
-        this.modalService.error(`Error en la inscripcón:${error.message}`);
+        console.log(error);
+        // this.modalService.error(`Error en la inscripcón:${error.message}`);
       }
     });
   }
@@ -1349,7 +1392,7 @@ export class PreInscripcionComponent implements OnInit {
 
         const a = document.createElement('a');
         a.href = url;
-        a.download = 'documento.pdf'; // nombre del archivo
+        a.download = 'ficha-inscripcion.pdf'; // nombre del archivo
         a.click();
 
         window.URL.revokeObjectURL(url);
@@ -1359,6 +1402,8 @@ export class PreInscripcionComponent implements OnInit {
       }
     });
   }
+
+  
 
   calcularEdad(fechaNacimiento: Date): number {
     const hoy = new Date();
