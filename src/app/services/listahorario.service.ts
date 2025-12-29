@@ -45,10 +45,10 @@ export class ListahorarioService extends GenericService<ListarHorConv> {
     });
   }
   findDisponibles(edad: number, idModalidad: number, idSede: number) {
-    const params = new HttpParams();
-    params.set("edad", edad);
-    params.set("idModalidad", idModalidad);
-    params.set("idSede", idSede);
+    const params = new HttpParams()
+    .set("edad", edad)
+    .set("idModalidad", idModalidad)
+    .set("idSede", idSede);
     return this.http.get<Listahorario[]>(`${this.url}/disponibles`, { params });
   }
   setListahorarioChange(data: ListarHorConv[]) {
