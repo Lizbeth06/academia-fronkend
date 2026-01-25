@@ -1,0 +1,367 @@
+.search-filter-section {
+  background: white;
+  padding: 20px 20px 0 20px;
+  border-radius: 10px;
+  margin-bottom: 25px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.btn-filtros {
+  height: 50px;
+  padding: 0 20px;
+  white-space: nowrap;
+}
+
+.loader-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 50px 20px;
+}
+
+.loader-container p {
+  margin-top: 15px;
+  color: #8e298c;
+  font-size: 15px;
+}
+
+/*Sin resultado*/
+.no-results {
+  text-align: center;
+  padding: 60px 20px;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.no-results mat-icon {
+  font-size: 70px;
+  width: 70px;
+  height: 70px;
+  color: #ccc;
+  margin-bottom: 15px;
+}
+
+.no-results h3 {
+  font-size: 22px;
+  color: #333;
+  margin: 0 0 8px 0;
+}
+
+.no-results p {
+  font-size: 15px;
+  color: #666;
+  margin-bottom: 20px;
+}
+
+/*CARDS*/
+
+.convocatorias-cards {
+  /* gap: 24px; */
+}
+
+.flip-card-container {
+  height: 420px;
+  perspective: 1000px;
+}
+
+.flip-card {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.7s ease;
+  transform-style: preserve-3d;
+  z-index: -1;
+}
+
+.flip-card-container:hover .flip-card {
+  transform: rotateY(180deg);
+}
+
+.flip-card-front,
+.flip-card-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  z-index: 1;
+}
+
+.flip-card-front {
+  background: white;
+}
+
+.flip-card-back {
+  background: linear-gradient(135deg, #8e298c, #cb532e);
+  transform: rotateY(180deg);
+  color: white;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+}
+
+/* SOLUCIÓN CRÍTICA: pointer-events para el botón */
+.flip-card-container:hover .flip-card-back {
+  pointer-events: auto;
+}
+
+.card-imagen {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.card-gradient {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, transparent 0%, transparent 40%, rgba(0, 0, 0, 0.8) 100%);
+}
+
+.card-badges {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  right: 12px;
+  display: flex;
+  justify-content: space-between;
+  z-index: 1;
+}
+
+.badge-tipo {
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.badge-tipo.tipo-deporte {
+  background: rgba(142, 41, 140, 0.95);
+  color: white;
+}
+
+.badge-tipo.tipo-paradeporte {
+  background: rgba(203, 83, 46, 0.95);
+  color: white;
+}
+
+.badge-estado {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(8px);
+}
+
+.badge-estado mat-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+}
+
+.badge-estado.estado-activa {
+  background: rgba(76, 175, 80, 0.95);
+  color: white;
+}
+
+.badge-estado.estado-cerrada {
+  background: rgba(117, 117, 117, 0.95);
+  color: white;
+}
+
+.card-front-info {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 2rem;
+  z-index: 2;
+}
+
+.card-front-info h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: white;
+  margin: 0 0 1rem 0;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  line-height: 1.3;
+}
+
+.hover-hint {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: white;
+  opacity: 0.8;
+  margin: 0;
+}
+
+.hover-hint mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+}
+
+/* REVERSO DEL CARD */
+.back-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.back-estado,
+.back-tipo {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  text-transform: uppercase;
+}
+
+.back-estado mat-icon {
+  font-size: 14px;
+  width: 14px;
+  height: 14px;
+}
+
+.back-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.back-content h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 0 0 0.3rem 0;
+  line-height: 1.3;
+}
+
+.back-subtitle {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0 0 1rem 0;
+}
+
+.back-horarios {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 1rem;
+  overflow-y: auto;
+  max-height: 140px;
+}
+
+.horario-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 10px;
+  border-radius: 10px;
+  backdrop-filter: blur(10px);
+}
+
+.horario-item mat-icon {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.horario-data {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.horario-turno {
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.horario-cupos {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.horario-cupos mat-icon {
+  font-size: 14px;
+  width: 14px;
+  height: 14px;
+}
+
+/* BOTÓN INSCRIBIRSE - CORREGIDO */
+.btn-inscribirse {
+  width: 100%;
+  height: 48px;
+  border: none;
+  border-radius: 12px;
+  background: white;
+  color: #8e298c;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+  margin-top: auto;
+  position: relative;
+  z-index: 5;
+  bottom: 0;
+}
+
+.btn-inscribirse:hover {
+  background: rgba(255, 255, 255, 0.9);
+  transform: scale(1.02);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.btn-inscribirse:active {
+  transform: scale(0.98);
+}
+
+.btn-inscribirse mat-icon {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+}

@@ -1,22 +1,28 @@
-import { Component } from "@angular/core";
+import { Component, inject, OnInit } from "@angular/core";
 import { MaterialModule } from "../../../../material/material.module";
 import { ConvocatoriaAgrupada } from "../../../../model/convocatoriaagrupada.model";
 import { Router } from "@angular/router";
+import { Listahorario } from "../../../../model/listahorario";
+import { ListahorarioService } from "../../../../services/listahorario.service";
+import { CommonModule } from "@angular/common";
+import { Horario } from "../../../../model/horario.model";
 
 @Component({
   selector: "app-convocatorias-card",
-  imports: [MaterialModule],
+  imports: [CommonModule, MaterialModule],
   templateUrl: "./convocatorias-card.component.html",
   styleUrl: "./convocatorias-card.component.css",
 })
-export class ConvocatoriasCardComponent {
+export class ConvocatoriasCardComponent implements OnInit {
   constructor(private router: Router) {}
+
+  private listahorarioService = inject(ListahorarioService);
   busqueda: string = "";
   regionSeleccionada: string = "";
   sedeSeleccionada: string = "";
   deporteSeleccionado: string = "";
   tipoSeleccionado: string = "";
-  cargando: boolean = true;
+  cargando: boolean = false;
   mostrarFiltros: boolean = false;
   mostrarFormulario: boolean = false;
 
@@ -25,11 +31,24 @@ export class ConvocatoriasCardComponent {
   deportes: string[] = [];
   tipos: string[] = [];
 
-  listaconvocatoriaCard: any[] = [];
+  listaconvocatoriaCard: Listahorario[] = [];
   tiposConvocatoria: any[] = [];
   listaCovocatoria: { data: any[] } = { data: [] };
   convocatoriasFiltradas: ConvocatoriaAgrupada[] = [];
 
+  ngOnInit(): void {
+    this.obteniendoCardConvocatoria();
+  }
+  obteniendoCardConvocatoria() {
+    this.cargando = true;
+    this.listahorarioService.findAll().subscribe({
+      next: (data) => {
+        this.cargando = false;
+        this.listaconvocatoriaCard = data;
+        console.log(data);
+      },
+    });
+  }
   aplicarFiltros(): void {
     this.convocatoriasFiltradas = this.listaCovocatoria.data.filter((conv) => {
       const matchBusqueda =
@@ -58,6 +77,15 @@ export class ConvocatoriasCardComponent {
   toggleFiltros(): void {
     this.mostrarFiltros = !this.mostrarFiltros;
   }
+
+  getPorcentajeCupos(horario: Horario): number {
+    return Math.round((horario.numVacante - horario.contador) / horario.numVacante) * 100;
+  }
+
+  getTipoTexto(tipo: string): string {
+    return tipo === "paradeporte" ? "Para Deporte" : "Deporte";
+  }
+
   volverConvocatoria() {
     this.router.navigate(["/admin/inscripcion/convocatoria"]);
   }

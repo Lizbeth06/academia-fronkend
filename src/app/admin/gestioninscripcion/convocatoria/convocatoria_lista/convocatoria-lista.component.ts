@@ -432,19 +432,6 @@ export class ConvocatoriaComponent implements OnInit {
     // });
   }
 
-  getPorcentajeCupos(convocatoria: Convocatoria): number {
-    // return Math.round((convocatoria.numinscritos / convocatoria.numvacantes) * 100);
-    return 1;
-  }
-
-  getTipoTexto(tipo: string): string {
-    return tipo === "paradeporte" ? "Para Deporte" : "Deporte";
-  }
-
-  getTipoClass(tipo: string): string {
-    return tipo === "paradeporte" ? "tipo-paradeporte" : "tipo-deporte";
-  }
-
   modalEliminar(template: TemplateRef<any>, idDelete: number) {
     this.idDeleteConvocatoria = idDelete;
     this.matDialogRef = this.dialogService.openDialogCustom({
