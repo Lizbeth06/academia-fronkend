@@ -44,6 +44,7 @@ import { Apoderado } from '../../../../model/apoderado.model';
 import { ModalService } from '../../../../util/modal.service';
 import { Apoderadoparticipante } from '../../../../model/apoderadoparticipante.model';
 import { ApoderadoparticipanteService } from '../../../../services/apoderadoparticipante.service';
+import { Persona } from "../../../../model/persona";
 
 // Formato de fecha personalizado
 export const MY_DATE_FORMATS = {
@@ -110,7 +111,7 @@ export interface HorarioView {
   dias: string,
   horas: string,
   deporte: string,
-  disponible: boolean,
+  numeroPreinscripcionesDisponibles: number,
 }
 
 export interface ParticipanteView {
@@ -423,27 +424,33 @@ export class PreInscripcionComponent implements OnInit {
     const dni = this.apoderadoForm.get("numeroDocumento")?.value;
 
     this.cargandoApoderado = true;
+
+    this.limpiarFormularioApoderado();
+    this.apoderadoForm.patchValue({
+      numeroDocumento: dni,
+    });
+
     this.apoderadoService.findByDocumento(tipoDoc, dni).subscribe({
       next: (data) => {
         console.log("Entró dentro de este flujo");
         console.log(data);
         this.apoderadoForm.patchValue({
-          apellidoPaterno: data.amaterno,
-          apellidoMaterno: data.apaterno,
-          nombres: data.nombres,
-          fechaNacimiento: data.fnacimiento,
-          sexo: data.genero,
-          departamento: data.ubigeo.ubiDpto,
-          provincia: data.ubigeo.ubiProvincia,
-          distrito: data.ubigeo.idUbigeo,
-          direccion: data.direccion,
-          correo: data.correo,
-          telefono: data.telefono,
+          apellidoPaterno: data.persona.amaterno,
+          apellidoMaterno: data.persona.apaterno,
+          nombres: data.persona.nombres,
+          fechaNacimiento: data.persona.fnacimiento,
+          sexo: data.persona.genero,
+          departamento: data.persona.ubigeo.ubiDpto,
+          provincia: data.persona.ubigeo.ubiProvincia,
+          distrito: data.persona.ubigeo.idUbigeo,
+          direccion: data.persona.direccion,
+          correo: data.persona.correo,
+          telefono: data.persona.telefono,
         });
-        this.ubigeoService.findProvincias(data.ubigeo.ubiDpto!).subscribe((data) => {
+        this.ubigeoService.findProvincias(data.persona.ubigeo.ubiDpto!).subscribe((data) => {
           this.provincias = data;
         });
-        this.ubigeoService.findDistritos(data.ubigeo.ubiDpto!, data.ubigeo.ubiProvincia!).subscribe((data) => {
+        this.ubigeoService.findDistritos(data.persona.ubigeo.ubiDpto!, data.persona.ubigeo.ubiProvincia!).subscribe((data) => {
           this.distritos = data;
         });
         this.cargandoApoderado = false;
@@ -534,17 +541,22 @@ export class PreInscripcionComponent implements OnInit {
     const tipoDoc = this.alumnoForm.get("tipoDocumento")?.value;
     const dni = this.alumnoForm.get("numeroDocumento")?.value;
 
-    if (dni && dni.length === 8) {
+    this.limpiarFormularioAlumno();
+    this.alumnoForm.patchValue({
+      numeroDocumento: dni,
+    });
+
+    if (dni) {
       this.cargandoAlumno = true;
 
       this.participanteService.findByDocumento(tipoDoc, dni).subscribe({
         next: (data) => {
           this.alumnoForm.patchValue({
-            apellidoPaterno: data.apaterno,
-            apellidoMaterno: data.amaterno,
-            nombres: data.nombres,
-            fechaNacimiento: data.fnacimiento,
-            sexo: data.genero,
+            apellidoPaterno: data.persona.apaterno,
+            apellidoMaterno: data.persona.amaterno,
+            nombres: data.persona.nombres,
+            fechaNacimiento: data.persona.fnacimiento,
+            sexo: data.persona.genero,
             tipoSeguro: undefined,
             // tipoSeguro: data.tiposeguro.idTiposeguro,
             tieneDiscapacidad: data.presentaDiscapacidad
@@ -655,12 +667,26 @@ export class PreInscripcionComponent implements OnInit {
     }
   }
 
+  limpiarFormularioApoderado(): void {
+    this.apoderadoForm.reset({
+      tipoDocumento: 1,
+      sexo: 1,
+    });
+    this.apoderadoForm.markAsPristine();
+    this.apoderadoForm.markAsUntouched();
+  }
+
   limpiarFormularioAlumno(): void {
     this.alumnoForm.reset({
       tipoDocumento: 1,
+      sexo: 1,
+      tipoRelacionApoderdo: 1,
+      tipoSeguro: 1,
       tieneDiscapacidad: false,
-      // modalidadEnvio: null
     });
+    // this.alumnoForm.markAsPristine();
+    this.alumnoForm.markAsUntouched({emitEvent: true});
+
     this.tieneDiscapacidad = false;
     // this.modalidadEnvioActual = null;
 
@@ -984,22 +1010,22 @@ export class PreInscripcionComponent implements OnInit {
       participante.tieneDiscapacidad ? 1 : 2,
       complejoId,
     )
-    // this.listahorarioService.findAll(
-    // )
-    .subscribe(data => {
-      this.horarios = data.map<HorarioView>(lh => {
-        this.deportes.add(lh.horario.listadisciplina.disciplina.descripcion ?? '');
-        return {
-          idHorario: lh.idListahorario,
-          edad: lh.horario.categoriaedad.edadminima + ' - ' + lh.horario.categoriaedad.edadmaxima,
-          etapa: lh.horario.nivel?.descripcion ?? '',
-          dias: lh.horario.turno.listadia?.map(ld => ld.dias?.descripcion?.toUpperCase().slice(0, 3)).join(' - ') ?? '',
-          horas: lh.horario.turno.horainicio?.slice(0, 5) + ' - ' + lh.horario.turno.horafin?.slice(0, 5),
-          deporte: lh.horario.listadisciplina.disciplina.descripcion ?? '',
-          disponible: true
-        }
+      // this.listahorarioService.findAll(
+      // )
+      .subscribe(data => {
+        this.horarios = data.map<HorarioView>(lh => {
+          this.deportes.add(lh.horario.listadisciplina.disciplina.descripcion ?? '');
+          return <HorarioView>{
+            idHorario: lh.idListahorario,
+            edad: lh.horario.categoriaedad.edadminima + ' - ' + lh.horario.categoriaedad.edadmaxima,
+            etapa: lh.horario.nivel?.descripcion ?? '',
+            dias: lh.horario.turno.listadia?.map(ld => ld.dias?.descripcion?.toUpperCase().slice(0, 3)).join(' - ') ?? '',
+            horas: lh.horario.turno.horainicio?.slice(0, 5) + ' - ' + lh.horario.turno.horafin?.slice(0, 5),
+            deporte: lh.horario.listadisciplina.disciplina.descripcion ?? '',
+            numeroPreinscripcionesDisponibles: lh.horario.limitePreinscripcion - lh.horario.contador
+          }
+        });
       });
-    });
     this.horarioSeleccionado = null;
 
     this.sedeDeporteForm.patchValue({ deporte: "" });
@@ -1124,7 +1150,7 @@ export class PreInscripcionComponent implements OnInit {
 
     const nuevoHorario: HorarioAsignado = {
       participanteId: participante.numeroDocumento,
-      participanteNombre: `${participante.nombres} ${participante.apellidoMaterno} ${participante.apellidoMaterno}`,
+      participanteNombre: `${participante.nombres} ${participante.apellidoPaterno} ${participante.apellidoMaterno}`,
       departamento: this.sedeDeporteForm.value.departamento,
       provincia: this.sedeDeporteForm.value.provincia,
       distrito: this.sedeDeporteForm.value.distrito,
@@ -1259,33 +1285,37 @@ export class PreInscripcionComponent implements OnInit {
         tipoinscripcion: { idTipoinscripcion: 1 } as Tipoinscripcion,
         apoderadoparticipante: {
           participante: {
-            numDocumento: participanteView.numeroDocumento,
-            nombres: participanteView.nombres,
-            apaterno: participanteView.apellidoPaterno,
-            amaterno: participanteView.apellidoMaterno,
-            genero: participanteView.sexo,
-            fnacimiento: participanteView.fechaNacimiento,
+            persona: {
+              numDocumento: participanteView.numeroDocumento,
+              nombres: participanteView.nombres,
+              apaterno: participanteView.apellidoPaterno,
+              amaterno: participanteView.apellidoMaterno,
+              genero: participanteView.sexo,
+              fnacimiento: participanteView.fechaNacimiento,
+              tipodocumento: {
+                idTipoDocumento: participanteView.tipoDocumento
+              } as Tipodocumento
+            } as Persona,
             presentaDiscapacidad: participanteView.tieneDiscapacidad,
-            tipodocumento: {
-              idTipoDocumento: participanteView.tipoDocumento
-            } as Tipodocumento,
           } as Participante,
           apoderado: {
-            numDocumento: apoderado.numeroDocumento,
-            nombres: apoderado.nombres,
-            apaterno: apoderado.apellidoPaterno,
-            amaterno: apoderado.apellidoMaterno,
-            genero: apoderado.sexo,
-            correo: apoderado.correo,
-            telefono: apoderado.telefono,
-            direccion: apoderado.direccion,
-            tipodocumento: {
-              idTipoDocumento: apoderado.tipoDocumento
-            } as Tipodocumento,
-            ubigeo: {
-              idUbigeo: apoderado.distrito
-            } as Ubigeo,
-            fnacimiento: apoderado.fechaNacimiento,
+            persona: {
+              numDocumento: apoderado.numeroDocumento,
+              nombres: apoderado.nombres,
+              apaterno: apoderado.apellidoPaterno,
+              amaterno: apoderado.apellidoMaterno,
+              genero: apoderado.sexo,
+              correo: apoderado.correo,
+              telefono: apoderado.telefono,
+              direccion: apoderado.direccion,
+              tipodocumento: {
+                idTipoDocumento: apoderado.tipoDocumento
+              } as Tipodocumento,
+              ubigeo: {
+                idUbigeo: apoderado.distrito
+              } as Ubigeo,
+              fnacimiento: apoderado.fechaNacimiento
+            }
           } as Apoderado,
           tiporelacion: {
             idTiporelacion: participanteView.tipoRelacionApoderado
@@ -1301,14 +1331,14 @@ export class PreInscripcionComponent implements OnInit {
             this.fichasInscripcion = data.map<FichaView>((e) => {
               return {
                 idInscripcion: e.idInscripcion,
-                codigo: '345231',
-                nombres: e.apoderadoparticipante.participante.nombres,
-                apellidoPaterno: e.apoderadoparticipante.participante.apaterno,
-                apellidoMaterno: e.apoderadoparticipante.participante.apaterno,
-                domicilio: e.apoderadoparticipante.apoderado.direccion,
-                fechaNacimiento: this.formatearFecha(e.apoderadoparticipante.participante.fnacimiento),
-                documento: e.apoderadoparticipante.participante.numDocumento,
-                edad: this.calcularEdad(e.apoderadoparticipante.participante.fnacimiento),
+                codigo: `${e.idInscripcion}`.padStart(6, '0'),
+                nombres: e.apoderadoparticipante.participante.persona.nombres,
+                apellidoPaterno: e.apoderadoparticipante.participante.persona.apaterno,
+                apellidoMaterno: e.apoderadoparticipante.participante.persona.apaterno,
+                domicilio: e.apoderadoparticipante.apoderado.persona.direccion,
+                fechaNacimiento: this.formatearFecha(e.apoderadoparticipante.participante.persona.fnacimiento),
+                documento: e.apoderadoparticipante.participante.persona.numDocumento,
+                edad: this.calcularEdad(e.apoderadoparticipante.participante.persona.fnacimiento),
                 disciplina: e.listahorario.horario?.listadisciplina?.disciplina.descripcion ?? '',
                 etapa: e.listahorario.horario?.nivel?.descripcion ?? '',
                 sede: e.listahorario.horario?.listadisciplina?.sede.ubicacion ?? '',
@@ -1319,8 +1349,8 @@ export class PreInscripcionComponent implements OnInit {
             console.log("inscripción exitosa");
             console.log('Modales a mostrar:', this.modalesInformativos.length);
 
-            data.forEach(d=>{
-              this.inscripcionService.notificarCorreo(d.idInscripcion!).subscribe(d=>{console.log(d)});
+            data.forEach(d => {
+              this.inscripcionService.notificarCorreo(d.idInscripcion!).subscribe(d => { console.log(d) });
             });
 
             // Primero mostrar la confirmación
@@ -1403,7 +1433,7 @@ export class PreInscripcionComponent implements OnInit {
     });
   }
 
-  
+
 
   calcularEdad(fechaNacimiento: Date): number {
     const hoy = new Date();
@@ -1552,5 +1582,11 @@ export class PreInscripcionComponent implements OnInit {
     const tipoDoc = Number(this.alumnoForm.get("tipoDocumento")?.value);
     const numDoc = this.alumnoForm.get("numeroDocumento")?.value;
     return this.cargandoAlumno || (tipoDoc == 1 && numDoc?.length !== 8) || (tipoDoc == 2 && (numDoc.length < 9 || numDoc.length > 20));
+  }
+
+  onStepChange(event: any){
+    console.log('stepper cambiado');
+    this.alumnoForm.markAsUntouched({emitEvent: true});
+    this.alumnoForm.markAsPristine({emitEvent: true});
   }
 }

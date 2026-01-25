@@ -8,7 +8,7 @@
 
   <!-- Stepper -->
   @if (!mostrarConfirmacion && !mostrarPasoDocumentos) {
-  <mat-stepper [linear]="true" #stepper>
+  <mat-stepper [linear]="true" #stepper (selectionChange)="onStepChange($event)">
     <!-- ========================================== -->
     <!-- PASO 1: DATOS DEL PADRE Y/O APODERADO(A) -->
     <!-- ========================================== -->
@@ -156,7 +156,7 @@
       </div>
     </mat-step>
     <!-- ========================================== -->
-    <!-- PASO 2: DATOS DE LOS PARTICIPANTES -->
+    <!-- PASO 2: DATOS DE LOS PARTICIPANTES         -->
     <!-- ========================================== -->
     <mat-step>
       <ng-template matStepLabel>Datos de los Participantes</ng-template>
@@ -428,11 +428,11 @@
       }
       <!-- Botones Navegación -->
       <div class="button-row">
-        <button mat-raised-button matStepperPrevious>
+        <button mat-raised-button matStepperPrevious type="button">
           <mat-icon>arrow_back</mat-icon>
           Anterior
         </button>
-        <button mat-raised-button color="primary" matStepperNext [disabled]="!puedeAvanzarPaso2()">
+        <button mat-raised-button color="primary" matStepperNext [disabled]="!puedeAvanzarPaso2()" type="button">
           Continuar
           <mat-icon>arrow_forward</mat-icon>
         </button>
@@ -652,6 +652,7 @@
                       <th>ETAPA</th>
                       <th>DÍAS</th>
                       <th>HORAS</th>
+                      <th>CUPOS</th>
                       <th>ESCOGER</th>
                     </tr>
                   </thead>
@@ -662,8 +663,11 @@
                       <td>{{ horario.etapa }}</td>
                       <td>{{ horario.dias }}</td>
                       <td>{{ horario.horas }}</td>
+                      <td>{{ horario.numeroPreinscripcionesDisponibles }}</td>
                       <td class="td-check">
-                        <mat-checkbox [checked]="esHorarioSeleccionado(horario)"
+                        <mat-checkbox 
+                          [checked]="esHorarioSeleccionado(horario)"
+                          [disabled] = "horario.numeroPreinscripcionesDisponibles === 0"
                           (change)="seleccionarHorario(horario, $event)">
                         </mat-checkbox>
                       </td>

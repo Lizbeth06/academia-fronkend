@@ -1,17 +1,6 @@
-import { Tipodocumento } from "./tipodocumento";
-import { Ubigeo } from "./ubigeo.model";
+import { Persona } from "./persona";
 
 export interface Apoderado{
     idApoderado?: number;
-    numDocumento: string;
-    nombres: string;
-    apaterno: string;
-    amaterno: string;
-    genero: number;
-    correo: string;
-    telefono: string;
-    direccion: string;
-    fnacimiento: Date;
-    tipodocumento: Tipodocumento;
-    ubigeo: Ubigeo;
+    persona: Persona;
 }

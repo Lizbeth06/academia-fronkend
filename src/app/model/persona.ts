@@ -12,7 +12,7 @@ export class Persona {
   telefono: string;
   direccion: string;
   urllinkeding: string;
-  fNacimiento: Date | string;
+  fnacimiento: Date;
   urlFoto: string;
   tipodocumento: Tipodocumento;
   ubigeo: Ubigeo;
