@@ -1,0 +1,35 @@
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.tabla-4c {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.tabla-4c td {
+  padding: 10px 12px;
+  vertical-align: middle;
+}
+
+.pdf-img {
+  width: 45px; /* tamaño más grande */
+  height: 45px; /* proporción correcta */
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.pdf-img:hover {
+  transform: scale(1.15);
+}
+
+.btn-red {
+  background-color: #d32f2f !important;
+  color: #fff !important;
+}
+.btn-amarillo {
+  background-color: #fbc02d !important;
+  color: #000 !important;
+}
