@@ -206,7 +206,7 @@ export class ConvocatoriaFormComponent implements OnInit {
       this.toastrService.error("No hay imagen seleccionada", "Error", { timeOut: 3200 });
       return;
     }
-    this.imageService.createImage(this.selectedFile).subscribe({
+    this.imageService.createImage(this.selectedFile, "convocatorias").subscribe({
       next: (response) => {
         console.log(response);
         this.publicarConvocatoria(response.url);
