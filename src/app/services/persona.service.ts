@@ -10,42 +10,49 @@ import { environment } from '../environments/environment';
 @Injectable({
   providedIn: 'root'
 })
-export class PersonaService extends GenericService<Persona>{
+export class PersonaService extends GenericService<Persona> {
   private personaChange: Subject<Persona[]> = new Subject<Persona[]>
 
   constructor(
     protected override http: HttpClient,
-  ) { 
+  ) {
     super(
       http,
       `${environment.HOST}/api/persona`
     );
   }
 
-  findTipodocByNumdoc(tipodocumento:number,numdocumento:string){
+  findTipodocByNumdoc(tipodocumento: number, numdocumento: string) {
     const params = new HttpParams()
-    .set('tipodocumento', tipodocumento)
-    .set('numdocumento', numdocumento);
-  return this.http.get<Persona[]>(`${environment.HOST}/api/persona/searchxnumdoc`, { params });
+      .set('tipodocumento', tipodocumento)
+      .set('numdocumento', numdocumento);
+    return this.http.get<Persona[]>(`${environment.HOST}/api/persona/searchxnumdoc`, { params });
   }
 
-  setPersonaChange(data:Persona[]){
+  findByDocumento(idTipodocumento: number, numDocumento: string): Observable<Persona> {
+    const params = new HttpParams()
+      .set("idTipodocumento", idTipodocumento)
+      .set('numDocumento', numDocumento);
+    return this.http.get<Persona>(`${this.url}/documento`, { params });
+  }
+
+  setPersonaChange(data: Persona[]) {
     this.personaChange.next(data);
   }
 
-  getPersonaChange(){
+  getPersonaChange() {
     return this.personaChange.asObservable();
   }
 
 
   updateByCorreoTelefonoByIdpersona(idPersona: number, correo: string, telefono: string) {
-  const params = new HttpParams()
-    .set('idPersona', idPersona.toString())
-    .set('correo', correo)
-    .set('telefono', telefono);
+    const params = new HttpParams()
+      .set('idPersona', idPersona.toString())
+      .set('correo', correo)
+      .set('telefono', telefono);
 
-  return this.http.put<Persona>(`${environment.HOST}/api/persona/updatecorreotelefono`, null, { params });
-}
+    return this.http.put<Persona>(`${environment.HOST}/api/persona/updatecorreotelefono`, null, { params });
+  }
 
-  
+
 }

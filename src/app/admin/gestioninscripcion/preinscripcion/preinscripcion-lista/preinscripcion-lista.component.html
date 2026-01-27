@@ -74,11 +74,11 @@
                   <mat-error>Campo obligatorio</mat-error>
                 </mat-form-field>
                 <mat-form-field appearance="outline" class="col-6">
-                  <mat-label>Sexo</mat-label>
+                  <mat-label>Género</mat-label>
                   <mat-select formControlName="sexo">
-                    @for (sexo of sexos; track sexo.value) {
-                    <mat-option [value]="sexo.value">
-                      {{ sexo.label }}
+                    @for (genero of generos; track genero) {
+                    <mat-option [value]="$index">
+                      {{ genero }}
                     </mat-option>
                     }
                   </mat-select>
@@ -339,9 +339,9 @@
                   <mat-form-field appearance="outline" class="col-12">
                     <mat-label>Sexo</mat-label>
                     <mat-select formControlName="sexo">
-                      @for (sexo of sexos; track sexo.value) {
-                      <mat-option [value]="sexo.value">
-                        {{ sexo.label }}
+                      @for (genero of generos; track genero) {
+                      <mat-option [value]="$index">
+                        {{ genero }}
                       </mat-option>
                       }
                     </mat-select>

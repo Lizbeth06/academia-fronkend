@@ -14,3 +14,14 @@
     grid-template-columns: 1fr; 
   }
 }
+
+.form-section-header{
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+  gap: 8px;
+
+  & span{
+    font-size: large;
+  }
+}
