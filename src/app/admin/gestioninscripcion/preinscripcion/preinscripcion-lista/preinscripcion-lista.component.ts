@@ -38,7 +38,7 @@ import { TiporelacionService } from '../../../../services/tiporelacion.service';
 import { Tiporelacion } from '../../../../model/tiporelacion.model';
 import { ListahorarioService } from '../../../../services/listahorario.service';
 import { InscripcionService } from '../../../../services/inscripcion.service';
-import { Estado, Inscripcion, Tipoinscripcion } from '../../../../model/inscripcion';
+import { Inscripcion, Tipoinscripcion } from '../../../../model/inscripcion';
 import { Listahorario } from '../../../../model/listahorario';
 import { Apoderado } from '../../../../model/apoderado.model';
 import { ModalService } from '../../../../util/modal.service';
@@ -1277,7 +1277,7 @@ export class PreInscripcionComponent implements OnInit {
         finscripcion: new Date(),
         observacion: '',
         listahorario: { idListahorario: horarioViewAsignado?.horario.idHorario } as Listahorario,
-        estado: { idEstado: 1 } as Estado,
+        estado: "1",
         tiposeguro: { idTiposeguro: participanteView.tipoSeguro } as Tiposeguro,
         tipoinscripcion: { idTipoinscripcion: 1 } as Tipoinscripcion,
         apoderadoparticipante: {

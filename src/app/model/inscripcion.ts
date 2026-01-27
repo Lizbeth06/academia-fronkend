@@ -9,15 +9,10 @@ export interface Inscripcion{
     finscripcion: Date;
     observacion: string;
     listahorario: Listahorario;
-    estado: Estado;
+    estado: string;
     tiposeguro: Tiposeguro;
     tipoinscripcion: Tipoinscripcion;
     apoderadoparticipante: Apoderadoparticipante;
-}
-
-export interface Estado{
-    idEstado: number;
-    descripcion: string;
 }
 
 export interface Tipoinscripcion{
