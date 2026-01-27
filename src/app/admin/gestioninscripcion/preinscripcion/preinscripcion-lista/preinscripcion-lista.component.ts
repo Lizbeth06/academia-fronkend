@@ -1004,7 +1004,7 @@ export class PreInscripcionComponent implements OnInit {
     const participante: ParticipanteView = this.participantes.find(p => p.numeroDocumento === this.participanteSeleccionadoId)!;
     this.listahorarioService.findDisponibles(
       this.calcularEdad(participante.fechaNacimiento),
-      participante.tieneDiscapacidad ? 1 : 2,
+      participante.tieneDiscapacidad ? 2 : 1,
       complejoId,
     )
       // this.listahorarioService.findAll(
