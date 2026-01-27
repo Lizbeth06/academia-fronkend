@@ -231,10 +231,7 @@ export class PreInscripcionComponent implements OnInit {
   // Opciones para los dropdowns
   tiposDocumento: Tipodocumento[] = [];
 
-  sexos = [
-    { value: 1, label: "Masculino" },
-    { value: 2, label: "Femenino" },
-  ];
+  generos = ['FEMENINO', 'MASCULINO', 'OTROS'];
 
   tiposRelacionApoderado: Tiporelacion[] = [];
 
