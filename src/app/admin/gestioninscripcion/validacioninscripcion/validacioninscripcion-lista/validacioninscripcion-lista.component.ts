@@ -1,43 +1,42 @@
-import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common';
-import { MatTableDataSource, MatTableModule } from '@angular/material/table';
-import { MatIconModule } from '@angular/material/icon';
-import { MaterialModule } from '../../../../material/material.module';
-
+import { Component, OnInit, ViewChild } from "@angular/core";
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
+import { CommonModule } from "@angular/common";
+import { MatTableDataSource, MatTableModule } from "@angular/material/table";
+import { MatIconModule } from "@angular/material/icon";
+import { MaterialModule } from "../../../../material/material.module";
+import { validarInput, ValidationType } from "../../../../util/validaciones.util";
+import { MatPaginator, MatPaginatorIntl } from "@angular/material/paginator";
+import { MatSort } from "@angular/material/sort";
+import { PaginatorService } from "../../../../services/security/paginator.service";
+import { RouterLink } from "@angular/router";
 
 @Component({
-  selector: 'app-validacioninscripcion',
+  selector: "app-validacioninscripcion",
   standalone: true,
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    MatTableModule,
-    MatIconModule,
-    MaterialModule
-  ],
-  templateUrl: './validacioninscripcion-lista.component.html',
-  styleUrl: './validacioninscripcion-lista.component.css'
+  imports: [MaterialModule, RouterLink],
+  templateUrl: "./validacioninscripcion-lista.component.html",
+  styleUrl: "./validacioninscripcion-lista.component.css",
+  providers: [{ provide: MatPaginatorIntl, useClass: PaginatorService }],
 })
-export class ValidacioninscripcionListaComponent {
-
-  registroForm: FormGroup;
+export class ValidacioninscripcionListaComponent implements OnInit {
+  constructor(private fb: FormBuilder) {
+    this.buildForm();
+  }
   filtroForm: FormGroup;
   participante: any = null;
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
+  @ViewChild(MatSort) sort!: MatSort;
 
-  displayedColumns = [
-    "nroRegistro",
-    "nombre",
-    "deporte",
-    "modalidad",
-    "etapa",
-    "complejo",
-    "edad",
-    "estado"
-  ];
+  buildForm() {
+    this.filtroForm = this.fb.group({
+      nroRegistro: [""],
+      dni: ["", [Validators.pattern(/^\d{8}$/)]],
+    });
+  }
 
-  dataSource = new MatTableDataSource<any>([]);
+  displayedColumns = ["nroRegistro", "nombre", "deporte", "modalidad", "etapa", "complejo", "edad", "estado", "accion"];
 
+  dataSource = new MatTableDataSource<any>();
 
   BD = [
     {
@@ -52,25 +51,42 @@ export class ValidacioninscripcionListaComponent {
       etapa: "Preinscripción",
       complejo: "Videna",
       estado: "Pendiente",
-      horario: "Mañana"
-    }
+      horario: "Mañana",
+    },
   ];
 
-  constructor(private fb: FormBuilder) {
-    this.registroForm = this.fb.group({ nroRegistro: [''] });
-    this.filtroForm = this.fb.group({ dni: [''] });
-  }
+  ngOnInit(): void {
+    this.getAllPreinscrito();
+    this.filtroForm.get("nroRegistro")?.valueChanges.subscribe((value) => {
+      const dniControl = this.filtroForm.get("dni");
+      value ? dniControl?.disable({ emitEvent: false }) : dniControl?.enable({ emitEvent: false });
+    });
 
+    this.filtroForm.get("dni")?.valueChanges.subscribe((value) => {
+      const nroControl = this.filtroForm.get("nroRegistro");
+      value ? nroControl?.disable({ emitEvent: false }) : nroControl?.enable({ emitEvent: false });
+    });
+  }
   buscarRegistro() {
-    const nro = this.registroForm.value.nroRegistro;
-    this.participante = this.BD.find(p => p.nroRegistro === nro) || null;
+    const { nroRegistro, dni } = this.filtroForm.value;
+    if (nroRegistro) {
+      this.participante = this.BD.find((p) => p.nroRegistro === nroRegistro) || null;
+    } else if (dni) {
+      this.participante = this.BD.find((p) => p.dni === dni) || null;
+    }
+    this.dataSource.data = this.participante ? [this.participante] : [];
   }
 
-  buscarAvanzado() {
-  const dni = this.filtroForm.value.dni;
+  getAllPreinscrito() {
+    this.dataSource.data = this.BD;
+  }
+  crearTabla(data: any[]) {
+    this.dataSource = new MatTableDataSource(data);
+    this.dataSource.paginator = this.paginator;
+    this.dataSource.sort = this.sort;
+  }
 
-  const resultados = this.BD.filter(x => x.dni.includes(dni));
-
-  this.dataSource = new MatTableDataSource(resultados);
-}
+  soloNumeros(event: KeyboardEvent, type: ValidationType) {
+    validarInput(event, type);
+  }
 }

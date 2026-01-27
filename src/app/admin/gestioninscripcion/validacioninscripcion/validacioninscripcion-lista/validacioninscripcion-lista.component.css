@@ -16,50 +16,66 @@
   /* Gradiente brillante con colores corporativos */
   background: linear-gradient(
     135deg,
-    #ff704a 0%,     /* naranja brillante */
-    #cb532e 25%,    /* color base naranja */
-    #542394 75%,    /* color base morado */
-    #7b4bf0 100%    /* morado brillante para glow */
+    #ff704a 0%,
+    /* naranja brillante */ #cb532e 25%,
+    /* color base naranja */ #542394 75%,
+    /* color base morado */ #7b4bf0 100% /* morado brillante para glow */
   );
 
   /* Halo extremo con sombra difusa */
-  box-shadow: 
+  box-shadow:
     0 0 150px rgba(255, 255, 255, 0.6),
     0 0 300px rgba(255, 255, 255, 0.35),
     0 4px 25px rgba(0, 0, 0, 0.15);
 
   /* Animación de luz viva */
   background-size: 200% 200%;
-  animation: cinematicShine 4.5s ease-in-out infinite, pulseGlow 6s ease-in-out infinite;
+  animation:
+    cinematicShine 4.5s ease-in-out infinite,
+    pulseGlow 6s ease-in-out infinite;
 }
 
 /* Movimiento de gradiente para efecto de luz dinámica */
 @keyframes cinematicShine {
-  0% { background-position: 0% 50%; }
-  25% { background-position: 50% 50%; }
-  50% { background-position: 100% 50%; }
-  75% { background-position: 50% 50%; }
-  100% { background-position: 0% 50%; }
+  0% {
+    background-position: 0% 50%;
+  }
+  25% {
+    background-position: 50% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  75% {
+    background-position: 50% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
 /* Pulso de brillo sutil para efecto cinematográfico */
 @keyframes pulseGlow {
-  0%, 100% { box-shadow: 
-    0 0 150px rgba(255, 255, 255, 0.6),
-    0 0 300px rgba(255, 255, 255, 0.35),
-    0 4px 25px rgba(0, 0, 0, 0.15); }
-  50% { box-shadow: 
-    0 0 180px rgba(255, 255, 255, 0.8),
-    0 0 350px rgba(255, 255, 255, 0.5),
-    0 4px 25px rgba(0, 0, 0, 0.15); }
+  0%,
+  100% {
+    box-shadow:
+      0 0 150px rgba(255, 255, 255, 0.6),
+      0 0 300px rgba(255, 255, 255, 0.35),
+      0 4px 25px rgba(0, 0, 0, 0.15);
+  }
+  50% {
+    box-shadow:
+      0 0 180px rgba(255, 255, 255, 0.8),
+      0 0 350px rgba(255, 255, 255, 0.5),
+      0 4px 25px rgba(0, 0, 0, 0.15);
+  }
 }
 
 /* Tarjeta informativa moderna */
 .info-banner {
+  margin-bottom: 24px;
   background: #fff4c7; /* Amarillo cálido suave */
   padding: 12px 18px;
-  margin: 15px auto 25px auto;
-  max-width: 900px;
   border-radius: 4px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   text-align: center;
@@ -71,7 +87,11 @@
   border-radius: 10px;
   padding: 15px;
   margin-bottom: 25px;
-  box-shadow: 0 2px 7px rgba(0,0,0,0.15);
+  box-shadow: 0 2px 7px rgba(0, 0, 0, 0.15);
+}
+
+.btn-buscar {
+  width: 100%;
 }
 
 /* BUSCADOR COMPACTO */
@@ -87,34 +107,22 @@
   border: 1px solid #ccc;
 }
 
-.btn-search {
-  background: #167a7a;
-  color: white;
-  border: none;
-  padding: 0 25px;
-  border-radius: 6px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  cursor: pointer;
-}
 /* RESPONSIVE SOLO PARA row-inline */
 @media (max-width: 600px) {
   .row-inline {
-    flex-direction: column;   /* pasa los elementos debajo */
+    flex-direction: column; /* pasa los elementos debajo */
   }
 
   .row-inline input,
   .row-inline button {
-    width: 100%;              /* ambos ocupan todo el ancho */
+    width: 100%; /* ambos ocupan todo el ancho */
   }
 
   .row-inline button {
-    justify-content: center;  /* centra el contenido del botón */
+    justify-content: center; /* centra el contenido del botón */
     height: 40px;
   }
 }
-
 
 /*** CUADROS DE INFORMACIÓN ***/
 .info-grid {
@@ -143,9 +151,6 @@
   font-weight: 500;
   color: #222;
 }
-
-
-
 
 .btn-blue {
   background: #76c9ec;
@@ -176,7 +181,7 @@
 }
 
 .subtitle-1 {
-  font-size: 18px; 
+  font-size: 18px;
   font-weight: 600;
   text-align: center;
   margin: 0 0 10px 0;
@@ -196,42 +201,9 @@
   text-align: center;
 }
 
-.btn-red{
-        background-color: #d32f2f !important; /* rojo */
-    color: #fff !important;
-}
-.btn-amarillo{
-        background-color: #fbc02d !important; /* amarillo */
-    color: #000 !important;
-}
-
-
-
-.tabla-4c {
+.table-container {
   width: 100%;
-  border-collapse: collapse;
-  margin-top: 10px;
-}
-
-.tabla-4c td {
-  padding: 10px 12px;
-  vertical-align: middle;
-}
-
-.pdf-img {
-  width: 45px;      /* tamaño más grande */
-  height: 45px;     /* proporción correcta */
-  cursor: pointer;
-  transition: .2s ease;
-}
-
-.pdf-img:hover {
-  transform: scale(1.15);
-}
-
-.table-container{
-    width: 100%;
-    overflow-x: auto;
+  overflow-x: auto;
 }
 
 /* Centrar subtítulos específicos: tarjeta y encabezado de tabla */
@@ -317,5 +289,3 @@
   background-clip: padding-box !important;
   border: none !important;
 }
-
-

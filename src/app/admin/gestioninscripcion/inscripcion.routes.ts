@@ -11,8 +11,13 @@ export const inscripcionRoutes: Routes = [
   // 👇 NUEVAS RUTAS DE PRE-INSCRIPCIÓN y CONVOCATORIA
   {
     path: "validacioninscripcion",
-    component: ValidacioninscripcionListaComponent,
     title: "Validacion inscripcion",
+    children: [
+      {
+        path: "",
+        loadChildren: () => import("./validacioninscripcion/validacion.routes").then((m) => m.validacion_routes),
+      },
+    ],
   },
 
   {
