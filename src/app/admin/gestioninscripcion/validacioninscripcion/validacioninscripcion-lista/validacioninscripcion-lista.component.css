@@ -2,6 +2,11 @@
   --grad1: #cb532e;
   --grad2: #542394;
 }
+/* para la tabla */
+.mat-mdc-cell {
+  width: 100%;
+  text-align: center;
+}
 
 /* Header Section */
 .header-section {

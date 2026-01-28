@@ -19,13 +19,26 @@
         <div class="col-12 col-sm-6 col-md-5">
           <mat-form-field appearance="outline">
             <mat-label class="full-width mat-body">Número de registro</mat-label>
-            <input matInput formControlName="nroRegistro" placeholder="N° Registro" (keydown)="soloNumeros($event, 'numero')" />
+            <input
+              matInput
+              formControlName="nroRegistro"
+              placeholder="N° Registro"
+              (keydown)="soloNumeros($event, 'numero')"
+              (ngModelChange)="changeBusqueda()"
+            />
           </mat-form-field>
         </div>
         <div class="col-12 col-sm-6 col-md-5">
           <mat-form-field appearance="outline">
             <mat-label class="full-width mat-body">Número de documento</mat-label>
-            <input matInput formControlName="dni" placeholder="N° DNI" (keydown)="soloNumeros($event, 'numero')" maxlength="8" />
+            <input
+              matInput
+              formControlName="dni"
+              placeholder="N° DNI"
+              (keydown)="soloNumeros($event, 'numero')"
+              maxlength="8"
+              (ngModelChange)="changeBusqueda()"
+            />
             <mat-error *ngIf="filtroForm.get('dni')?.hasError('pattern')">Dato incorrecto</mat-error>
           </mat-form-field>
         </div>
@@ -45,64 +58,67 @@
         <table mat-table [dataSource]="dataSource" class="table-modern mat-elevation-z8">
           <ng-container matColumnDef="nroRegistro">
             <th mat-header-cell *matHeaderCellDef>No Registro</th>
-            <td mat-cell *matCellDef="let row">{{ row.nroRegistro }}</td>
+            <td mat-cell *matCellDef="let row">{{ row.idInscripcion }}</td>
           </ng-container>
 
           <!-- Nombre completo -->
           <ng-container matColumnDef="nombre">
             <th mat-header-cell *matHeaderCellDef>Nombre y Apellidos</th>
-            <td mat-cell *matCellDef="let row">{{ `${row.nombre} ${row.apPaterno} ${row.apMaterno}` }}</td>
+            <td mat-cell *matCellDef="let row">{{ nombreParticipante(row.apoderadoparticipante.participante) }}</td>
           </ng-container>
           <!-- Deporte -->
           <ng-container matColumnDef="deporte">
             <th mat-header-cell *matHeaderCellDef>Deporte</th>
-            <td mat-cell *matCellDef="let row">{{ row.deporte }}</td>
+            <td mat-cell *matCellDef="let row">{{ row.listahorario.horario.listadisciplina.disciplina.descripcion }}</td>
           </ng-container>
           <!-- Modalidad -->
           <ng-container matColumnDef="modalidad">
             <th mat-header-cell *matHeaderCellDef>Modalidad</th>
-            <td mat-cell *matCellDef="let row">{{ row.modalidad }}</td>
+            <td mat-cell *matCellDef="let row">{{ row.listahorario.horario.modalidad.descripcion }}</td>
           </ng-container>
 
           <!-- Etapa -->
           <ng-container matColumnDef="etapa">
             <th mat-header-cell *matHeaderCellDef>Etapa</th>
-            <td mat-cell *matCellDef="let row">{{ row.etapa }}</td>
+            <td mat-cell *matCellDef="let row">{{ row.tipoinscripcion.descripcion }}</td>
           </ng-container>
 
           <!-- Complejo -->
           <ng-container matColumnDef="complejo">
             <th mat-header-cell *matHeaderCellDef>Complejo</th>
-            <td mat-cell *matCellDef="let row">{{ row.complejo }}</td>
+            <td mat-cell *matCellDef="let row">{{ row.listahorario.horario.listadisciplina.sede.nombre }}</td>
           </ng-container>
 
           <!-- Edad -->
           <ng-container matColumnDef="edad">
             <th mat-header-cell *matHeaderCellDef>Edad</th>
-            <td mat-cell *matCellDef="let row">{{ row.edad }}</td>
+            <td mat-cell *matCellDef="let row">{{ obtenerEdad(row.apoderadoparticipante.participante.persona.fnacimiento) }}</td>
           </ng-container>
 
           <!-- Estado -->
           <ng-container matColumnDef="estado">
             <th mat-header-cell *matHeaderCellDef>Estado</th>
-            <td mat-cell *matCellDef="let row">{{ row.estado }}</td>
+            <td mat-cell *matCellDef="let row">
+              <span *ngIf="row.estado === '0'" class="chip-inactive">Rechazado</span>
+              <span *ngIf="row.estado === '1'" class="chip-pendiente">Pendiente</span>
+              <span *ngIf="row.estado === '2'" class="chip-active">Inscrito</span>
+            </td>
           </ng-container>
 
           <!-- Accion -->
           <ng-container matColumnDef="accion">
             <th mat-header-cell *matHeaderCellDef>Acción</th>
             <td mat-cell *matCellDef="let row">
-              <button mat-icon-button color="primary" routerLink="validando">
-                <mat-icon>check_circle</mat-icon>
+              <button mat-icon-button (click)="mostrarPreinscrito(row.idInscripcion)">
+                <mat-icon style="color: #8e298c">check_circle</mat-icon>
               </button>
             </td>
           </ng-container>
-
           <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
           <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
 
           <tr class="mat-row" *matNoDataRow>
-            <td class="mat-cell text-center" colspan="9">No existe alumnos pre-inscritos</td>
+            <td class="mat-cell" [attr.colspan]="displayedColumns.length">No existe alumnos pre-inscritos</td>
           </tr>
         </table>
       </div>

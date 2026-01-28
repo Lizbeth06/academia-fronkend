@@ -33,3 +33,21 @@
   background-color: #fbc02d !important;
   color: #000 !important;
 }
+.datos-alumno {
+  align-items: center;
+}
+@media (max-width: 768px) {
+  .btn-phone {
+    margin-top: 24px;
+  }
+}
+
+.chip-estado {
+  background-color: rgba(255, 178, 43, 1) !important;
+  height: auto !important;
+  padding: 0.25rem;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: hsl(40, 100%, 23%);
+}
