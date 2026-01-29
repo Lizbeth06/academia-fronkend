@@ -1,14 +1,13 @@
-import { Component, inject, Inject, OnInit, ViewChild } from "@angular/core";
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
+import { Component, inject, OnInit, ViewChild } from "@angular/core";
+import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { CommonModule } from "@angular/common";
 import { MatTableDataSource, MatTableModule } from "@angular/material/table";
-import { MatIconModule } from "@angular/material/icon";
 import { MaterialModule } from "../../../../material/material.module";
 import { validarInput, ValidationType } from "../../../../util/validaciones.util";
 import { MatPaginator, MatPaginatorIntl } from "@angular/material/paginator";
 import { MatSort } from "@angular/material/sort";
 import { PaginatorService } from "../../../../services/security/paginator.service";
-import { Router, RouterLink } from "@angular/router";
+import { Router } from "@angular/router";
 import { InscripcionService } from "../../../../services/inscripcion.service";
 import { Inscripcion } from "../../../../model/inscripcion.model";
 import { Participante } from "../../../../model/participante.model";
