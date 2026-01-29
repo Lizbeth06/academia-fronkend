@@ -6,10 +6,8 @@ import { UbigeoService } from "../../../../services/ubigeo.service";
 import { Ubigeo } from "../../../../model/ubigeo.model";
 import { Sede } from "../../../../model/sede.model";
 import { Horario, Modalidad } from "../../../../model/horario.model";
-import { ModalidadService } from "../../../../services/modalidad.service";
-import { SelectionModel } from "@angular/cdk/collections";
-import { MatTableDataSource } from "@angular/material/table";
 import { HorarioService } from "../../../../services/horario.service";
+import { ToastrService } from "ngx-toastr";
 
 @Component({
   selector: "app-selecthorario-form",
@@ -18,7 +16,10 @@ import { HorarioService } from "../../../../services/horario.service";
   styleUrl: "./selecthorario-form.component.css",
 })
 export class SelecthorarioFormComponent implements OnInit {
-  constructor(private formBuild: FormBuilder) {
+  constructor(
+    private formBuild: FormBuilder,
+    private toastrService: ToastrService,
+  ) {
     this.buildForm();
   }
   @Output() horariosSeleccionados = new EventEmitter<Horario[]>();
@@ -101,6 +102,9 @@ export class SelecthorarioFormComponent implements OnInit {
       next: (data) => {
         this.dataHorarios = data;
         this.horariosSeleccionados.emit(this.dataHorarios);
+        if (this.dataHorarios.length === 0) {
+          this.toastrService.warning("Agregar un horario a la sede", "!Importante¡", { timeOut: 3200, progressBar: true });
+        }
       },
     });
   }

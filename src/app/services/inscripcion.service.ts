@@ -3,7 +3,7 @@ import { GenericService } from "./generic.service";
 import { Observable, Subject } from "rxjs";
 import { HttpClient, HttpParams } from "@angular/common/http";
 import { environment } from "../environments/environment";
-import { Inscripcion } from '../model/inscripcion';
+import { Inscripcion } from "../model/inscripcion.model";
 
 @Injectable({
   providedIn: "root",
@@ -20,24 +20,29 @@ export class InscripcionService extends GenericService<Inscripcion> {
   }
 
   findAllbyId(ids: number[]) {
-    const params = new HttpParams().set('ids', ids.join(','));
+    const params = new HttpParams().set("ids", ids.join(","));
     return this.http.get<Inscripcion[]>(`${environment.HOST}/api/inscripcion/multiples`, { params });
   }
 
   generarFichaPreInscripcion(idInscripcion: number): Observable<Blob> {
     return this.http.get(`${this.url}/${idInscripcion}/ficha-preinscripcion`, {
-      responseType: 'blob'
+      responseType: "blob",
     });
   }
 
   generarDeclaracionJurada(idInscripcion: number): Observable<Blob> {
     return this.http.get(`${this.url}/${idInscripcion}/declaracion-jurada`, {
-      responseType: 'blob'
+      responseType: "blob",
+    });
+  }
+  generarCarnetDigital(idInscripcion: number): Observable<Blob> {
+    return this.http.get(`${this.url}/${idInscripcion}/carnet-digital`, {
+      responseType: "blob",
     });
   }
 
-  notificarCorreo(idInscripcion: number){
-    return this.http.post(`${this.url}/${idInscripcion}/notificacion-correo`,null);
+  notificarCorreo(idInscripcion: number) {
+    return this.http.post(`${this.url}/${idInscripcion}/notificacion-correo`, null);
   }
 
   setInscripcionChange(data: Inscripcion[]) {

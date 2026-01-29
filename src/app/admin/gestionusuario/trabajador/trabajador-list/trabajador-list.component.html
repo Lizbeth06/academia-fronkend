@@ -17,7 +17,7 @@
   
   <section class="btn-nuevo">
     <mat-card-actions align="end">
-        <button mat-stroked-button (click)="openDialog('30ms', '15ms')">Agregar</button>
+        <button mat-stroked-button (click)="openDialog()">Agregar</button>
     </mat-card-actions>
   </section>
 
@@ -35,19 +35,6 @@
                 <ng-container matColumnDef="id">
                   <th mat-header-cell *matHeaderCellDef mat-sort-header> ID </th>
                   <td mat-cell *matCellDef="let row; let i=index"> {{i + 1}} </td>
-                </ng-container>
-                
-                <!-- Accion Column -->
-                <ng-container matColumnDef="accion">
-                  <th mat-header-cell *matHeaderCellDef mat-sort-header> Accion </th>
-                  <td mat-cell *matCellDef="let row">
-                    <button type="button" mat-icon-button class="btnActionEdit">
-                      <mat-icon>edit</mat-icon>
-                    </button>
-                    <button type="button" mat-icon-button class="btnActionDelete">
-                      <mat-icon>delete</mat-icon>
-                    </button>
-                  </td>
                 </ng-container>
 
                 <ng-container matColumnDef="foto">
@@ -85,6 +72,19 @@
                 <ng-container matColumnDef="oficina">
                   <th mat-header-cell *matHeaderCellDef mat-sort-header> Oficina</th>
                   <td mat-cell *matCellDef="let row"> {{row.oficina.descripcion}} </td>
+                </ng-container>
+
+                <!-- Accion Column -->
+                <ng-container matColumnDef="accion">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header> Accion </th>
+                  <td mat-cell *matCellDef="let row">
+                    <button type="button" mat-icon-button class="btnActionEdit" (click)="openDialog(row.idTrabajador)">
+                      <mat-icon>edit</mat-icon>
+                    </button>
+                    <button type="button" mat-icon-button class="btnActionDelete" (click)="delete(row.idTrabajador)">
+                      <mat-icon>delete</mat-icon>
+                    </button>
+                  </td>
                 </ng-container>
              
             

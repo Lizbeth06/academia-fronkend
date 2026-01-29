@@ -1,5 +1,4 @@
 <div class="pre-inscripcion-container">
-
   <!-- Header -->
   <div class="header-section">
     <h1 class="titulo-principal">PRE - INSCRIPCIÓN</h1>
@@ -8,237 +7,239 @@
 
   <!-- Stepper -->
   @if (!mostrarConfirmacion && !mostrarPasoDocumentos) {
-  <mat-stepper [linear]="true" #stepper>
-    <!-- ========================================== -->
-    <!-- PASO 1: DATOS DEL PADRE Y/O APODERADO(A) -->
-    <!-- ========================================== -->
-    <mat-step [stepControl]="apoderadoForm">
-      <ng-template matStepLabel>Datos del Padre y/o Apoderado(a)</ng-template>
-      <form [formGroup]="apoderadoForm" class="row">
-        <div class="col-12 col-md-6">
-          <mat-card class="form-card">
-            <mat-card-header>
-              <mat-card-title>DATOS DEL PADRE Y/O APODERADO(A)</mat-card-title>
-            </mat-card-header>
-            <mat-card-content>
-              <!--  Fila 1: Tipo de Apoderado, Tipo Documento y Número (los 3 juntos) -->
-              <div class="row">
-                <mat-form-field appearance="outline" class="col-6">
-                  <mat-label>Tipo de Documento</mat-label>
-                  <mat-select formControlName="tipoDocumento" (selectionChange)="changeTipodocApoderado()">
-                    @for (tipo of tiposDocumento; track tipo.idTipoDocumento) {
-                    <mat-option [value]="tipo.idTipoDocumento">
-                      {{ tipo.descripcion }}
-                    </mat-option>
-                    }
-                  </mat-select>
-                  <mat-error>Campo obligatorio</mat-error>
-                </mat-form-field>
-                <mat-form-field appearance="outline" class="col-6">
-                  <mat-label>Número de Documento</mat-label>
-                  <input matInput formControlName="numeroDocumento" (keypress)="soloNumerosApoderado($event)">
-                  <button mat-icon-button matSuffix type="button" (click)="buscarApoderado()"
-                    [disabled]="disabledSearchButtonApoderado()" matTooltip="Buscar en RENIEC">
-                    @if (!cargandoApoderado) {
-                    <mat-icon>search</mat-icon>
-                    }
-                    @if (cargandoApoderado) {
-                    <mat-spinner diameter="20"></mat-spinner>
-                    }
-                  </button>
-                  <mat-error>{{msgErrorNroDocApoderado}}</mat-error>
-                </mat-form-field>
-                <!-- Fila 2: Apellidos y Nombres -->
-                <mat-form-field appearance="outline" class="col-12">
-                  <mat-label>Apellido Paterno</mat-label>
-                  <input matInput formControlName="apellidoPaterno" (keypress)="soloLetras($event)">
-                  <mat-error>Campo obligatorio</mat-error>
-                </mat-form-field>
-                <mat-form-field appearance="outline" class="col-12">
-                  <mat-label>Apellido Materno</mat-label>
-                  <input matInput formControlName="apellidoMaterno" (keypress)="soloLetras($event)">
-                  <mat-error>Campo obligatorio</mat-error>
-                </mat-form-field>
-                <mat-form-field appearance="outline" class="col-12">
-                  <mat-label>Nombres</mat-label>
-                  <input matInput formControlName="nombres" (keypress)="soloLetras($event)">
-                  <mat-error>Campo obligatorio</mat-error>
-                </mat-form-field>
-                <!-- Fila 3: Fecha de Nacimiento y Sexo -->
-                <mat-form-field appearance="outline" class="col-6">
-                  <mat-label>Fecha de Nacimiento</mat-label>
-                  <input matInput [matDatepicker]="pickerApoderado" formControlName="fechaNacimiento">
-                  <mat-datepicker-toggle matSuffix [for]="pickerApoderado"></mat-datepicker-toggle>
-                  <mat-datepicker #pickerApoderado></mat-datepicker>
-                  <!-- <mat-hint>Formato: DD/MM/YYYY</mat-hint> -->
-                  <mat-error>Campo obligatorio</mat-error>
-                </mat-form-field>
-                <mat-form-field appearance="outline" class="col-6">
-                  <mat-label>Sexo</mat-label>
-                  <mat-select formControlName="sexo">
-                    @for (sexo of sexos; track sexo.value) {
-                    <mat-option [value]="sexo.value">
-                      {{ sexo.label }}
-                    </mat-option>
-                    }
-                  </mat-select>
-                  <mat-error>Campo obligatorio</mat-error>
-                </mat-form-field>
-              </div>
-            </mat-card-content>
-          </mat-card>
+    <mat-stepper [linear]="true" #stepper (selectionChange)="onStepChange($event)">
+      <!-- ========================================== -->
+      <!-- PASO 1: DATOS DEL PADRE Y/O APODERADO(A) -->
+      <!-- ========================================== -->
+      <mat-step [stepControl]="apoderadoForm">
+        <ng-template matStepLabel>Datos del Padre y/o Apoderado(a)</ng-template>
+        <form [formGroup]="apoderadoForm" class="row">
+          <div class="col-12 col-md-6">
+            <mat-card class="form-card">
+              <mat-card-header>
+                <mat-card-title>DATOS DEL PADRE Y/O APODERADO(A)</mat-card-title>
+              </mat-card-header>
+              <mat-card-content>
+                <!--  Fila 1: Tipo de Apoderado, Tipo Documento y Número (los 3 juntos) -->
+                <div class="row">
+                  <mat-form-field appearance="outline" class="col-6">
+                    <mat-label>Tipo de Documento</mat-label>
+                    <mat-select formControlName="tipoDocumento" (selectionChange)="changeTipodocApoderado()">
+                      @for (tipo of tiposDocumento; track tipo.idTipoDocumento) {
+                        <mat-option [value]="tipo.idTipoDocumento">
+                          {{ tipo.descripcion }}
+                        </mat-option>
+                      }
+                    </mat-select>
+                    <mat-error>Campo obligatorio</mat-error>
+                  </mat-form-field>
+                  <mat-form-field appearance="outline" class="col-6">
+                    <mat-label>Número de Documento</mat-label>
+                    <input matInput formControlName="numeroDocumento" (keypress)="soloNumerosApoderado($event)" />
+                    <button
+                      mat-icon-button
+                      matSuffix
+                      type="button"
+                      (click)="buscarApoderado()"
+                      [disabled]="disabledSearchButtonApoderado()"
+                      matTooltip="Buscar en RENIEC"
+                    >
+                      @if (!cargandoApoderado) {
+                        <mat-icon>search</mat-icon>
+                      }
+                      @if (cargandoApoderado) {
+                        <mat-spinner diameter="20"></mat-spinner>
+                      }
+                    </button>
+                    <mat-error>{{ msgErrorNroDocApoderado }}</mat-error>
+                  </mat-form-field>
+                  <!-- Fila 2: Apellidos y Nombres -->
+                  <mat-form-field appearance="outline" class="col-12">
+                    <mat-label>Apellido Paterno</mat-label>
+                    <input matInput formControlName="apellidoPaterno" (keypress)="soloLetras($event)" />
+                    <mat-error>Campo obligatorio</mat-error>
+                  </mat-form-field>
+                  <mat-form-field appearance="outline" class="col-12">
+                    <mat-label>Apellido Materno</mat-label>
+                    <input matInput formControlName="apellidoMaterno" (keypress)="soloLetras($event)" />
+                    <mat-error>Campo obligatorio</mat-error>
+                  </mat-form-field>
+                  <mat-form-field appearance="outline" class="col-12">
+                    <mat-label>Nombres</mat-label>
+                    <input matInput formControlName="nombres" (keypress)="soloLetras($event)" />
+                    <mat-error>Campo obligatorio</mat-error>
+                  </mat-form-field>
+                  <!-- Fila 3: Fecha de Nacimiento y Sexo -->
+                  <mat-form-field appearance="outline" class="col-6">
+                    <mat-label>Fecha de Nacimiento</mat-label>
+                    <input matInput [matDatepicker]="pickerApoderado" formControlName="fechaNacimiento" />
+                    <mat-datepicker-toggle matSuffix [for]="pickerApoderado"></mat-datepicker-toggle>
+                    <mat-datepicker #pickerApoderado></mat-datepicker>
+                    <!-- <mat-hint>Formato: DD/MM/YYYY</mat-hint> -->
+                    <mat-error>Campo obligatorio</mat-error>
+                  </mat-form-field>
+                  <mat-form-field appearance="outline" class="col-6">
+                    <mat-label>Género</mat-label>
+                    <mat-select formControlName="sexo">
+                      @for (genero of generos; track genero) {
+                        <mat-option [value]="$index">
+                          {{ genero }}
+                        </mat-option>
+                      }
+                    </mat-select>
+                    <mat-error>Campo obligatorio</mat-error>
+                  </mat-form-field>
+                </div>
+              </mat-card-content>
+            </mat-card>
+          </div>
+          <div class="col-12 col-md-6">
+            <mat-card class="form-card">
+              <mat-card-header>
+                <mat-card-title>DIRECCIÓN Y CONTACTO</mat-card-title>
+              </mat-card-header>
+              <mat-card-content>
+                <!-- Fila 4: Ubicación -->
+                <div class="row">
+                  <mat-form-field appearance="outline" class="col-12">
+                    <mat-label>Departamento</mat-label>
+                    <mat-select formControlName="departamento" (selectionChange)="onDepartamentoChange()">
+                      @for (dep of departamentos; track dep.idUbigeo) {
+                        <mat-option [value]="dep.ubiDpto">
+                          {{ dep.ubiNombre }}
+                        </mat-option>
+                      }
+                    </mat-select>
+                    <mat-error>Campo obligatorio</mat-error>
+                  </mat-form-field>
+                  <mat-form-field appearance="outline" class="col-12">
+                    <mat-label>Provincia</mat-label>
+                    <mat-select formControlName="provincia" (selectionChange)="onProvinciaChange()">
+                      @for (prov of provincias; track prov.idUbigeo) {
+                        <mat-option [value]="prov.ubiProvincia">
+                          {{ prov.ubiNombre }}
+                        </mat-option>
+                      }
+                    </mat-select>
+                    <mat-error>Campo obligatorio</mat-error>
+                  </mat-form-field>
+                  <mat-form-field appearance="outline" class="col-12">
+                    <mat-label>Distrito</mat-label>
+                    <mat-select formControlName="distrito">
+                      @for (dist of distritos; track dist.idUbigeo) {
+                        <mat-option [value]="dist.idUbigeo">
+                          {{ dist.ubiNombre }}
+                        </mat-option>
+                      }
+                    </mat-select>
+                    <mat-error>Campo obligatorio</mat-error>
+                  </mat-form-field>
+                  <!-- Fila 5: Dirección y Referencia -->
+                  <mat-form-field appearance="outline" class="col-12">
+                    <mat-label>Dirección</mat-label>
+                    <input matInput formControlName="direccion" />
+                    <mat-error>Campo obligatorio</mat-error>
+                  </mat-form-field>
+                  <mat-form-field appearance="outline" class="col-6">
+                    <mat-label>Correo Electrónico</mat-label>
+                    <input matInput type="email" formControlName="correo" />
+                  </mat-form-field>
+                  <mat-form-field appearance="outline" class="col-6">
+                    <mat-label>Número de teléfono</mat-label>
+                    <input matInput type="text" formControlName="telefono" minlength="9" maxlength="9" />
+                  </mat-form-field>
+                </div>
+              </mat-card-content>
+            </mat-card>
+          </div>
+        </form>
+        <div class="button-row">
+          <button mat-raised-button color="primary" matStepperNext [disabled]="!apoderadoForm.valid">
+            Continuar
+            <mat-icon>arrow_forward</mat-icon>
+          </button>
         </div>
-        <div class="col-12 col-md-6">
-          <mat-card class="form-card">
-            <mat-card-header>
-              <mat-card-title>DIRECCIÓN Y CONTACTO</mat-card-title>
-            </mat-card-header>
-            <mat-card-content>
-              <!-- Fila 4: Ubicación -->
-              <div class="row">
-                <mat-form-field appearance="outline" class="col-12">
-                  <mat-label>Departamento</mat-label>
-                  <mat-select formControlName="departamento" (selectionChange)="onDepartamentoChange()">
-                    @for (dep of departamentos; track dep.idUbigeo) {
-                    <mat-option [value]="dep.ubiDpto">
-                      {{ dep.ubiNombre }}
-                    </mat-option>
-                    }
-                  </mat-select>
-                  <mat-error>Campo obligatorio</mat-error>
-                </mat-form-field>
-                <mat-form-field appearance="outline" class="col-12">
-                  <mat-label>Provincia</mat-label>
-                  <mat-select formControlName="provincia" (selectionChange)="onProvinciaChange()">
-                    @for (prov of provincias; track prov.idUbigeo) {
-                    <mat-option [value]="prov.ubiProvincia">
-                      {{ prov.ubiNombre }}
-                    </mat-option>
-                    }
-                  </mat-select>
-                  <mat-error>Campo obligatorio</mat-error>
-                </mat-form-field>
-                <mat-form-field appearance="outline" class="col-12">
-                  <mat-label>Distrito</mat-label>
-                  <mat-select formControlName="distrito">
-                    @for (dist of distritos; track dist.idUbigeo) {
-                    <mat-option [value]="dist.idUbigeo">
-                      {{ dist.ubiNombre }}
-                    </mat-option>
-                    }
-                  </mat-select>
-                  <mat-error>Campo obligatorio</mat-error>
-                </mat-form-field>
-                <!-- Fila 5: Dirección y Referencia -->
-                <mat-form-field appearance="outline" class="col-12">
-                  <mat-label>Dirección</mat-label>
-                  <input matInput formControlName="direccion">
-                  <mat-error>Campo obligatorio</mat-error>
-                </mat-form-field>
-                <mat-form-field appearance="outline" class="col-6">
-                  <mat-label>Correo Electrónico</mat-label>
-                  <input matInput type="email" formControlName="correo">
-                </mat-form-field>
-                <mat-form-field appearance="outline" class="col-6">
-                  <mat-label>Número de teléfono</mat-label>
-                  <input matInput type="text" formControlName="telefono" minlength="9" maxlength="9">
-                </mat-form-field>
-              </div>
-            </mat-card-content>
-          </mat-card>
-        </div>
-      </form>
-      <div class="button-row">
-        <button mat-raised-button color="primary" matStepperNext [disabled]="!apoderadoForm.valid">
-          Continuar
-          <mat-icon>arrow_forward</mat-icon>
-        </button>
-      </div>
-    </mat-step>
-    <!-- ========================================== -->
-    <!-- PASO 2: DATOS DE LOS PARTICIPANTES -->
-    <!-- ========================================== -->
-    <mat-step>
-      <ng-template matStepLabel>Datos de los Participantes</ng-template>
-      <!-- Advertencia: Debe agregar al menos 1 participante -->
-      @if (participantes.length === 0) {
-      <div class="advertencia-participantes">
-        <mat-icon>warning</mat-icon>
-        <span>Debe agregar al menos un participante para continuar</span>
-      </div>
-      }
-      <!-- Participantes Agregados (Cards colapsables arriba) -->
-      @if (participantes.length > 0) {
-      <div class="participantes-agregados">
-        <div class="participantes-header">
-          <h3>
-            Participantes Agregados: {{participantes.length}}
-          </h3>
-          <span class="participantes-hint">Haga clic para ver o editar los datos</span>
-        </div>
-        <mat-accordion class="participantes-accordion">
-          @for (participante of participantes; track participante.numeroDocumento) {
-          <mat-expansion-panel class="participante-panel">
-            <mat-expansion-panel-header>
-              <mat-panel-title>
-                <div class="participante-resumen">
-                  <div class="participante-info">
-                    <span class="participante-nombre">
-                      {{ participante.nombres }} {{ participante.apellidoPaterno }} {{ participante.apellidoMaterno }}
-                    </span>
-                    <span class="participante-datos">
-                      DNI: {{ participante.numeroDocumento }} |
-                      {{ (participante.sexo ==1) ? 'Masculino' : 'Femenino'}} |
-                      {{calcularEdad(participante.fechaNacimiento)}} años
-                      <!-- <span [class.modalidad-digital]="participante.modalidadEnvio === 'digital'"
+      </mat-step>
+      <!-- ========================================== -->
+      <!-- PASO 2: DATOS DE LOS PARTICIPANTES         -->
+      <!-- ========================================== -->
+      <mat-step>
+        <ng-template matStepLabel>Datos de los Participantes</ng-template>
+        <!-- Advertencia: Debe agregar al menos 1 participante -->
+        @if (participantes.length === 0) {
+          <div class="advertencia-participantes">
+            <mat-icon>warning</mat-icon>
+            <span>Debe agregar al menos un participante para continuar</span>
+          </div>
+        }
+        <!-- Participantes Agregados (Cards colapsables arriba) -->
+        @if (participantes.length > 0) {
+          <div class="participantes-agregados">
+            <div class="participantes-header">
+              <h3>Participantes Agregados: {{ participantes.length }}</h3>
+              <span class="participantes-hint">Haga clic para ver o editar los datos</span>
+            </div>
+            <mat-accordion class="participantes-accordion">
+              @for (participante of participantes; track participante.numeroDocumento) {
+                <mat-expansion-panel class="participante-panel">
+                  <mat-expansion-panel-header>
+                    <mat-panel-title>
+                      <div class="participante-resumen">
+                        <div class="participante-info">
+                          <span class="participante-nombre">
+                            {{ participante.nombres }} {{ participante.apellidoPaterno }} {{ participante.apellidoMaterno }}
+                          </span>
+                          <span class="participante-datos">
+                            DNI: {{ participante.numeroDocumento }} | {{ participante.sexo == 1 ? "Masculino" : "Femenino" }} |
+                            {{ obtenerEdad(participante.fechaNacimiento) }} años
+                            <!-- <span [class.modalidad-digital]="participante.modalidadEnvio === 'digital'"
                         [class.modalidad-presencial]="participante.modalidadEnvio === 'presencial'">
                         {{ participante.modalidadEnvio === 'digital' ? 'Digital' : 'Presencial' }}
                       </span> -->
-                    </span>
-                  </div>
-                </div>
-              </mat-panel-title>
-            </mat-expansion-panel-header>
-            <div class="participante-detalles">
-              <div class="detalle-row">
-                <div class="detalle-item">
-                  <mat-icon>badge</mat-icon>
-                  <div>
-                    <strong>Documento:</strong>
-                    <!-- TODO: Añadir el tipo de documento -->
-                    <span>DNI - {{
-                      participante.numeroDocumento }}</span>
-                  </div>
-                </div>
-                <div class="detalle-item">
-                  <mat-icon>cake</mat-icon>
-                  <div>
-                    <strong>Fecha de Nacimiento:</strong>
-                    <span>{{ formatearFecha(participante.fechaNacimiento) }}</span>
-                  </div>
-                </div>
-              </div>
-              <div class="detalle-row">
-                <div class="detalle-item">
-                  <mat-icon>local_hospital</mat-icon>
-                  <div>
-                    <strong>Seguro:</strong>
-                    <!-- TODO: Establecer el tipo de seguro -->
-                    <span>SIS</span>
-                    <!-- <span>{{ getLabelFromValue(tiposSeguro, participante.tiposeguro) }}</span> -->
-                  </div>
-                </div>
-                <div class="detalle-item">
-                  <mat-icon>accessible</mat-icon>
-                  <div>
-                    <strong>Discapacidad:</strong>
-                    <span [class.tiene-discapacidad]="participante.tieneDiscapacidad">
-                      {{ participante.tieneDiscapacidad ? 'Sí' : 'No' }}
-                    </span>
-                  </div>
-                </div>
-              </div>
-              <!-- <div class="detalle-row">
+                          </span>
+                        </div>
+                      </div>
+                    </mat-panel-title>
+                  </mat-expansion-panel-header>
+                  <div class="participante-detalles">
+                    <div class="detalle-row">
+                      <div class="detalle-item">
+                        <mat-icon>badge</mat-icon>
+                        <div>
+                          <strong>Documento:</strong>
+                          <!-- TODO: Añadir el tipo de documento -->
+                          <span>DNI - {{ participante.numeroDocumento }}</span>
+                        </div>
+                      </div>
+                      <div class="detalle-item">
+                        <mat-icon>cake</mat-icon>
+                        <div>
+                          <strong>Fecha de Nacimiento:</strong>
+                          <span>{{ formatearFecha(participante.fechaNacimiento) }}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="detalle-row">
+                      <div class="detalle-item">
+                        <mat-icon>local_hospital</mat-icon>
+                        <div>
+                          <strong>Seguro:</strong>
+                          <!-- TODO: Establecer el tipo de seguro -->
+                          <span>SIS</span>
+                          <!-- <span>{{ getLabelFromValue(tiposSeguro, participante.tiposeguro) }}</span> -->
+                        </div>
+                      </div>
+                      <div class="detalle-item">
+                        <mat-icon>accessible</mat-icon>
+                        <div>
+                          <strong>Discapacidad:</strong>
+                          <span [class.tiene-discapacidad]="participante.tieneDiscapacidad">
+                            {{ participante.tieneDiscapacidad ? "Sí" : "No" }}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    <!-- <div class="detalle-row">
                 <div class="detalle-item">
                   <mat-icon>{{ participante.modalidadEnvio === 'digital' ? 'cloud_upload' : 'location_on' }}</mat-icon>
                   <div>
@@ -247,571 +248,579 @@
                   </div>
                 </div>
               </div> -->
-              <div class="participante-acciones">
-                <button mat-button color="primary" (click)="editarParticipante(participante)">
-                  <mat-icon>edit</mat-icon>
-                  Editar
-                </button>
-                <button mat-button color="warn" (click)="eliminarParticipante(participante)">
-                  <mat-icon>delete</mat-icon>
-                  Eliminar
-                </button>
-              </div>
-            </div>
-          </mat-expansion-panel>
-          }
-        </mat-accordion>
-      </div>
-      }
-      <!-- Formulario Actual (Para agregar o editar) -->
-      <mat-card class="form-card">
-        <mat-card-header>
-          <mat-card-title>
-            {{ editandoParticipante ? 'EDITAR PARTICIPANTE' : 'DATOS DEL PARTICIPANTE' }}
-          </mat-card-title>
-          @if (!editandoParticipante && participantes.length > 0) {
-          <div class="form-subtitle">
-            Agregando participante #{{ participantes.length + 1 }}
+                    <div class="participante-acciones">
+                      <button mat-button color="primary" (click)="editarParticipante(participante)">
+                        <mat-icon>edit</mat-icon>
+                        Editar
+                      </button>
+                      <button mat-button color="warn" (click)="eliminarParticipante(participante)">
+                        <mat-icon>delete</mat-icon>
+                        Eliminar
+                      </button>
+                    </div>
+                  </div>
+                </mat-expansion-panel>
+              }
+            </mat-accordion>
           </div>
-          }
-        </mat-card-header>
-        <mat-card-content>
-          <form [formGroup]="alumnoForm">
-            <!-- Fila 1: Tipo de Documento y Número de Documento -->
-            <div class="row">
-              <div class="col-12 col-md-6">
-                <div class="row">
-
-                  <mat-form-field appearance="outline" class="col-6">
-                    <mat-label>Tipo de Documento</mat-label>
-                    <mat-select formControlName="tipoDocumento" (selectionChange)="changeTipodocAlumno()">
-                      @for (tipo of tiposDocumento; track tipo.idTipoDocumento) {
-                      <mat-option [value]="tipo.idTipoDocumento">
-                        {{ tipo.descripcion }}
-                      </mat-option>
-                      }
-                    </mat-select>
-                    <mat-error>Campo obligatorio</mat-error>
-                  </mat-form-field>
-                  <mat-form-field appearance="outline" class="col-6">
-                    <mat-label>Número de Documento</mat-label>
-                    <input matInput formControlName="numeroDocumento" (keypress)="soloNumerosAlumno($event)">
-                    <button mat-icon-button matSuffix type="button" (click)="buscarAlumno()"
-                      [disabled]="disabledSearchButtonAlumno()" matTooltip="Buscar en RENIEC">
-                      @if (!cargandoAlumno) {
-                      <mat-icon>search</mat-icon>
-                      }
-                      @if (cargandoAlumno) {
-                      <mat-spinner diameter="20"></mat-spinner>
-                      }
-                    </button>
-                    <mat-error>{{msgErrorNroDocAlumno}}</mat-error>
-                  </mat-form-field>
-                  <!-- Fila 2: Apellidos y Nombres -->
-                  <mat-form-field appearance="outline" class="col-12">
-                    <mat-label>Apellido Paterno</mat-label>
-                    <input matInput formControlName="apellidoPaterno" (keypress)="soloLetras($event)">
-                    <mat-error>Campo obligatorio</mat-error>
-                  </mat-form-field>
-                  <mat-form-field appearance="outline" class="col-12">
-                    <mat-label>Apellido Materno</mat-label>
-                    <input matInput formControlName="apellidoMaterno" (keypress)="soloLetras($event)">
-                    <mat-error>Campo obligatorio</mat-error>
-                  </mat-form-field>
-                  <mat-form-field appearance="outline" class="col-12">
-                    <mat-label>Nombres</mat-label>
-                    <input matInput formControlName="nombres" (keypress)="soloLetras($event)">
-                    <mat-error>Campo obligatorio</mat-error>
-                  </mat-form-field>
-                </div>
-              </div>
-              <!-- Fila 3: Fecha de Nacimiento y Sexo -->
-              <div class="col-12 col-md-6 custom-border-lg">
-                <div class="row">
-                  <mat-form-field appearance="outline" class="col-12">
-                    <mat-label>Fecha de Nacimiento</mat-label>
-                    <input matInput [matDatepicker]="pickerAlumno" formControlName="fechaNacimiento">
-                    <mat-datepicker-toggle matSuffix [for]="pickerAlumno"></mat-datepicker-toggle>
-                    <mat-datepicker #pickerAlumno></mat-datepicker>
-                    <!-- <mat-hint>Formato: DD/MM/YYYY</mat-hint> -->
-                    <mat-error>Campo obligatorio</mat-error>
-                  </mat-form-field>
-                  <mat-form-field appearance="outline" class="col-12">
-                    <mat-label>Sexo</mat-label>
-                    <mat-select formControlName="sexo">
-                      @for (sexo of sexos; track sexo.value) {
-                      <mat-option [value]="sexo.value">
-                        {{ sexo.label }}
-                      </mat-option>
-                      }
-                    </mat-select>
-                    <mat-error>Campo obligatorio</mat-error>
-                  </mat-form-field>
-                  <!-- Fila 4: Parentesco y Tipo de Seguro -->
-                  <mat-form-field appearance="outline" class="col-12">
-                    <mat-label>Tipo de Seguro</mat-label>
-                    <mat-select formControlName="tipoSeguro">
-                      @for (tipoSeguro of tiposSeguro; track tipoSeguro.idTiposeguro) {
-                      <mat-option [value]="tipoSeguro.idTiposeguro">
-                        {{ tipoSeguro.descripcion }}
-                      </mat-option>
-                      }
-                    </mat-select>
-                    <mat-error>Campo obligatorio</mat-error>
-                  </mat-form-field>
-                  <mat-form-field appearance="outline" class="col-12">
-                    <mat-label>Relación del apoderado con el participante</mat-label>
-                    <mat-select formControlName="tipoRelacionApoderado">
-                      @for (tipoRelacionApoderado of tiposRelacionApoderado; track tipoRelacionApoderado.idTiporelacion)
-                      {
-                      <mat-option [value]="tipoRelacionApoderado.idTiporelacion">
-                        {{ tipoRelacionApoderado.descripcion }}
-                      </mat-option>
-                      }
-                    </mat-select>
-                    <mat-error>Campo obligatorio</mat-error>
-                  </mat-form-field>
-                </div>
-              </div>
-            </div>
-            <!-- Sección de Discapacidad -->
-            <div class="discapacidad-section">
-              <p class="discapacidad-pregunta">¿El participante presenta algún tipo de discapacidad física o
-                intelectual?</p>
-              <mat-checkbox formControlName="tieneDiscapacidad" (change)="onDiscapacidadChange($event)">
-                Sí
-              </mat-checkbox>
-              @if (tieneDiscapacidad) {
-              <div class="discapacidad-mensaje">
-                <mat-icon>info</mat-icon>
-                <span>Sólo se mostrarán horarios dirigidos a personas con discapacidad.</span>
-              </div>
-              }
-            </div>
-            <!-- Botones de Acción del Formulario -->
-            <div class="form-acciones">
-              <!-- Botón Agregar Participante -->
-              @if (!editandoParticipante) {
-              <button mat-raised-button color="accent" type="button" (click)="agregarParticipante()"
-                [disabled]="!alumnoForm.valid" class="btn-agregar-participante">
-                Agregar este participante
-              </button>
-              }
-              <!-- Botones Actualizar y Cancelar -->
-              @if (editandoParticipante) {
-              <div class="botones-edicion">
-                <button mat-raised-button color="primary" type="button" (click)="actualizarParticipante()"
-                  [disabled]="!alumnoForm.valid">
-                  <mat-icon>save</mat-icon>
-                  Actualizar Participante
-                </button>
-                <button mat-raised-button type="button" (click)="cancelarEdicion()">
-                  <mat-icon>cancel</mat-icon>
-                  Cancelar
-                </button>
-              </div>
-              }
-            </div>
-          </form>
-        </mat-card-content>
-      </mat-card>
-      <!-- Info: Cuántos participantes hay -->
-      @if (participantes.length > 0) {
-      <div class="info-participantes">
-        <mat-icon>info</mat-icon>
-        <span>
-          Ha agregado <strong>{{ participantes.length }}</strong>
-          {{ participantes.length === 1 ? 'participante' : 'participantes' }}.
-          {{ !editandoParticipante ? 'Puede agregar más o continuar al siguiente paso.' : '' }}
-        </span>
-      </div>
-      }
-      <!-- Botones Navegación -->
-      <div class="button-row">
-        <button mat-raised-button matStepperPrevious>
-          <mat-icon>arrow_back</mat-icon>
-          Anterior
-        </button>
-        <button mat-raised-button color="primary" matStepperNext [disabled]="!puedeAvanzarPaso2()">
-          Continuar
-          <mat-icon>arrow_forward</mat-icon>
-        </button>
-      </div>
-    </mat-step>
-    <!-- ========================================== -->
-    <!-- PASO 3: HORARIOS POR PARTICIPANTE -->
-    <!-- ========================================== -->
-    <mat-step>
-      <ng-template matStepLabel>Asignación de Horarios</ng-template>
-      <!--  Advertencia: Debe asignar horarios -->
-      @if (horariosAsignados.length === 0) {
-      <div class="advertencia-participantes mb-3">
-        <mat-icon>warning</mat-icon>
-        <span>Debe asignar al menos un horario a un participante para finalizar</span>
-      </div>
-      }
-      <!--  HORARIOS AGREGADOS (Cards colapsables arriba) -->
-      @if (horariosAsignados.length > 0) {
-      <div class="horarios-agregados">
-        <div class="horarios-header">
-          <h3>
-            Horarios Asignados ({{ horariosAsignados.length }})
-          </h3>
-          <span class="horarios-hint">Haga clic para ver los detalles</span>
-        </div>
-        <mat-accordion class="horarios-accordion">
-          @for (horario of horariosAsignados; track horario.horario.idHorario) {
-          <mat-expansion-panel class="horario-panel">
-            <mat-expansion-panel-header>
-              <mat-panel-title>
-                <div class="horario-resumen">
-                  <div class="horario-info">
-                    <span class="horario-participante">{{ horario.participanteNombre }}</span>
-                    <span class="horario-datos">
-                      {{ horario.deporteNombre }} - {{ horario.complejoDeportivoNombre }}
-                    </span>
-                  </div>
-                </div>
-              </mat-panel-title>
-            </mat-expansion-panel-header>
-            <div class="horario-detalles">
-              <div class="detalle-row">
-                <div class="detalle-item">
-                  <mat-icon>location_on</mat-icon>
-                  <div>
-                    <strong>Complejo Deportivo:</strong>
-                    <span>{{ horario.complejoDeportivoNombre }}</span>
-                  </div>
-                </div>
-                <div class="detalle-item">
-                  <mat-icon>sports_soccer</mat-icon>
-                  <div>
-                    <strong>Deporte:</strong>
-                    <span>{{ horario.deporteNombre }}</span>
-                  </div>
-                </div>
-              </div>
-              <div class="detalle-row">
-                <div class="detalle-item">
-                  <mat-icon>calendar_today</mat-icon>
-                  <div>
-                    <strong>Días:</strong>
-                    <span>{{ horario.horario.dias }}</span>
-                  </div>
-                </div>
-                <div class="detalle-item">
-                  <mat-icon>access_time</mat-icon>
-                  <div>
-                    <strong>Horario:</strong>
-                    <span>{{ horario.horario.horas }}</span>
-                  </div>
-                </div>
-              </div>
-              <div class="detalle-row">
-                <div class="detalle-item">
-                  <mat-icon>child_care</mat-icon>
-                  <div>
-                    <strong>Edad:</strong>
-                    <span>{{ horario.horario.edad }}</span>
-                  </div>
-                </div>
-                <div class="detalle-item">
-                  <mat-icon>trending_up</mat-icon>
-                  <div>
-                    <strong>Etapa:</strong>
-                    <span>{{ horario.horario.etapa }}</span>
-                  </div>
-                </div>
-              </div>
-              <div class="horario-acciones">
-                <button mat-button color="warn" (click)="eliminarHorario(horario)">
-                  <mat-icon>delete</mat-icon>
-                  Eliminar
-                </button>
-              </div>
-            </div>
-          </mat-expansion-panel>
-          }
-        </mat-accordion>
-      </div>
-      }
-      <div class="paso3-horizontal">
-        <!-- COLUMNA IZQUIERDA: ELIGE UN COMPLEJO DEPORTIVO -->
-        <mat-card class="form-card card-complejo">
-          <mat-card-header>
-            <mat-card-title>ASIGNAR HORARIO A PARTICIPANTE</mat-card-title>
-          </mat-card-header>
-          <mat-card-content>
-            <form [formGroup]="sedeDeporteForm">
-              <!--  NUEVO: Selector de Participante -->
-              <mat-form-field appearance="outline" class="field-full">
-                <mat-label>Seleccionar Participante</mat-label>
-                <mat-select formControlName="participante" (selectionChange)="onParticipanteChange()">
-                  <mat-option value="">--Seleccionar--</mat-option>
-                  @for (p of participantes; track p.numeroDocumento) {
-                  <mat-option [value]="p.numeroDocumento" [disabled]="yaExisteHorarioAsignado(p.numeroDocumento)">
-                    {{ p.nombres }} {{ p.apellidoPaterno }} {{ p.apellidoMaterno }}
-                  </mat-option>
-                  }
-                </mat-select>
-              </mat-form-field>
-              <!--  Los demás campos solo se muestran si hay participante seleccionado -->
-              @if (participanteSeleccionadoId) {
-              <div>
-                <mat-form-field appearance="outline" class="field-full">
-                  <mat-label>Departamento</mat-label>
-                  <mat-select formControlName="departamento" (selectionChange)="onDepartamentoSedeChange()">
-                    <mat-option value="">--Seleccionar--</mat-option>
-                    @for (dep of departamentosSede; track dep.idUbigeo) {
-                    <mat-option [value]="dep.ubiDpto">
-                      {{ dep.ubiNombre }}
-                    </mat-option>
-                    }
-                  </mat-select>
-                </mat-form-field>
-                <mat-form-field appearance="outline" class="field-full">
-                  <mat-label>Provincia</mat-label>
-                  <mat-select formControlName="provincia" (selectionChange)="onProvinciaSedeChange()">
-                    <mat-option value="">--Seleccionar--</mat-option>
-                    @for (prov of provinciasSede; track prov.idUbigeo) {
-                    <mat-option [value]="prov.ubiProvincia">
-                      {{ prov.ubiNombre }}
-                    </mat-option>
-                    }
-                  </mat-select>
-                </mat-form-field>
-                <mat-form-field appearance="outline" class="field-full">
-                  <mat-label>Distrito</mat-label>
-                  <mat-select formControlName="distrito" (selectionChange)="onDistritoSedeChange()">
-                    <mat-option value="">--Seleccionar--</mat-option>
-                    @for (dist of distritosSede; track dist.idUbigeo) {
-                    <mat-option [value]="dist.idUbigeo">
-                      {{ dist.ubiNombre }}
-                    </mat-option>
-                    }
-                  </mat-select>
-                </mat-form-field>
-                <mat-form-field appearance="outline" class="field-full">
-                  <mat-label>Complejo Deportivo</mat-label>
-                  <mat-select formControlName="complejoDeportivo" (selectionChange)="onComplejoDeportivoChange()">
-                    <mat-option value="">--Seleccionar--</mat-option>
-                    @for (complejo of complejosDeportivos; track complejo.idSede) {
-                    <mat-option [value]="complejo.idSede">
-                      {{ complejo.nombre }}
-                    </mat-option>
-                    }
-                  </mat-select>
-                </mat-form-field>
-                <!-- Mapa -->
-                @if (mapaVisible) {
-                <div class="mapa-container">
-                  <div class="mapa-info">
-                    <mat-icon>location_on</mat-icon>
-                    <strong>{{ ubicacionComplejo?.nombre }}</strong>
-                  </div>
-                  <div class="mapa-iframe">
-                    <iframe width="100%" height="250" frameborder="0" style="border:0" [src]="getMapaUrl()"
-                      allowfullscreen>
-                    </iframe>
-                  </div>
-                </div>
-                }
-              </div>
-              }
-            </form>
-          </mat-card-content>
-        </mat-card>
-        <!-- COLUMNA DERECHA: DEPORTES Y HORARIOS (solo si hay participante seleccionado) -->
-        @if (participanteSeleccionadoId && sedeDeporteForm.get('complejoDeportivo')?.value) {
-        <mat-card class="form-card card-deportes">
-          <mat-card-header>
-            <mat-card-title>DEPORTES Y HORARIOS</mat-card-title>
-          </mat-card-header>
-          <mat-card-content>
-            <form [formGroup]="sedeDeporteForm">
-              <mat-form-field appearance="outline" class="field-full">
-                <mat-label>Deporte</mat-label>
-                <mat-select formControlName="deporte" (selectionChange)="onDeporteChange()">
-                  <mat-option value="">--Seleccionar--</mat-option>
-                  @for (deporte of deportes; track deporte) {
-                  <mat-option [value]="deporte">
-                    {{ deporte }}
-                  </mat-option>
-                  }
-                </mat-select>
-                <mat-error>Campo obligatorio</mat-error>
-              </mat-form-field>
-              <!-- Tabla de Horarios -->
-              @if (horariosFiltrados.length > 0) {
-              <div class="horarios-tabla-container">
-                <p class="horarios-titulo">Horarios según la edad del participante con vacantes disponibles:</p>
-                <table class="horarios-tabla">
-                  <thead>
-                    <tr>
-                      <th>EDAD</th>
-                      <th>ETAPA</th>
-                      <th>DÍAS</th>
-                      <th>HORAS</th>
-                      <th>ESCOGER</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    @for (horario of horariosFiltrados; track horario.idHorario) {
-                    <tr [class.selected]="esHorarioSeleccionado(horario)">
-                      <td>{{ horario.edad }}</td>
-                      <td>{{ horario.etapa }}</td>
-                      <td>{{ horario.dias }}</td>
-                      <td>{{ horario.horas }}</td>
-                      <td class="td-check">
-                        <mat-checkbox [checked]="esHorarioSeleccionado(horario)"
-                          (change)="seleccionarHorario(horario, $event)">
-                        </mat-checkbox>
-                      </td>
-                    </tr>
-                    }
-                  </tbody>
-                </table>
-                <!--  NUEVO: Botón Agregar Horario -->
-                @if (tieneHorarioSeleccionado()) {
-                <div class="btn-agregar-horario-container">
-                  <button mat-raised-button color="accent" (click)="agregarHorario()"
-                    [disabled]="!sedeDeporteForm.valid || !tieneHorarioSeleccionado()">
-                    <mat-icon>add_circle</mat-icon>
-                    Agregar Horario
-                  </button>
-                </div>
-                }
-              </div>
-              }
-            </form>
-          </mat-card-content>
-        </mat-card>
         }
-      </div>
-      <div class="button-row">
-        <button mat-raised-button matStepperPrevious>
-          <mat-icon>arrow_back</mat-icon>
-          Anterior
-        </button>
-        <button mat-raised-button color="accent" (click)="finalizarPreInscripcion()"
-          [disabled]="!puedeFinalizarInscripcion()">
-          Finalizar Pre-Inscripción
-          <mat-icon>check_circle</mat-icon>
-        </button>
-      </div>
-
-    </mat-step>
-  </mat-stepper>
+        <!-- Formulario Actual (Para agregar o editar) -->
+        <mat-card class="form-card">
+          <mat-card-header>
+            <mat-card-title>
+              {{ editandoParticipante ? "EDITAR PARTICIPANTE" : "DATOS DEL PARTICIPANTE" }}
+            </mat-card-title>
+            @if (!editandoParticipante && participantes.length > 0) {
+              <div class="form-subtitle">Agregando participante #{{ participantes.length + 1 }}</div>
+            }
+          </mat-card-header>
+          <mat-card-content>
+            <form [formGroup]="alumnoForm">
+              <!-- Fila 1: Tipo de Documento y Número de Documento -->
+              <div class="row">
+                <div class="col-12 col-md-6">
+                  <div class="row">
+                    <mat-form-field appearance="outline" class="col-6">
+                      <mat-label>Tipo de Documento</mat-label>
+                      <mat-select formControlName="tipoDocumento" (selectionChange)="changeTipodocAlumno()">
+                        @for (tipo of tiposDocumento; track tipo.idTipoDocumento) {
+                          <mat-option [value]="tipo.idTipoDocumento">
+                            {{ tipo.descripcion }}
+                          </mat-option>
+                        }
+                      </mat-select>
+                      <mat-error>Campo obligatorio</mat-error>
+                    </mat-form-field>
+                    <mat-form-field appearance="outline" class="col-6">
+                      <mat-label>Número de Documento</mat-label>
+                      <input matInput formControlName="numeroDocumento" (keypress)="soloNumerosAlumno($event)" />
+                      <button
+                        mat-icon-button
+                        matSuffix
+                        type="button"
+                        (click)="buscarAlumno()"
+                        [disabled]="disabledSearchButtonAlumno()"
+                        matTooltip="Buscar en RENIEC"
+                      >
+                        @if (!cargandoAlumno) {
+                          <mat-icon>search</mat-icon>
+                        }
+                        @if (cargandoAlumno) {
+                          <mat-spinner diameter="20"></mat-spinner>
+                        }
+                      </button>
+                      <mat-error>{{ msgErrorNroDocAlumno }}</mat-error>
+                    </mat-form-field>
+                    <!-- Fila 2: Apellidos y Nombres -->
+                    <mat-form-field appearance="outline" class="col-12">
+                      <mat-label>Apellido Paterno</mat-label>
+                      <input matInput formControlName="apellidoPaterno" (keypress)="soloLetras($event)" />
+                      <mat-error>Campo obligatorio</mat-error>
+                    </mat-form-field>
+                    <mat-form-field appearance="outline" class="col-12">
+                      <mat-label>Apellido Materno</mat-label>
+                      <input matInput formControlName="apellidoMaterno" (keypress)="soloLetras($event)" />
+                      <mat-error>Campo obligatorio</mat-error>
+                    </mat-form-field>
+                    <mat-form-field appearance="outline" class="col-12">
+                      <mat-label>Nombres</mat-label>
+                      <input matInput formControlName="nombres" (keypress)="soloLetras($event)" />
+                      <mat-error>Campo obligatorio</mat-error>
+                    </mat-form-field>
+                  </div>
+                </div>
+                <!-- Fila 3: Fecha de Nacimiento y Sexo -->
+                <div class="col-12 col-md-6 custom-border-lg">
+                  <div class="row">
+                    <mat-form-field appearance="outline" class="col-12">
+                      <mat-label>Fecha de Nacimiento</mat-label>
+                      <input matInput [matDatepicker]="pickerAlumno" formControlName="fechaNacimiento" />
+                      <mat-datepicker-toggle matSuffix [for]="pickerAlumno"></mat-datepicker-toggle>
+                      <mat-datepicker #pickerAlumno></mat-datepicker>
+                      <!-- <mat-hint>Formato: DD/MM/YYYY</mat-hint> -->
+                      <mat-error>Campo obligatorio</mat-error>
+                    </mat-form-field>
+                    <mat-form-field appearance="outline" class="col-12">
+                      <mat-label>Sexo</mat-label>
+                      <mat-select formControlName="sexo">
+                        @for (genero of generos; track genero) {
+                          <mat-option [value]="$index">
+                            {{ genero }}
+                          </mat-option>
+                        }
+                      </mat-select>
+                      <mat-error>Campo obligatorio</mat-error>
+                    </mat-form-field>
+                    <!-- Fila 4: Parentesco y Tipo de Seguro -->
+                    <mat-form-field appearance="outline" class="col-12">
+                      <mat-label>Tipo de Seguro</mat-label>
+                      <mat-select formControlName="tipoSeguro">
+                        @for (tipoSeguro of tiposSeguro; track tipoSeguro.idTiposeguro) {
+                          <mat-option [value]="tipoSeguro.idTiposeguro">
+                            {{ tipoSeguro.descripcion }}
+                          </mat-option>
+                        }
+                      </mat-select>
+                      <mat-error>Campo obligatorio</mat-error>
+                    </mat-form-field>
+                    <mat-form-field appearance="outline" class="col-12">
+                      <mat-label>Relación del apoderado con el participante</mat-label>
+                      <mat-select formControlName="tipoRelacionApoderado">
+                        @for (tipoRelacionApoderado of tiposRelacionApoderado; track tipoRelacionApoderado.idTiporelacion) {
+                          <mat-option [value]="tipoRelacionApoderado.idTiporelacion">
+                            {{ tipoRelacionApoderado.descripcion }}
+                          </mat-option>
+                        }
+                      </mat-select>
+                      <mat-error>Campo obligatorio</mat-error>
+                    </mat-form-field>
+                  </div>
+                </div>
+              </div>
+              <!-- Sección de Discapacidad -->
+              <div class="discapacidad-section">
+                <p class="discapacidad-pregunta">¿El participante presenta algún tipo de discapacidad física o intelectual?</p>
+                <mat-checkbox formControlName="tieneDiscapacidad" (change)="onDiscapacidadChange($event)"> Sí </mat-checkbox>
+                @if (tieneDiscapacidad) {
+                  <div class="discapacidad-mensaje">
+                    <mat-icon>info</mat-icon>
+                    <span>Sólo se mostrarán horarios dirigidos a personas con discapacidad.</span>
+                  </div>
+                }
+              </div>
+              <!-- Botones de Acción del Formulario -->
+              <div class="form-acciones">
+                <!-- Botón Agregar Participante -->
+                @if (!editandoParticipante) {
+                  <button
+                    mat-raised-button
+                    color="accent"
+                    type="button"
+                    (click)="agregarParticipante()"
+                    [disabled]="!alumnoForm.valid"
+                    class="btn-agregar-participante"
+                  >
+                    Agregar este participante
+                  </button>
+                }
+                <!-- Botones Actualizar y Cancelar -->
+                @if (editandoParticipante) {
+                  <div class="botones-edicion">
+                    <button mat-raised-button color="primary" type="button" (click)="actualizarParticipante()" [disabled]="!alumnoForm.valid">
+                      <mat-icon>save</mat-icon>
+                      Actualizar Participante
+                    </button>
+                    <button mat-raised-button type="button" (click)="cancelarEdicion()">
+                      <mat-icon>cancel</mat-icon>
+                      Cancelar
+                    </button>
+                  </div>
+                }
+              </div>
+            </form>
+          </mat-card-content>
+        </mat-card>
+        <!-- Info: Cuántos participantes hay -->
+        @if (participantes.length > 0) {
+          <div class="info-participantes">
+            <mat-icon>info</mat-icon>
+            <span>
+              Ha agregado <strong>{{ participantes.length }}</strong> {{ participantes.length === 1 ? "participante" : "participantes" }}.
+              {{ !editandoParticipante ? "Puede agregar más o continuar al siguiente paso." : "" }}
+            </span>
+          </div>
+        }
+        <!-- Botones Navegación -->
+        <div class="button-row">
+          <button mat-raised-button matStepperPrevious type="button">
+            <mat-icon>arrow_back</mat-icon>
+            Anterior
+          </button>
+          <button mat-raised-button color="primary" matStepperNext [disabled]="!puedeAvanzarPaso2()" type="button">
+            Continuar
+            <mat-icon>arrow_forward</mat-icon>
+          </button>
+        </div>
+      </mat-step>
+      <!-- ========================================== -->
+      <!-- PASO 3: HORARIOS POR PARTICIPANTE -->
+      <!-- ========================================== -->
+      <mat-step>
+        <ng-template matStepLabel>Asignación de Horarios</ng-template>
+        <!--  Advertencia: Debe asignar horarios -->
+        @if (horariosAsignados.length === 0) {
+          <div class="advertencia-participantes mb-3">
+            <mat-icon>warning</mat-icon>
+            <span>Debe asignar al menos un horario a un participante para finalizar</span>
+          </div>
+        }
+        <!--  HORARIOS AGREGADOS (Cards colapsables arriba) -->
+        @if (horariosAsignados.length > 0) {
+          <div class="horarios-agregados">
+            <div class="horarios-header">
+              <h3>Horarios Asignados ({{ horariosAsignados.length }})</h3>
+              <span class="horarios-hint">Haga clic para ver los detalles</span>
+            </div>
+            <mat-accordion class="horarios-accordion">
+              @for (horario of horariosAsignados; track horario.horario.idHorario) {
+                <mat-expansion-panel class="horario-panel">
+                  <mat-expansion-panel-header>
+                    <mat-panel-title>
+                      <div class="horario-resumen">
+                        <div class="horario-info">
+                          <span class="horario-participante">{{ horario.participanteNombre }}</span>
+                          <span class="horario-datos"> {{ horario.deporteNombre }} - {{ horario.complejoDeportivoNombre }} </span>
+                        </div>
+                      </div>
+                    </mat-panel-title>
+                  </mat-expansion-panel-header>
+                  <div class="horario-detalles">
+                    <div class="detalle-row">
+                      <div class="detalle-item">
+                        <mat-icon>location_on</mat-icon>
+                        <div>
+                          <strong>Complejo Deportivo:</strong>
+                          <span>{{ horario.complejoDeportivoNombre }}</span>
+                        </div>
+                      </div>
+                      <div class="detalle-item">
+                        <mat-icon>sports_soccer</mat-icon>
+                        <div>
+                          <strong>Deporte:</strong>
+                          <span>{{ horario.deporteNombre }}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="detalle-row">
+                      <div class="detalle-item">
+                        <mat-icon>calendar_today</mat-icon>
+                        <div>
+                          <strong>Días:</strong>
+                          <span>{{ horario.horario.dias }}</span>
+                        </div>
+                      </div>
+                      <div class="detalle-item">
+                        <mat-icon>access_time</mat-icon>
+                        <div>
+                          <strong>Horario:</strong>
+                          <span>{{ horario.horario.horas }}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="detalle-row">
+                      <div class="detalle-item">
+                        <mat-icon>child_care</mat-icon>
+                        <div>
+                          <strong>Edad:</strong>
+                          <span>{{ horario.horario.edad }}</span>
+                        </div>
+                      </div>
+                      <div class="detalle-item">
+                        <mat-icon>trending_up</mat-icon>
+                        <div>
+                          <strong>Etapa:</strong>
+                          <span>{{ horario.horario.etapa }}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="horario-acciones">
+                      <button mat-button color="warn" (click)="eliminarHorario(horario)">
+                        <mat-icon>delete</mat-icon>
+                        Eliminar
+                      </button>
+                    </div>
+                  </div>
+                </mat-expansion-panel>
+              }
+            </mat-accordion>
+          </div>
+        }
+        <div class="paso3-horizontal">
+          <!-- COLUMNA IZQUIERDA: ELIGE UN COMPLEJO DEPORTIVO -->
+          <mat-card class="form-card card-complejo">
+            <mat-card-header>
+              <mat-card-title>ASIGNAR HORARIO A PARTICIPANTE</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <form [formGroup]="sedeDeporteForm">
+                <!--  NUEVO: Selector de Participante -->
+                <mat-form-field appearance="outline" class="field-full">
+                  <mat-label>Seleccionar Participante</mat-label>
+                  <mat-select formControlName="participante" (selectionChange)="onParticipanteChange()">
+                    <mat-option value="">--Seleccionar--</mat-option>
+                    @for (p of participantes; track p.numeroDocumento) {
+                      <mat-option [value]="p.numeroDocumento" [disabled]="yaExisteHorarioAsignado(p.numeroDocumento)">
+                        {{ p.nombres }} {{ p.apellidoPaterno }} {{ p.apellidoMaterno }}
+                      </mat-option>
+                    }
+                  </mat-select>
+                </mat-form-field>
+                <!--  Los demás campos solo se muestran si hay participante seleccionado -->
+                @if (participanteSeleccionadoId) {
+                  <div>
+                    <mat-form-field appearance="outline" class="field-full">
+                      <mat-label>Departamento</mat-label>
+                      <mat-select formControlName="departamento" (selectionChange)="onDepartamentoSedeChange()">
+                        <mat-option value="">--Seleccionar--</mat-option>
+                        @for (dep of departamentosSede; track dep.idUbigeo) {
+                          <mat-option [value]="dep.ubiDpto">
+                            {{ dep.ubiNombre }}
+                          </mat-option>
+                        }
+                      </mat-select>
+                    </mat-form-field>
+                    <mat-form-field appearance="outline" class="field-full">
+                      <mat-label>Provincia</mat-label>
+                      <mat-select formControlName="provincia" (selectionChange)="onProvinciaSedeChange()">
+                        <mat-option value="">--Seleccionar--</mat-option>
+                        @for (prov of provinciasSede; track prov.idUbigeo) {
+                          <mat-option [value]="prov.ubiProvincia">
+                            {{ prov.ubiNombre }}
+                          </mat-option>
+                        }
+                      </mat-select>
+                    </mat-form-field>
+                    <mat-form-field appearance="outline" class="field-full">
+                      <mat-label>Distrito</mat-label>
+                      <mat-select formControlName="distrito" (selectionChange)="onDistritoSedeChange()">
+                        <mat-option value="">--Seleccionar--</mat-option>
+                        @for (dist of distritosSede; track dist.idUbigeo) {
+                          <mat-option [value]="dist.idUbigeo">
+                            {{ dist.ubiNombre }}
+                          </mat-option>
+                        }
+                      </mat-select>
+                    </mat-form-field>
+                    <mat-form-field appearance="outline" class="field-full">
+                      <mat-label>Complejo Deportivo</mat-label>
+                      <mat-select formControlName="complejoDeportivo" (selectionChange)="onComplejoDeportivoChange()">
+                        <mat-option value="">--Seleccionar--</mat-option>
+                        @for (complejo of complejosDeportivos; track complejo.idSede) {
+                          <mat-option [value]="complejo.idSede">
+                            {{ complejo.nombre }}
+                          </mat-option>
+                        }
+                      </mat-select>
+                    </mat-form-field>
+                    <!-- Mapa -->
+                    @if (mapaVisible) {
+                      <div class="mapa-container">
+                        <div class="mapa-info">
+                          <mat-icon>location_on</mat-icon>
+                          <strong>{{ ubicacionComplejo?.nombre }}</strong>
+                        </div>
+                        <div class="mapa-iframe">
+                          <iframe width="100%" height="250" frameborder="0" style="border: 0" [src]="getMapaUrl()" allowfullscreen> </iframe>
+                        </div>
+                      </div>
+                    }
+                  </div>
+                }
+              </form>
+            </mat-card-content>
+          </mat-card>
+          <!-- COLUMNA DERECHA: DEPORTES Y HORARIOS (solo si hay participante seleccionado) -->
+          @if (participanteSeleccionadoId && sedeDeporteForm.get("complejoDeportivo")?.value) {
+            <mat-card class="form-card card-deportes">
+              <mat-card-header>
+                <mat-card-title>DEPORTES Y HORARIOS</mat-card-title>
+              </mat-card-header>
+              <mat-card-content>
+                <form [formGroup]="sedeDeporteForm">
+                  <mat-form-field appearance="outline" class="field-full">
+                    <mat-label>Deporte</mat-label>
+                    <mat-select formControlName="deporte" (selectionChange)="onDeporteChange()">
+                      <mat-option value="">--Seleccionar--</mat-option>
+                      @for (deporte of deportes; track deporte) {
+                        <mat-option [value]="deporte">
+                          {{ deporte }}
+                        </mat-option>
+                      }
+                    </mat-select>
+                    <mat-error>Campo obligatorio</mat-error>
+                  </mat-form-field>
+                  <!-- Tabla de Horarios -->
+                  @if (horariosFiltrados.length > 0) {
+                    <div class="horarios-tabla-container">
+                      <p class="horarios-titulo">Horarios según la edad del participante con vacantes disponibles:</p>
+                      <table class="horarios-tabla">
+                        <thead>
+                          <tr>
+                            <th>EDAD</th>
+                            <th>ETAPA</th>
+                            <th>DÍAS</th>
+                            <th>HORAS</th>
+                            <th>CUPOS</th>
+                            <th>ESCOGER</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          @for (horario of horariosFiltrados; track horario.idHorario) {
+                            <tr [class.selected]="esHorarioSeleccionado(horario)">
+                              <td>{{ horario.edad }}</td>
+                              <td>{{ horario.etapa }}</td>
+                              <td>{{ horario.dias }}</td>
+                              <td>{{ horario.horas }}</td>
+                              <td>{{ horario.numeroPreinscripcionesDisponibles }}</td>
+                              <td class="td-check">
+                                <mat-checkbox
+                                  [checked]="esHorarioSeleccionado(horario)"
+                                  [disabled]="horario.numeroPreinscripcionesDisponibles === 0"
+                                  (change)="seleccionarHorario(horario, $event)"
+                                >
+                                </mat-checkbox>
+                              </td>
+                            </tr>
+                          }
+                        </tbody>
+                      </table>
+                      <!--  NUEVO: Botón Agregar Horario -->
+                      @if (tieneHorarioSeleccionado()) {
+                        <div class="btn-agregar-horario-container">
+                          <button
+                            mat-raised-button
+                            color="accent"
+                            (click)="agregarHorario()"
+                            [disabled]="!sedeDeporteForm.valid || !tieneHorarioSeleccionado()"
+                          >
+                            <mat-icon>add_circle</mat-icon>
+                            Agregar Horario
+                          </button>
+                        </div>
+                      }
+                    </div>
+                  }
+                </form>
+              </mat-card-content>
+            </mat-card>
+          }
+        </div>
+        <div class="button-row">
+          <button mat-raised-button matStepperPrevious>
+            <mat-icon>arrow_back</mat-icon>
+            Anterior
+          </button>
+          <button mat-raised-button color="accent" (click)="finalizarPreInscripcion()" [disabled]="!puedeFinalizarInscripcion()">
+            Finalizar Pre-Inscripción
+            <mat-icon>check_circle</mat-icon>
+          </button>
+        </div>
+      </mat-step>
+    </mat-stepper>
   }
 
   <!-- ========================================== -->
   <!--  MODALES INFORMATIVOS (UNO POR PARTICIPANTE) -->
   <!-- ========================================== -->
   @if (mostrarModalInformativo && modalInformativoActual) {
-  <div class="modal-overlay" (click)="$event.stopPropagation()">
-    <div class="modal-contenido">
-      <button class="modal-cerrar" (click)="cerrarModalInformativo()">
-        <mat-icon>close</mat-icon>
-      </button>
-      <div class="modal-icono">
-        <mat-icon>check_circle</mat-icon>
-      </div>
-      <h2 class="modal-titulo">¡Importante!</h2>
-      <div class="modal-mensaje">
-        <p><strong>Su pre-inscripción ha sido registrada exitosamente para {{ modalInformativoActual.modalidad ===
-            'digital' ? 'la' : 'el' }} participante:</strong></p>
-        <p class="participante-nombre-modal">{{ modalInformativoActual.participante.nombres }} {{
-          modalInformativoActual.participante.apellidoPaterno }} {{ modalInformativoActual.participante.apellidoMaterno
-          }}</p>
-        <div class="modal-seccion">
-          <p><strong>A continuación podrá:</strong></p>
-          <!-- Contenido DIGITAL -->
-          @if (modalInformativoActual.modalidad === 'digital') {
-          <ul>
-            <li>Descargar su <strong>Ficha de Pre-inscripción</strong></li>
-          </ul>
-          }
-          @if (modalInformativoActual.modalidad === 'digital') {
-          <p class="nota-carnet">
-            <mat-icon>info_outline</mat-icon>
-            Recuerde que para descargar su carnet digital puede realizarlo pasada las 72 horas de haber realizado su
-            Pre-inscripción.
+    <div class="modal-overlay" (click)="$event.stopPropagation()">
+      <div class="modal-contenido">
+        <button class="modal-cerrar" (click)="cerrarModalInformativo()">
+          <mat-icon>close</mat-icon>
+        </button>
+        <div class="modal-icono">
+          <mat-icon>check_circle</mat-icon>
+        </div>
+        <h2 class="modal-titulo">¡Importante!</h2>
+        <div class="modal-mensaje">
+          <p>
+            <strong
+              >Su pre-inscripción ha sido registrada exitosamente para
+              {{ modalInformativoActual.modalidad === "digital" ? "la" : "el" }} participante:</strong
+            >
           </p>
-          }
-          <!-- Contenido PRESENCIAL -->
-          @if (modalInformativoActual.modalidad === 'presencial') {
-          <ul>
-            <li>Descargar su <strong>Ficha de Pre-inscripción</strong> y <strong>Declaración Jurada</strong></li>
-          </ul>
-          }
-          @if (modalInformativoActual.modalidad === 'presencial') {
-          <p class="nota-presencial">
-            <mat-icon>info_outline</mat-icon>
-            Recuerde que la validación presencial del programa "Academia IPD Deporte para Todos", debe llevar los
-            documentos requeridos en su sede en los horarios de 8:00 AM a 5:00 PM de lunes a viernes.
+          <p class="participante-nombre-modal">
+            {{ modalInformativoActual.participante.nombres }} {{ modalInformativoActual.participante.apellidoPaterno }}
+            {{ modalInformativoActual.participante.apellidoMaterno }}
           </p>
-          }
+          <div class="modal-seccion">
+            <p><strong>A continuación podrá:</strong></p>
+            <!-- Contenido DIGITAL -->
+            @if (modalInformativoActual.modalidad === "digital") {
+              <ul>
+                <li>Descargar su <strong>Ficha de Pre-inscripción</strong></li>
+              </ul>
+            }
+            @if (modalInformativoActual.modalidad === "digital") {
+              <p class="nota-carnet">
+                <mat-icon>info_outline</mat-icon>
+                Recuerde que para descargar su carnet digital puede realizarlo pasada las 72 horas de haber realizado su Pre-inscripción.
+              </p>
+            }
+            <!-- Contenido PRESENCIAL -->
+            @if (modalInformativoActual.modalidad === "presencial") {
+              <ul>
+                <li>Descargar su <strong>Ficha de Pre-inscripción</strong> y <strong>Declaración Jurada</strong></li>
+              </ul>
+            }
+            @if (modalInformativoActual.modalidad === "presencial") {
+              <p class="nota-presencial">
+                <mat-icon>info_outline</mat-icon>
+                Recuerde que la validación presencial del programa "Academia IPD Deporte para Todos", debe llevar los documentos requeridos en su sede
+                en los horarios de 8:00 AM a 5:00 PM de lunes a viernes.
+              </p>
+            }
+          </div>
         </div>
       </div>
     </div>
-  </div>
   }
 
   <!-- ========================================== -->
   <!--  CONFIRMACIÓN CON CAROUSEL -->
   <!-- ========================================== -->
   @if (mostrarConfirmacion) {
-  <div class="confirmacion-container">
-    <div class="confirmacion-grid">
-      <!-- Lado Izquierdo -->
-      <mat-card class="confirmacion-card">
-        <mat-card-header>
-          <mat-card-title>
-            <mat-icon class="icon-check">check_circle</mat-icon>
-            PRE-INSCRIPCIÓN CONFIRMADA
-          </mat-card-title>
-        </mat-card-header>
-        <mat-card-content>
-          <p class="mensaje-principal">
-            Acaba de realizar <strong>{{ participantes.length }}</strong>
-            {{ participantes.length === 1 ? 'pre-inscripción' : 'pre-inscripciones' }}
-            en el programa "Academia IPD Deporte para Todos".
-            Para descargar su ficha de pre-inscripción y/o declaración jurada, haga clic en los siguientes iconos de
-            cada participante:
-          </p>
-          <div class="modalidad-mensaje-presencial">
-            <mat-icon>info</mat-icon>
-            <p>Podrá presentar los documentos requeridos de manera presencial en el complejo deportivo seleccionado,
-              dentro del horario de atención de lunes a viernes, de 8:00 a. m. a 5:00 p. m., o, si lo prefiere, de forma
-              virtual a través del enlace proporcionado en su correo electrónico.</p>
-          </div>
-          <!--  Lista de participantes con iconos PDF -->
-          <div class="lista-participantes-pdf">
-            @for (ficha of fichasInscripcion; track ficha.idInscripcion; let i = $index) {
-            <div class="participante-pdf-item">
-              <div class="participante-pdf-header">
-                <span class="participante-numero">Participante {{ i + 1 }}:</span>
-                <span class="participante-nombre-pdf">{{ ficha.nombres }} {{ ficha.apellidoPaterno }} {{
-                  ficha.apellidoMaterno }}</span>
-              </div>
-              <div class="participante-pdf-cards">
-                <!-- Ficha de Pre-inscripción (TODOS) -->
-                <div class="pdf-card" (click)="generarFichaPreinscripcion(ficha)">
-                  <div class="pdf-card-icon">
-                    <mat-icon class="pdf-icon-large">picture_as_pdf</mat-icon>
+    <div class="confirmacion-container">
+      <div class="confirmacion-grid">
+        <!-- Lado Izquierdo -->
+        <mat-card class="confirmacion-card">
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon class="icon-check">check_circle</mat-icon>
+              PRE-INSCRIPCIÓN CONFIRMADA
+            </mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <p class="mensaje-principal">
+              Acaba de realizar <strong>{{ participantes.length }}</strong>
+              {{ participantes.length === 1 ? "pre-inscripción" : "pre-inscripciones" }}
+              en el programa "Academia IPD Deporte para Todos". Para descargar su ficha de pre-inscripción y/o declaración jurada, haga clic en los
+              siguientes iconos de cada participante:
+            </p>
+            <div class="modalidad-mensaje-presencial">
+              <mat-icon>info</mat-icon>
+              <p>
+                Podrá presentar los documentos requeridos de manera presencial en el complejo deportivo seleccionado, dentro del horario de atención
+                de lunes a viernes, de 8:00 a. m. a 5:00 p. m., o, si lo prefiere, de forma virtual a través del enlace proporcionado en su correo
+                electrónico.
+              </p>
+            </div>
+            <!--  Lista de participantes con iconos PDF -->
+            <div class="lista-participantes-pdf">
+              @for (ficha of fichasInscripcion; track ficha.idInscripcion; let i = $index) {
+                <div class="participante-pdf-item">
+                  <div class="participante-pdf-header">
+                    <span class="participante-numero">Participante {{ i + 1 }}:</span>
+                    <span class="participante-nombre-pdf">{{ ficha.nombres }} {{ ficha.apellidoPaterno }} {{ ficha.apellidoMaterno }}</span>
                   </div>
-                  <div class="pdf-card-title">Ficha de Pre-inscripción</div>
-                  <div class="pdf-card-subtitle">{{ ficha.nombres }} {{ ficha.apellidoPaterno }}</div>
-                </div>
-                <div class="pdf-card" (click)="generarDeclaracionJurada(ficha)">
-                  <div class="pdf-card-icon">
-                    <mat-icon class="pdf-icon-large">picture_as_pdf</mat-icon>
-                  </div>
-                  <div class="pdf-card-title">Declaración Jurada</div>
-                  <div class="pdf-card-subtitle">{{ ficha.nombres }} {{ ficha.apellidoPaterno }}</div>
-                </div>
-                <!-- Declaración Jurada (solo PRESENCIAL) -->
-                <!-- @if (participante.modalidadEnvio === 'presencial') {
+                  <div class="participante-pdf-cards">
+                    <!-- Ficha de Pre-inscripción (TODOS) -->
+                    <div class="pdf-card" (click)="generarFichaPreinscripcion(ficha)">
+                      <div class="pdf-card-icon">
+                        <mat-icon class="pdf-icon-large">picture_as_pdf</mat-icon>
+                      </div>
+                      <div class="pdf-card-title">Ficha de Pre-inscripción</div>
+                      <div class="pdf-card-subtitle">{{ ficha.nombres }} {{ ficha.apellidoPaterno }}</div>
+                    </div>
+                    <div class="pdf-card" (click)="generarDeclaracionJurada(ficha)">
+                      <div class="pdf-card-icon">
+                        <mat-icon class="pdf-icon-large">picture_as_pdf</mat-icon>
+                      </div>
+                      <div class="pdf-card-title">Declaración Jurada</div>
+                      <div class="pdf-card-subtitle">{{ ficha.nombres }} {{ ficha.apellidoPaterno }}</div>
+                    </div>
+                    <!-- Declaración Jurada (solo PRESENCIAL) -->
+                    <!-- @if (participante.modalidadEnvio === 'presencial') {
                 <div class="pdf-card" (click)="generarDeclaracionJurada(participante)">
                   <div class="pdf-card-icon">
                     <mat-icon class="pdf-icon-large">picture_as_pdf</mat-icon>
@@ -820,95 +829,96 @@
                   <div class="pdf-card-subtitle">{{ participante.nombres }} {{ participante.apaterno }}</div>
                 </div>
                 } -->
-              </div>
+                  </div>
+                </div>
+              }
             </div>
-            }
-          </div>
-        </mat-card-content>
-      </mat-card>
-      <!--  Lado Derecho: CAROUSEL DE FICHAS -->
-      <mat-card class="ficha-card">
-        <mat-card-header>
-          <mat-card-title>
-            FICHA DE PRE-INSCRIPCIÓN
+          </mat-card-content>
+        </mat-card>
+        <!--  Lado Derecho: CAROUSEL DE FICHAS -->
+        <mat-card class="ficha-card">
+          <mat-card-header>
+            <mat-card-title>
+              FICHA DE PRE-INSCRIPCIÓN
+              @if (participantes.length > 1) {
+                <span class="ficha-contador"> ({{ fichaActual + 1 }} de {{ participantes.length }}) </span>
+              }
+            </mat-card-title>
+            <mat-card-subtitle>ACADEMIA IPD TEMPORADA 2026</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <!--  Flechas de navegación -->
             @if (participantes.length > 1) {
-            <span class="ficha-contador">
-              ({{ fichaActual + 1 }} de {{ participantes.length }})
-            </span>
+              <div class="carousel-navigation">
+                <button mat-icon-button class="carousel-btn carousel-prev" (click)="anteriorFicha()" [disabled]="fichaActual === 0">
+                  <mat-icon>chevron_left</mat-icon>
+                </button>
+                <button
+                  mat-icon-button
+                  class="carousel-btn carousel-next"
+                  (click)="siguienteFicha()"
+                  [disabled]="fichaActual === participantes.length - 1"
+                >
+                  <mat-icon>chevron_right</mat-icon>
+                </button>
+              </div>
             }
-          </mat-card-title>
-          <mat-card-subtitle>ACADEMIA IPD TEMPORADA 2026</mat-card-subtitle>
-        </mat-card-header>
-        <mat-card-content>
-          <!--  Flechas de navegación -->
-          @if (participantes.length > 1) {
-          <div class="carousel-navigation">
-            <button mat-icon-button class="carousel-btn carousel-prev" (click)="anteriorFicha()"
-              [disabled]="fichaActual === 0">
-              <mat-icon>chevron_left</mat-icon>
-            </button>
-            <button mat-icon-button class="carousel-btn carousel-next" (click)="siguienteFicha()"
-              [disabled]="fichaActual === participantes.length - 1">
-              <mat-icon>chevron_right</mat-icon>
-            </button>
-          </div>
-          }
-          <!--  Datos de la ficha actual -->
-          @if (fichasInscripcion[fichaActual]; as ficha) {
-          <div class="ficha-datos">
-            <div class="ficha-item">
-              <strong>Código:</strong>
-              <span>{{ ficha.codigo || '------' }}</span>
-            </div>
-            <div class="ficha-item">
-              <strong>Nombre:</strong>
-              <span>{{ ficha.nombres }}</span>
-            </div>
-            <div class="ficha-item">
-              <strong>Ape. Paterno:</strong>
-              <span>{{ ficha.apellidoPaterno }}</span>
-            </div>
-            <div class="ficha-item">
-              <strong>Ape. Materno:</strong>
-              <span>{{ ficha.apellidoMaterno }}</span>
-            </div>
-            <!-- <div class="ficha-item">
+            <!--  Datos de la ficha actual -->
+            @if (fichasInscripcion[fichaActual]; as ficha) {
+              <div class="ficha-datos">
+                <div class="ficha-item">
+                  <strong>Código:</strong>
+                  <span>{{ ficha.codigo || "------" }}</span>
+                </div>
+                <div class="ficha-item">
+                  <strong>Nombre:</strong>
+                  <span>{{ ficha.nombres }}</span>
+                </div>
+                <div class="ficha-item">
+                  <strong>Ape. Paterno:</strong>
+                  <span>{{ ficha.apellidoPaterno }}</span>
+                </div>
+                <div class="ficha-item">
+                  <strong>Ape. Materno:</strong>
+                  <span>{{ ficha.apellidoMaterno }}</span>
+                </div>
+                <!-- <div class="ficha-item">
               <strong>Distrito:</strong>
               <span>{{ getLabelFromValue(distritos, apoderadoForm.value.distrito) }}</span>
             </div> -->
-            <div class="ficha-item">
-              <strong>Domicilio:</strong>
-              <span>{{ ficha.domicilio }}</span>
-            </div>
-            <div class="ficha-item">
-              <strong>F.Nacimiento:</strong>
-              <span>{{ ficha.fechaNacimiento }}</span>
-            </div>
-            <div class="ficha-item">
-              <strong>DNI/CE:</strong>
-              <span>{{ ficha.documento }}</span>
-            </div>
-            <div class="ficha-item">
-              <strong>Edad:</strong>
-              <span>{{ ficha.edad }}</span>
-            </div>
-            <div class="ficha-item">
-              <strong>Disciplina:</strong>
-              <span>{{ficha.disciplina}}</span>
-            </div>
-            <div class="ficha-item">
-              <strong>Etapa:</strong>
-              <span>{{ficha.etapa}}</span>
-            </div>
-            <div class="ficha-item">
-              <strong>Complejo:</strong>
-              <span>{{ficha.complejo}}</span>
-            </div>
-            <div class="ficha-item">
-              <strong>Horario:</strong>
-              <span>{{ficha.horario}}</span>
-            </div>
-            <!-- <div class="ficha-item">
+                <div class="ficha-item">
+                  <strong>Domicilio:</strong>
+                  <span>{{ ficha.domicilio }}</span>
+                </div>
+                <div class="ficha-item">
+                  <strong>F.Nacimiento:</strong>
+                  <span>{{ ficha.fechaNacimiento }}</span>
+                </div>
+                <div class="ficha-item">
+                  <strong>DNI/CE:</strong>
+                  <span>{{ ficha.documento }}</span>
+                </div>
+                <div class="ficha-item">
+                  <strong>Edad:</strong>
+                  <span>{{ ficha.edad }}</span>
+                </div>
+                <div class="ficha-item">
+                  <strong>Disciplina:</strong>
+                  <span>{{ ficha.disciplina }}</span>
+                </div>
+                <div class="ficha-item">
+                  <strong>Etapa:</strong>
+                  <span>{{ ficha.etapa }}</span>
+                </div>
+                <div class="ficha-item">
+                  <strong>Complejo:</strong>
+                  <span>{{ ficha.complejo }}</span>
+                </div>
+                <div class="ficha-item">
+                  <strong>Horario:</strong>
+                  <span>{{ ficha.horario }}</span>
+                </div>
+                <!-- <div class="ficha-item">
               <strong>Deporte:</strong>
               <span>{{ participante.horarioAsignado?.deporteNombre || '-' }}</span>
             </div>
@@ -925,21 +935,19 @@
               <span>{{ participante.horarioAsignado?.horario.dias }} de {{ participante.horarioAsignado?.horario.horas
                 }}</span>
             </div> -->
-          </div>
-          }
-          <!-- Indicadores de posición -->
-          @if (participantes.length > 1) {
-          <div class="carousel-indicators">
-            @for (p of participantes; track p.numeroDocumento; let i = $index) {
-            <span class="indicator" [class.active]="i === fichaActual" (click)="fichaActual = i">
-            </span>
+              </div>
             }
-          </div>
-          }
-        </mat-card-content>
-      </mat-card>
+            <!-- Indicadores de posición -->
+            @if (participantes.length > 1) {
+              <div class="carousel-indicators">
+                @for (p of participantes; track p.numeroDocumento; let i = $index) {
+                  <span class="indicator" [class.active]="i === fichaActual" (click)="fichaActual = i"> </span>
+                }
+              </div>
+            }
+          </mat-card-content>
+        </mat-card>
+      </div>
     </div>
-  </div>
   }
-
 </div>

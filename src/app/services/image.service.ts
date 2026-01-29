@@ -10,12 +10,16 @@ import { Injectable } from "@angular/core";
 export class ImageService {
   apiUrl = environment.HOST;
 
-  constructor(private http: HttpClient, private tokenService: TokenService) {}
+  constructor(
+    private http: HttpClient,
+    private tokenService: TokenService,
+  ) {}
 
-  createImage(file: File): Observable<any> {
+  createImage(file: File, folder: string): Observable<any> {
     const token: string = this.tokenService.getToken() ?? "";
     const formData = new FormData();
     formData.append("file", file);
+    formData.append("folder", folder);
 
     return this.http.post<any>(`${this.apiUrl}/api/images/upload`, formData, {
       headers: {

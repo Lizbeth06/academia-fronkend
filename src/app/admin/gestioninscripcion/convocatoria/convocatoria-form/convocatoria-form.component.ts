@@ -44,7 +44,7 @@ export class ConvocatoriaFormComponent implements OnInit {
     private dialogService: DialogService,
     private datePipe: DatePipe,
     private toastrService: ToastrService,
-    private router: Router
+    private router: Router,
   ) {
     this.buildForm();
   }
@@ -164,17 +164,17 @@ export class ConvocatoriaFormComponent implements OnInit {
         this.listaHorarioEditar(horarios);
         data.listaHorarios.filter((h) => this.insertarHorario(h.horario));
 
-        this.convocatoriaForm.get("titulo")?.setValue(data.convocatoria.titulo),
-          this.convocatoriaForm.get("subtitulo")?.setValue(data.convocatoria.subtitulo);
+        (this.convocatoriaForm.get("titulo")?.setValue(data.convocatoria.titulo),
+          this.convocatoriaForm.get("subtitulo")?.setValue(data.convocatoria.subtitulo));
         this.convocatoriaForm.get("descripcion")?.setValue(data.convocatoria.descripcion);
         this.convocatoriaForm.get("temporada")?.setValue(data.convocatoria.temporada);
-        this.convocatoriaForm.get("finicioclase")?.setValue(this.datePipe.transform(data.convocatoria.temporada.finicioclases, "dd-MM-yyyy")),
+        (this.convocatoriaForm.get("finicioclase")?.setValue(this.datePipe.transform(data.convocatoria.temporada.finicioclases, "dd-MM-yyyy")),
           this.convocatoriaForm.get("fcierreclase")?.setValue(this.datePipe.transform(data.convocatoria.temporada.fcierreclases, "dd-MM-yyyy")),
           this.convocatoriaForm
             .get("finicioinscripcion")
             ?.setValue(this.datePipe.transform(data.convocatoria.temporada.fcierreinscripcion, "dd-MM-yyyy")),
           this.convocatoriaForm.get("fcierreinscripcion")?.setValue(this.datePipe.transform(data.convocatoria.temporada.fcierreclases, "dd-MM-yyyy")),
-          (this.selectedImage = data.convocatoria.urlImagen!);
+          (this.selectedImage = data.convocatoria.urlImagen!));
         this.convocatoriaForm.get("estado")?.setValue(data.convocatoria.estado);
       },
     });
@@ -206,7 +206,7 @@ export class ConvocatoriaFormComponent implements OnInit {
       this.toastrService.error("No hay imagen seleccionada", "Error", { timeOut: 3200 });
       return;
     }
-    this.imageService.createImage(this.selectedFile).subscribe({
+    this.imageService.createImage(this.selectedFile, "convocatorias").subscribe({
       next: (response) => {
         console.log(response);
         this.publicarConvocatoria(response.url);

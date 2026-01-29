@@ -1,6 +1,37 @@
 <h2 mat-dialog-title class="title-modal">{{titulo}}</h2>
 
 <mat-dialog-content class="mat-typography">
+  <!-- @if (true) {
+  <mat-card appearance="outlined" class="mb-3">
+    <mat-card-header>
+      <mat-icon mat-card-avatar>work</mat-icon>
+      <mat-card-title>Ficha del Trabajador</mat-card-title>
+      <mat-card-subtitle>{{trabajadorSeleccionado.codigoTrabajador}}</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="row mt-3">
+        <div class="col-md-6 mb-2">
+          <strong class="d-block text-secondary">Oficina</strong>
+          <span>{{trabajadorSeleccionado.oficina?.descripcion}}</span>
+        </div>
+        <div class="col-md-6 mb-2">
+          <strong class="d-block text-secondary">Cargo</strong>
+          <span>{{trabajadorSeleccionado.cargo}}</span>
+        </div>
+        <div class="col-md-12 mb-2">
+          <strong class="d-block text-secondary">Observaciones</strong>
+          <p class="m-0 text-muted">{{trabajadorSeleccionado.observaciones}}</p>
+        </div>
+        <div class="col-md-6">
+          <strong class="d-block text-secondary">Estado</strong>
+          <span class="badge" [class.bg-success]="trabajadorSeleccionado.estado" [class.bg-danger]="!trabajadorSeleccionado.estado">
+            {{trabajadorSeleccionado.estado ? 'Activo' : 'Inactivo'}}
+          </span>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+  } -->
   <br>
   <form [formGroup]="form" (ngSubmit)="operate()">
 

@@ -4,215 +4,236 @@
   <br>
   <form class="example-form" [formGroup]="form" (ngSubmit)="operate()">
 
-    <div class="row">
-   
-        <mat-form-field class="col-md-2">
-           <mat-label>Seleccionar</mat-label>
-          <mat-select formControlName="tipodocumento" >
-              @for (sp of tipodocumento; track $index) {
-                <mat-option [value]="sp.idTipoDocumento">{{sp.descripcion}}</mat-option>
-              }
-          </mat-select>
-          <mat-hint>Tipo de Doc.</mat-hint>
-        </mat-form-field> 
-        
-        <mat-form-field class="col-md-2" appearance="fill">
-          <mat-label>N° Documento</mat-label>
-          <input matInput type="text" formControlName="numDocumento">
-          
-          <!-- Botón de búsqueda con ícono de lupa al lado del input -->
-          <button mat-icon-button matSuffix (click)="buscarxDoc()">
-            <mat-icon>search</mat-icon>
-          </button>
-        </mat-form-field>
-        
-     
-        <mat-form-field class="col-md-2">
-          <mat-label>Nombres</mat-label>
-            <input matInput type="text" formControlName="nombres" [value]="form.value.nombres">
-        </mat-form-field>
-  
-        <mat-form-field class="col-md-2">
-          <mat-label>Ap. Paterno</mat-label>
-          <input matInput type="text" formControlName="apaterno" [value]="form.value.apaterno">
-        </mat-form-field>
-
-        <mat-form-field class="col-md-2">
-            <mat-label>Ap. Materno</mat-label>
-            <input matInput type="text" formControlName="amaterno" [value]="form.value.amaterno">
-        </mat-form-field>
-    
-        <mat-form-field class="col-md-2">
-          <mat-label>Seleccionar</mat-label>
-          <mat-select formControlName="genero">
-            @for (genero of genero; track $index) {
-              <mat-option [value]="$index">{{genero}}</mat-option>
-            }
-          </mat-select>
-          <mat-hint>Género</mat-hint>
-        </mat-form-field>
-    
+    <div class="form-section-header">
+      <mat-icon>person</mat-icon>
+      <span>Datos personales</span>
     </div>
 
-    <div class="row">
+    <div class="row mb-4">
 
-      <mat-form-field class="col-md-2">
-        <mat-label>Seleccionar</mat-label>
-        <mat-select formControlName="idepartamento" (selectionChange)="obtenerProvinciasDir()">
-          @for (departamento of departamentosDir; track departamento.idUbigeo) {
-            <mat-option [value]="departamento.ubiDpto">{{departamento.ubiNombre}}</mat-option>
+      <mat-form-field class="col-md-6">
+        <mat-label>Tipo de Doc.</mat-label>
+        <mat-select formControlName="tipodocumento">
+          @for (sp of tipodocumento; track $index) {
+          <mat-option [value]="sp.idTipoDocumento">{{sp.descripcion}}</mat-option>
           }
         </mat-select>
-        <mat-hint>Departamento</mat-hint>
-      </mat-form-field> 
-
-      <mat-form-field class="col-md-2">
-        <mat-label>Seleccionar</mat-label> 
-        <mat-select formControlName="idprovincia" (selectionChange)="obtenerDistritosDir()">
-          @for (provincia of provinciasDir; track provincia.idUbigeo) {
-            <mat-option [value]="provincia.ubiProvincia">{{provincia.ubiNombre}}</mat-option>
-          }
-        </mat-select>
-        <mat-hint>Provincia</mat-hint>
       </mat-form-field>
 
-      <mat-form-field class="col-md-2">
-        <mat-label>Seleccionar</mat-label>
-        <mat-select formControlName="iddistrito">
-          @for (distrito of distritosDir; track distrito.idUbigeo) {
-            <mat-option [value]="distrito.idUbigeo">{{distrito.ubiNombre}}</mat-option>
+      <mat-form-field class="col-md-6" appearance="fill">
+        <mat-label>N° Documento</mat-label>
+        <input matInput type="text" formControlName="numDocumento">
+
+        <!-- Botón de búsqueda con ícono de lupa al lado del input -->
+         @let searchButtonDisabled=buscando || form.get('numDocumento')?.invalid;
+        <button mat-icon-button matSuffix (click)="buscarxDoc()" [disabled]="searchButtonDisabled">
+          @if (buscando) {
+          <mat-spinner diameter="20"></mat-spinner>
+          }@else{
+          <mat-icon>search</mat-icon>
           }
-        </mat-select>
-        <mat-hint>Distrito</mat-hint>
+        </button>
       </mat-form-field>
 
-      <mat-form-field class="col-md-2">
+      <mat-form-field class="col-md-12">
+        <mat-label>Nombres</mat-label>
+        <input matInput type="text" formControlName="nombres" [value]="form.value.nombres">
+      </mat-form-field>
+
+      <mat-form-field class="col-md-12">
+        <mat-label>Ap. Paterno</mat-label>
+        <input matInput type="text" formControlName="apaterno" [value]="form.value.apaterno">
+      </mat-form-field>
+
+      <mat-form-field class="col-md-12">
+        <mat-label>Ap. Materno</mat-label>
+        <input matInput type="text" formControlName="amaterno" [value]="form.value.amaterno">
+      </mat-form-field>
+
+      <mat-form-field class="col-md-6">
         <mat-label>Fecha de Nacimiento</mat-label>
         <input matInput [matDatepicker]="picker1" formControlName="fNacimiento">
         <mat-datepicker-toggle matIconSuffix [for]="picker1"></mat-datepicker-toggle>
         <mat-datepicker #picker1></mat-datepicker>
       </mat-form-field>
 
-      <mat-form-field class="col-md-2">
+      <mat-form-field class="col-md-6">
+        <mat-label>Género</mat-label>
+        <mat-select formControlName="genero">
+          @for (genero of genero; track genero) {
+          <mat-option [value]="$index">{{genero}}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field class="col-md-12">
+        <mat-label>Nivel de Educación</mat-label>
+        <mat-select formControlName="niveleducacion">
+          @for (sp of niveleducacion; track $index) {
+          <mat-option [value]="sp.idNivelEducacion">{{sp.descripcion}}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+    </div>
+
+    <div class="form-section-header">
+      <mat-icon>location_on</mat-icon>
+      <span>Ubicación</span>
+    </div>
+
+    <div class="row mb-4">
+
+      <mat-form-field class="col-md-12">
+        <mat-label>Departamento</mat-label>
+        <mat-select formControlName="idDepartamento" (selectionChange)="seleccionarDepartamento()">
+          @for (departamento of departamentosDir; track departamento.idUbigeo) {
+          <mat-option [value]="departamento.ubiDpto">{{departamento.ubiNombre}}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field class="col-md-12">
+        <mat-label>Provincia</mat-label>
+        <mat-select formControlName="idProvincia" (selectionChange)="seleccionarProvincia()">
+          @for (provincia of provinciasDir; track provincia.idUbigeo) {
+          <mat-option [value]="provincia.ubiProvincia">{{provincia.ubiNombre}}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field class="col-md-12">
+        <mat-label>Distrito</mat-label>
+        <mat-select formControlName="idDistrito">
+          @for (distrito of distritosDir; track distrito.idUbigeo) {
+          <mat-option [value]="distrito.idUbigeo">{{distrito.ubiNombre}}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field class="col-md-12">
         <mat-label>Dirección</mat-label>
         <input matInput type="text" formControlName="direccion">
       </mat-form-field>
-      
-      <mat-form-field class="col-md-2">
-        <mat-label>Código Trabajador</mat-label>
-        <input matInput type="text" formControlName="codigoTrabajador">
-      </mat-form-field>
     </div>
 
-    <div class="row">
-      <mat-form-field class="col-md-2">
+    <div class="form-section-header">
+      <mat-icon>work</mat-icon>
+      <span>Información laboral</span>
+    </div>
+
+    <div class="row mb-4">
+      <mat-form-field class="col-md-12">
+        <mat-label>Código de trabajador</mat-label>
+        <input matInput type="text" formControlName="codigoTrabajador">
+      </mat-form-field>
+
+      <mat-form-field class="col-md-12">
         <mat-label> Cargo</mat-label>
         <input matInput type="text" formControlName="cargo">
       </mat-form-field>
 
-      <mat-form-field class="col-md-2">
-        <mat-label>Fecha Ingreso</mat-label>
+      <mat-form-field class="col-md-12">
+        <mat-label>Fecha de ingreso</mat-label>
         <input matInput [matDatepicker]="picker2" formControlName="fingreso">
         <mat-datepicker-toggle matIconSuffix [for]="picker2"></mat-datepicker-toggle>
         <mat-datepicker #picker2></mat-datepicker>
       </mat-form-field>
 
-      <mat-form-field class="col-md-2">
-        <mat-label>Fecha Salida</mat-label>
+      <mat-form-field class="col-md-12">
+        <mat-label>Fecha de salida</mat-label>
         <input matInput [matDatepicker]="picker3" formControlName="fsalida">
         <mat-datepicker-toggle matIconSuffix [for]="picker3"></mat-datepicker-toggle>
         <mat-datepicker #picker3></mat-datepicker>
       </mat-form-field>
 
-      <mat-form-field class="col-md-2">
-        <mat-label>Horario de Trabajo</mat-label>
+      <mat-form-field class="col-md-12">
+        <mat-label>Horario de trabajo</mat-label>
         <input matInput type="text" formControlName="horariotrabajo">
       </mat-form-field>
 
-      <mat-form-field class="col-md-2">
+      <mat-form-field class="col-md-12">
+        <mat-label>Oficina</mat-label>
+        <mat-select formControlName="oficina">
+          @for (sp of oficina; track $index) {
+          <mat-option [value]="sp.idOficina">{{sp.descripcion}}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field class="col-md-12">
+        <mat-label>Tipo de contrato</mat-label>
+        <mat-select formControlName="tipocontrato">
+          @for (tipocontrato of tipocontrato; track $index) {
+          <mat-option [value]="tipocontrato">{{tipocontrato}}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+    </div>
+
+    <div class="form-section-header">
+      <mat-icon>attach_money</mat-icon>
+      <span>Remunaración</span>
+    </div>
+
+    <div class="row mb-4">
+
+      <mat-form-field class="col-md-12">
         <mat-label>Salario</mat-label>
         <input matInput type="number" formControlName="salario">
       </mat-form-field>
 
-      <mat-form-field class="col-md-2">
-          <mat-label>Seleccionar</mat-label>
-          <mat-select formControlName="niveleducacion" >
-            @for (sp of niveleducacion; track $index) {
-              <mat-option [value]="sp.idNivelEducacion">{{sp.descripcion}}</mat-option>
-            }
-          </mat-select>
-          <mat-hint>Nivel de Educación</mat-hint>
+      <mat-form-field class="col-md-12">
+        <mat-label>Bonificaciones</mat-label>
+        <input matInput type="number" formControlName="bonificaciones">
       </mat-form-field>
-    
+
     </div>
 
-      <div class="row">
-        <mat-form-field class="col-md-2">
-          <mat-label>Seleccionar</mat-label>
-          <mat-select formControlName="oficina" >
-            @for (sp of oficina; track $index) {
-              <mat-option [value]="sp.idOficina">{{sp.descripcion}}</mat-option>
-            }
-          </mat-select>
-          <mat-hint>Oficina</mat-hint>
-        </mat-form-field>
+    <div class="form-section-header">
+      <mat-icon>article</mat-icon>
+      <span>Información adicional</span>
+    </div>
 
-        <mat-form-field class="col-md-2">
-          <mat-label>Seleccionar</mat-label>
-          <mat-select formControlName="oficina" >
-            @for (sp of oficina; track $index) {
-              <mat-option [value]="sp.idOficina">{{sp.descripcion}}</mat-option>
-            }
-          </mat-select>
-          <mat-hint>Oficina</mat-hint>
-        </mat-form-field>
-        
-        <mat-form-field class="col-md-2">
-          <mat-label>Bonificaciones</mat-label>
-          <input matInput type="number" formControlName="bonificaciones">
-        </mat-form-field>
+    <div class="row mb-4">
 
-        <mat-form-field class="col-md-2">
-          <mat-label>Seleccionar</mat-label>
-          <mat-select formControlName="tipocontrato" >
-            @for (tipocontrato of tipocontrato; track $index) {
-              <mat-option [value]="$index">{{tipocontrato}}</mat-option>
-            }
-          </mat-select>
-          <mat-hint>Tipo de Contrato</mat-hint>
-        </mat-form-field>
+      <mat-form-field class="col-md-12">
+        <mat-label>Metas</mat-label>
+        <input matInput type="text" formControlName="metas">
+      </mat-form-field>
 
-        <mat-form-field class="col-md-2">
-          <mat-label>Metas</mat-label>
-          <input matInput type="text" formControlName="metas">
-        </mat-form-field>
+      <mat-form-field class="col-md-12">
+        <mat-label>Url de Linkendin</mat-label>
+        <input matInput type="text" formControlName="linkedin">
+      </mat-form-field>
 
-        <mat-form-field class="col-md-2">
-          <mat-label>Url Linkendin</mat-label>
-          <input matInput type="text" formControlName="linkedin">
-        </mat-form-field>
+      <mat-form-field class="col-md-12">
+        <mat-label>Observaciones</mat-label>
+        <input matInput type="text" formControlName="observaciones">
+      </mat-form-field>
 
+    </div>
+
+    <div class="form-section-header">
+      <mat-icon>photo_camera</mat-icon>
+      <span>fotografía</span>
+    </div>
+
+    <div class="row mb-4">
+
+      <div class="col-md-12">
+        <input type="file" class="form-control" formControlName="urlFoto">
       </div>
 
-      <div class="row">
+    </div>
 
-        <mat-form-field class="col-md-2">
-          <mat-label>Observaciones</mat-label>
-          <input matInput type="text" formControlName="observaciones">
-        </mat-form-field>
+  </form>
 
-        <div class="col-md-2">
-          <input type="file" class="form-control" formControlName="urlFoto">
-          <mat-hint>Seleccionar foto</mat-hint>
-        </div>
-      </div>
-
-    </form>
-  
 </mat-dialog-content>
 
 
 <mat-dialog-actions align="end">
   <button mat-button mat-dialog-close btnCancelar>Cancelar</button>
-  <button mat-button [mat-dialog-close]="true" cdkFocusInitial><mat-icon>save</mat-icon> Guardar</button>
+  <button mat-button cdkFocusInitial [disabled]="form.invalid" (click)="save()"><mat-icon>save</mat-icon> Guardar</button>
 </mat-dialog-actions>

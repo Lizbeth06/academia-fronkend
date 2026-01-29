@@ -14,8 +14,8 @@ export class Trabajador {
     metas:          string;
     observaciones:  string;
     bonificaciones: number;
-    persona:       Persona;
+    persona:        Persona;
     niveleducacion: Niveleducacion;
-    oficina:       Oficina;
+    oficina:        Oficina;
+    isActive:       0|1;
 }
-
