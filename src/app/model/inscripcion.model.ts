@@ -7,6 +7,7 @@ export interface Inscripcion {
   finscripcion: Date;
   observacion: string;
   listahorario: Listahorario;
+  numRegistro: string;
   estado: string;
   tiposeguro: Tiposeguro;
   tipoinscripcion: Tipoinscripcion;

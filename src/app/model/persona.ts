@@ -7,7 +7,7 @@ export class Persona {
   nombres: string;
   apaterno: string;
   amaterno: string;
-  genero: number;
+  genero: string;
   correo: string;
   telefono: string;
   direccion: string;
