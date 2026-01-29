@@ -1,5 +1,5 @@
 export interface Disciplina {
-  idDisciplina: number;
+  idDisciplina?: number;
   codigo: string;
   descripcion: string;
   edadDeporte: string;

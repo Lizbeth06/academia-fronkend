@@ -7,6 +7,7 @@ import { Observable, of, Subject } from "rxjs";
 import { Listahorariobloque } from "../model/listahorario.model";
 import { TokenService } from "./token.service";
 import { ConvocatoriaAgrupada } from "../model/convocatoriaagrupada.model";
+import { DisciplinaSede } from "../model/disciplinasede.model";
 
 @Injectable({
   providedIn: "root",
@@ -31,6 +32,15 @@ export class ConvocatoriaService extends GenericService<Convocatoria> {
   getAllConvocatoria(): Observable<ConvocatoriaAgrupada[]> {
     const token: string = this.tokenService.getToken() ?? "";
     return this.http.get<ConvocatoriaAgrupada[]>(`${this.urlApi}/listaconvocatorias`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  }
+
+  getConvocatoriapordisciplina(): Observable<DisciplinaSede[]> {
+    const token: string = this.tokenService.getToken() ?? "";
+    return this.http.get<DisciplinaSede[]>(`${this.urlApi}/listapordisciplina`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

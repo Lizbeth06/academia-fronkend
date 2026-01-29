@@ -20,72 +20,68 @@
       </button>
     </div>
     <ng-container *ngIf="mostrarFiltros">
-      <div class="col-12 col-md-3">
-        <mat-form-field appearance="outline">
-          <mat-label>Región</mat-label>
-          <mat-select [(ngModel)]="regionSeleccionada" (ngModelChange)="aplicarFiltros()">
-            <mat-option value="">Todas las regiones</mat-option>
-            @for (region of regiones; track region) {
-            <mat-option [value]="region">
-              {{ region }}
-            </mat-option>
-            }
-          </mat-select>
-          <mat-icon matPrefix>location_on</mat-icon>
-        </mat-form-field>
-      </div>
+      <form [formGroup]="filtrosForm">
+        <div class="row">
+          <div class="col-12 col-md-3">
+            <mat-form-field appearance="outline">
+              <mat-label>Región</mat-label>
+              <mat-select formControlName="region" (selectionChange)="onDepartamentoChange()">
+                <mat-option value="">Todas las regiones</mat-option>
+                <mat-option *ngFor="let region of regiones" [value]="region">
+                  {{ region.ubiNombre }}
+                </mat-option>
+              </mat-select>
+              <mat-icon matPrefix>location_on</mat-icon>
+            </mat-form-field>
+          </div>
 
-      <div class="col-12 col-md-3">
-        <mat-form-field appearance="outline">
-          <mat-label>Sede</mat-label>
-          <mat-select [(ngModel)]="sedeSeleccionada" (ngModelChange)="aplicarFiltros()">
-            <mat-option value="">Todas las sedes</mat-option>
-            @for (sede of sedes; track sede) {
-            <mat-option [value]="sede">
-              {{ sede }}
-            </mat-option>
-            }
-          </mat-select>
-          <mat-icon matPrefix>stadium</mat-icon>
-        </mat-form-field>
-      </div>
-      <div class="col-12 col-md-3">
-        <!-- Filtro Deporte (NUEVO) -->
-        <mat-form-field appearance="outline">
-          <mat-label>Deporte</mat-label>
-          <mat-select [(ngModel)]="deporteSeleccionado" (ngModelChange)="aplicarFiltros()">
-            <mat-option value="">Todos los deportes</mat-option>
-            @for (deporte of deportes; track deporte) {
-            <mat-option [value]="deporte">
-              {{ deporte }}
-            </mat-option>
-            }
-          </mat-select>
-          <mat-icon matPrefix>sports_soccer</mat-icon>
-        </mat-form-field>
-      </div>
-      <div class="col-12 col-md-3">
-        <!-- Filtro Tipo Convocatoria (NUEVO) -->
-        <mat-form-field appearance="outline">
-          <mat-label>Tipo Convocatoria</mat-label>
-          <mat-select [(ngModel)]="tipoSeleccionado" (ngModelChange)="aplicarFiltros()">
-            <mat-option value="">Todos los tipos</mat-option>
-            @for (tipo of tiposConvocatoria; track tipo) {
-            <mat-option [value]="tipo.idTipoconvocatoria">
-              {{ tipo.descripcion }}
-            </mat-option>
-            }
-          </mat-select>
-          <mat-icon matPrefix>category</mat-icon>
-        </mat-form-field>
-      </div>
-      <div class="col-12 col-md-12">
-        <!-- Botón limpiar -->
-        <button mat-raised-button class="btn-limpiar w-100 mb-4" (click)="limpiarFiltros()">
-          <mat-icon>clear_all</mat-icon>
-          Limpiar Filtros
-        </button>
-      </div>
+          <div class="col-12 col-md-3">
+            <mat-form-field appearance="outline">
+              <mat-label>Sede</mat-label>
+              <mat-select formControlName="sede" (selectionChange)="aplicarFiltros()">
+                <mat-option value="">Todas las sedes</mat-option>
+                <mat-option *ngFor="let sede of sedes" [value]="sede">
+                  {{ sede.nombre }}
+                </mat-option>
+              </mat-select>
+              <mat-icon matPrefix>stadium</mat-icon>
+            </mat-form-field>
+          </div>
+          <div class="col-12 col-md-3">
+            <!-- Filtro Deporte (NUEVO) -->
+            <mat-form-field appearance="outline">
+              <mat-label>Deporte</mat-label>
+              <mat-select formControlName="deporte" (selectionChange)="aplicarFiltros()">
+                <mat-option value="">Todos los deportes</mat-option>
+                <mat-option *ngFor="let deporte of deportes" [value]="deporte">
+                  {{ deporte.descripcion }}
+                </mat-option>
+              </mat-select>
+              <mat-icon matPrefix>sports_soccer</mat-icon>
+            </mat-form-field>
+          </div>
+          <div class="col-12 col-md-3">
+            <!-- Filtro Tipo Convocatoria (NUEVO) -->
+            <mat-form-field appearance="outline">
+              <mat-label>Tipo Convocatoria</mat-label>
+              <mat-select formControlName="tipo" (selectionChange)="aplicarFiltros()">
+                <mat-option value="">Todos los tipos</mat-option>
+                <mat-option *ngFor="let tipo of tiposConvocatoria" [value]="tipo">
+                  {{ tipo.descripcion }}
+                </mat-option>
+              </mat-select>
+              <mat-icon matPrefix>category</mat-icon>
+            </mat-form-field>
+          </div>
+          <div class="col-12 col-md-12">
+            <!-- Botón limpiar -->
+            <button mat-raised-button class="btn-limpiar w-100 mb-4" (click)="limpiarFiltros()">
+              <mat-icon>clear_all</mat-icon>
+              Limpiar Filtros
+            </button>
+          </div>
+        </div>
+      </form>
     </ng-container>
   </div>
 </div>
@@ -95,8 +91,8 @@
   <p>Cargando convocatorias...</p>
 </div>
 
-<div class="convocatorias-cards row" *ngIf="!cargando && listaconvocatoriaCard.length > 0">
-  <div *ngFor="let conv of listaconvocatoriaCard" class="flip-card-container col-12 col-sm-6 col-md-4 mb-4">
+<div class="convocatorias-cards row" *ngIf="!cargando && listaconvocatoriaFiltro.length > 0">
+  <div *ngFor="let conv of listaconvocatoriaFiltro" class="flip-card-container col-12 col-sm-12 col-md-4 mb-4">
     <div class="flip-card">
       <!-- FRENTE -->
       <div class="flip-card-front">
@@ -104,8 +100,8 @@
         <div class="card-gradient"></div>
 
         <div class="card-badges">
-          <span class="badge-tipo" [ngClass]="conv.horario.modalidad.idModalidad === 2 ? 'tipo-paradeporte' : 'tipo-deporte'">{{
-            conv.horario.modalidad.descripcion
+          <span class="badge-tipo" [ngClass]="conv.horario[0].modalidad.idModalidad === 2 ? 'tipo-paradeporte' : 'tipo-deporte'">{{
+            conv.horario[0].modalidad.descripcion
           }}</span>
           <span class="badge-estado" [ngClass]="conv.convocatoria.estado === '1' ? 'estado-activa' : 'estado-cerrada'">
             <mat-icon>{{ conv.convocatoria.estado === "1" ? "check_circle" : "cancel" }}</mat-icon>
@@ -114,7 +110,10 @@
         </div>
 
         <div class="card-front-info">
-          <h3>{{ conv.convocatoria.titulo }}</h3>
+          <h3>{{ `${conv.disciplina.descripcion}-${conv.convocatoria.titulo}` }}</h3>
+          <h4 class="d-flex align-items-center">
+            <mat-icon>location_on</mat-icon>{{ conv.sede.nombre.charAt(0).toUpperCase() + conv.sede.nombre.slice(1).toLowerCase() }}
+          </h4>
           <p class="hover-hint">
             <mat-icon>touch_app</mat-icon>
             Ver más detalles
@@ -126,11 +125,11 @@
       <div class="flip-card-back">
         <div class="back-header">
           <span class="back-estado" [ngClass]="conv.convocatoria.estado === '1' ? 'estado-activa' : 'estado-cerrada'">
-            <mat-icon>{{ conv.estado === "1" ? "check_circle" : "cancel" }}</mat-icon>
+            <mat-icon>{{ conv.convocatoria.estado === "1" ? "check_circle" : "cancel" }}</mat-icon>
             {{ conv.convocatoria.estado === "1" ? "ACTIVA" : "CERRADA" }}
           </span>
-          <span class="back-tipo" [ngClass]="conv.horario.modalidad.idModalidad === 2 ? 'tipo-paradeporte' : 'tipo-deporte'">{{
-            conv.horario.modalidad.descripcion
+          <span class="back-tipo" [ngClass]="conv.horario[0].modalidad.idModalidad === 2 ? 'tipo-paradeporte' : 'tipo-deporte'">{{
+            conv.horario[0].modalidad.descripcion
           }}</span>
         </div>
         <div class="back-content">
@@ -138,13 +137,13 @@
           <p class="back-subtitle">{{ conv.convocatoria.subtitulo }}</p>
 
           <div class="back-horarios">
-            <div class="horario-item">
+            <div class="horario-item" *ngFor="let horario of conv.horario">
               <mat-icon>access_time</mat-icon>
               <div class="horario-data">
-                <span class="horario-turno">{{ conv.horario.turno.horafin }}</span>
+                <span class="horario-turno">{{ obtenerDiasHora(horario) }}</span>
                 <span class="horario-cupos">
                   <mat-icon>groups</mat-icon>
-                  {{ conv.horario.numVacante - conv.horario.contador }}/{{ conv.horario.numVacante }}
+                  {{ horario.numVacante - horario.contador }}/{{ horario.numVacante }}
                 </span>
               </div>
             </div>
@@ -161,9 +160,9 @@
   </div>
 </div>
 
-<div *ngIf="listaconvocatoriaCard.length === 0" class="no-results">
+<div *ngIf="listaconvocatoriaFiltro.length === 0" class="no-results">
   <mat-icon>search_off</mat-icon>
   <h3>No se encontraron convocatorias</h3>
   <p>Intenta ajustar los filtros de búsqueda</p>
-  <!-- <button mat-raised-button color="primary" (click)="limpiarFiltros()">Limpiar filtros</button> -->
+  <button mat-raised-button color="primary" (click)="limpiarFiltros()">Limpiar filtros</button>
 </div>

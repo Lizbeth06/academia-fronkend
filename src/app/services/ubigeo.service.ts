@@ -15,7 +15,7 @@ export class UbigeoService extends GenericService<Ubigeo> {
     super(http, `${environment.HOST}/api/ubigeo`);
   }
 
-  findAllDepartments() {
+  getAllDepartments() {
     return this.http.get<Ubigeo[]>(`${environment.HOST}/api/ubigeo/departamentos`);
   }
 

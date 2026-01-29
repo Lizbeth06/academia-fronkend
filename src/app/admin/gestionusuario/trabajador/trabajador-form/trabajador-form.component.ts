@@ -52,7 +52,7 @@ export class TrabajadorFormComponent {
       this.oficina = data;
     });
 
-    this.ubigeoService.findAllDepartments().subscribe((data) => {
+    this.ubigeoService.getAllDepartments().subscribe((data) => {
       this.departamentosDir = data;
     });
   }

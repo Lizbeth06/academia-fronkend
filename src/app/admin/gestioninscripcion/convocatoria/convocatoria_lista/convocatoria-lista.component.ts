@@ -15,7 +15,6 @@ import { DisciplinaService } from "../../../../services/disciplina.service";
 import { CategoriaedadService } from "../../../../services/categoriaedad.service";
 import { Temporada } from "../../../../model/temporada.model";
 import { Sede } from "../../../../model/sede.model";
-import { Disciplina } from "../../../../model/disciplina";
 import { MaterialModule } from "../../../../material/material.module";
 import { Router, RouterLink } from "@angular/router";
 import { Categoriaedad } from "../../../../model/categoriaedad.model";
@@ -29,6 +28,7 @@ import { MatDialogRef } from "@angular/material/dialog";
 import { DialogService } from "../../../../services/dialog/dialog.service";
 import { ToastrService } from "ngx-toastr";
 import { ConvocatoriaAgrupada } from "../../../../model/convocatoriaagrupada.model";
+import { Disciplina } from "../../../../model/disciplina.model";
 /**
  * Interface actualizada con deportes y tipo
  */

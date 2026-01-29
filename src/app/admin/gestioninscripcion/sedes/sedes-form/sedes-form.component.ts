@@ -89,7 +89,7 @@ export class SedesFormComponent {
   // Cargando datos
   cargarDatos() {
     // Departamentos
-    this.ubigeoService.findAllDepartments().subscribe((data) => {
+    this.ubigeoService.getAllDepartments().subscribe((data) => {
       this.departamentos = data;
     });
     // Secores

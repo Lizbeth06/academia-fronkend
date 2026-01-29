@@ -74,7 +74,7 @@ export class ConvocatoriaFormComponent implements OnInit {
   urlImage = "";
 
   horarioColumns: string[] = ["id", "modalidad", "etapa", "categoria", "edad", "frecuencia", "hora", "estado", "vacante", "inscrito", "accion"];
-  displayedColumns: string[] = ["select", "horario", "modalidad", "ubicacion"];
+  displayedColumns: string[] = ["select", "horario", "modalidad", "sede", "ubicacion"];
   dataHorario = new MatTableDataSource<Horario>();
   selection = new SelectionModel<Horario>(true, []);
 
@@ -140,7 +140,7 @@ export class ConvocatoriaFormComponent implements OnInit {
       },
       error: (err) => console.error(err),
     });
-    this.ubigeoService.findAllDepartments().subscribe({
+    this.ubigeoService.getAllDepartments().subscribe({
       next: (data) => {
         this.departamentos = data;
       },

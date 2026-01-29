@@ -50,7 +50,7 @@ export class SelecthorarioFormComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.ubigeoService.findAllDepartments().subscribe((data) => (this.departamentos = data));
+    this.ubigeoService.getAllDepartments().subscribe((data) => (this.departamentos = data));
   }
 
   onDepartamentoChange(tipoForm?: string): void {

@@ -64,7 +64,7 @@ export class InstitucionFormComponent {
       this.tipodocumento = data.filter((tipo) => tipo.idTipoDocumento === 3);
     });
 
-    this.ubigeoService.findAllDepartments().subscribe((data) => {
+    this.ubigeoService.getAllDepartments().subscribe((data) => {
       this.departamentosDir = data;
     });
   }
