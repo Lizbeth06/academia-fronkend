@@ -185,8 +185,7 @@
                             {{ participante.nombres }} {{ participante.apellidoPaterno }} {{ participante.apellidoMaterno }}
                           </span>
                           <span class="participante-datos">
-                            DNI: {{ participante.numeroDocumento }} | {{ participante.sexo.toUpperCase().trim() }} |
-                            {{ obtenerEdad(participante.fechaNacimiento) }} años
+                            DNI: {{ participante.numeroDocumento }} | {{ participante.genero }} | {{ obtenerEdad(participante.fechaNacimiento) }} años
                             <!-- <span [class.modalidad-digital]="participante.modalidadEnvio === 'digital'"
                         [class.modalidad-presencial]="participante.modalidadEnvio === 'presencial'">
                         {{ participante.modalidadEnvio === 'digital' ? 'Digital' : 'Presencial' }}
@@ -260,14 +259,15 @@
           </div>
         }
         <!-- Formulario Actual (Para agregar o editar) -->
-        <mat-card class="form-card">
+        <mat-card class="form-card" *ngIf="participantes.length < 3">
           <mat-card-header>
             <mat-card-title>
-              {{ editandoParticipante ? "EDITAR PARTICIPANTE" : "DATOS DEL PARTICIPANTE" }}
+              {{ editandoParticipante ? "EDITAR PARTICIPANTE " : "DATOS DEL PARTICIPANTE " }}
             </mat-card-title>
-            @if (!editandoParticipante && participantes.length > 0) {
-              <div class="form-subtitle">Agregando participante #{{ participantes.length + 1 }}</div>
-            }
+
+            <div *ngIf="!editandoParticipante && participantes.length > 0" class="form-subtitle">
+              Agregando participante #{{ participantes.length + 1 }}
+            </div>
           </mat-card-header>
           <mat-card-content>
             <form [formGroup]="alumnoForm">
@@ -343,7 +343,7 @@
                     <mat-form-field appearance="outline" class="col-12">
                       <mat-label>Sexo</mat-label>
                       <mat-select formControlName="sexo">
-                        <mat-option *ngFor="let genero of generos" [value]="genero.descripcion">
+                        <mat-option *ngFor="let genero of generos" [value]="genero.idGenero">
                           {{ genero.descripcion }}
                         </mat-option>
                       </mat-select>
@@ -424,7 +424,7 @@
             <mat-icon>info</mat-icon>
             <span>
               Ha agregado <strong>{{ participantes.length }}</strong> {{ participantes.length === 1 ? "participante" : "participantes" }}.
-              {{ !editandoParticipante ? "Puede agregar más o continuar al siguiente paso." : "" }}
+              {{ !editandoParticipante ? `Puede agregar solo ${participantes.length} participantes.` : "" }}
             </span>
           </div>
         }
@@ -533,7 +533,7 @@
             </mat-accordion>
           </div>
         }
-        <div class="paso3-horizontal">
+        <div *ngIf="!mostrarAsinarparticipante" class="paso3-horizontal">
           <!-- COLUMNA IZQUIERDA: ELIGE UN COMPLEJO DEPORTIVO -->
           <mat-card class="form-card card-complejo">
             <mat-card-header>
@@ -546,11 +546,14 @@
                   <mat-label>Seleccionar Participante</mat-label>
                   <mat-select formControlName="participante" (selectionChange)="onParticipanteChange()">
                     <mat-option value="">--Seleccionar--</mat-option>
-                    @for (p of participantes; track p.numeroDocumento) {
-                      <mat-option [value]="p.numeroDocumento" [disabled]="yaExisteHorarioAsignado(p.numeroDocumento)">
-                        {{ p.nombres }} {{ p.apellidoPaterno }} {{ p.apellidoMaterno }}
-                      </mat-option>
-                    }
+                    <mat-option
+                      *ngFor="let p of participantes"
+                      [value]="p.numeroDocumento"
+                      [disabled]="yaExisteHorarioAsignado(p.numeroDocumento)"
+                      style="text-transform: uppercase"
+                    >
+                      {{ p.nombres }} {{ p.apellidoPaterno }} {{ p.apellidoMaterno }}
+                    </mat-option>
                   </mat-select>
                 </mat-form-field>
                 <!--  Los demás campos solo se muestran si hay participante seleccionado -->
@@ -777,15 +780,15 @@
             </mat-card-title>
           </mat-card-header>
           <mat-card-content>
-            <p class="mensaje-principal">
+            <p class="mensaje-principal" style="text-align: justify">
               Acaba de realizar <strong>{{ participantes.length }}</strong>
               {{ participantes.length === 1 ? "pre-inscripción" : "pre-inscripciones" }}
               en el programa "Academia IPD Deporte para Todos". Para descargar su ficha de pre-inscripción y/o declaración jurada, haga clic en los
               siguientes iconos de cada participante:
             </p>
-            <div class="modalidad-mensaje-presencial">
-              <mat-icon>info</mat-icon>
-              <p>
+            <div class="row modalidad-mensaje-presencial">
+              <mat-icon class="col-2">info</mat-icon>
+              <p class="col-10" style="text-align: justify">
                 Podrá presentar los documentos requeridos de manera presencial en el complejo deportivo seleccionado, dentro del horario de atención
                 de lunes a viernes, de 8:00 a. m. a 5:00 p. m., o, si lo prefiere, de forma virtual a través del enlace proporcionado en su correo
                 electrónico.
@@ -884,7 +887,7 @@
             </div> -->
                 <div class="ficha-item">
                   <strong>Domicilio:</strong>
-                  <span>{{ ficha.domicilio }}</span>
+                  <span>{{ ficha.domicilio.toUpperCase() }}</span>
                 </div>
                 <div class="ficha-item">
                   <strong>F.Nacimiento:</strong>

@@ -9,9 +9,10 @@ import { MaterialModule } from "../../material/material.module";
   selector: "app-dialogcustom",
   standalone: true,
   imports: [CommonModule, MaterialModule, MatDialogModule],
-  template: `<button type="button" class="closeDialogUp" mat-dialog-close></button>
-    <ng-container *ngTemplateOutlet="data.template; context: { $implicit: data.data }"> </ng-container>`,
-  // templateUrl: './dialogcustom.component.html',
+  template: `<ng-container class="dialog-content">
+    <button type="button" class="closeDialogUp" mat-dialog-close></button>
+    <ng-container *ngTemplateOutlet="data.template; context: { $implicit: data.data }"> </ng-container>
+  </ng-container>`,
   styleUrl: "./dialogcustom.component.css",
 })
 export class DialogcustomComponent {

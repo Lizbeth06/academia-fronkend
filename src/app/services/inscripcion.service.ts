@@ -30,6 +30,12 @@ export class InscripcionService extends GenericService<Inscripcion> {
     });
   }
 
+  generarExcelpreinscritos(): Observable<Blob> {
+    return this.http.get(`http://localhost:8080/api/reportes-excel/preinscritos/excel`, {
+      responseType: "blob",
+    });
+  }
+
   generarDeclaracionJurada(idInscripcion: number): Observable<Blob> {
     return this.http.get(`${this.url}/${idInscripcion}/declaracion-jurada`, {
       responseType: "blob",
@@ -43,6 +49,10 @@ export class InscripcionService extends GenericService<Inscripcion> {
 
   notificarCorreo(idInscripcion: number) {
     return this.http.post(`${this.url}/${idInscripcion}/notificacion-correo`, null);
+  }
+
+  anularPreinscripcion(idInscripcion: number) {
+    return this.http.delete(`${this.url}/${idInscripcion}/delete-preinscripcion`);
   }
 
   setInscripcionChange(data: Inscripcion[]) {

@@ -1,5 +1,12 @@
 <mat-tab-group animationDuration="200ms" class="px-2" [(selectedIndex)]="tabIndex">
   <mat-tab label="Convocatoria" class="tab-content">
+    <mat-card *ngIf="temporada.length === 0" class="alerta" routerLink="/admin/inscripcion/temporada" mat-dialog-close>
+      <div class="alerta-contenido">
+        <mat-icon color="warn">warning</mat-icon>
+        <p class="m-0">Por favor se le agradece, agregar al menos una temporada</p>
+      </div>
+    </mat-card>
+
     <div class="seccion-superior pb-1">
       <h3 class="fs-6 fw-400 mb-4 pl-4" align="start">Selección de horarios creados por sede deportivo</h3>
       <app-selecthorario-form (horariosSeleccionados)="horariosAgregados($event)" />
@@ -137,6 +144,7 @@
         </div>
 
         <div class="col-12 col-md-12 capa-image">
+          <h3 class="fs-6 text-center mb-4">Agregar imagen</h3>
           <div class="image-container" matTooltip="Subir imagen" matTooltipPosition="above">
             <input class="image-input" type="file" (change)="onImage($event)" #image accept="image/jpeg, image/png" name="image logo" />
             <mat-icon (click)="!habilitar || image.click()" *ngIf="!selectedImage" style="cursor: pointer">add_a_photo</mat-icon>
@@ -362,6 +370,18 @@
   <div class="title-modal" cdkFocusInitial>{{ idEditHorario == 0 ? "Agregando horarios" : "Actualizando Horario" }}</div>
   <div mat-dialog-content align="center">
     <p class="fs-6 fw-400 mb-4">HORARIO</p>
+    <mat-card *ngIf="categoriahorario.length === 0" class="alerta" routerLink="/admin/inscripcion/categoria" mat-dialog-close>
+      <div class="alerta-contenido">
+        <mat-icon color="warn">warning</mat-icon>
+        <p class="m-0">Por favor se le agradece, agregar por lo menos una categoría</p>
+      </div>
+    </mat-card>
+    <mat-card *ngIf="turnohorario.length === 0" class="alerta" routerLink="/admin/inscripcion/turnos" mat-dialog-close>
+      <div class="alerta-contenido">
+        <mat-icon color="warn">warning</mat-icon>
+        <p class="m-0">Por favor se le agradece, agregar por lo menos un turno</p>
+      </div>
+    </mat-card>
     <app-horarios-form [dialogData]="dialogData"></app-horarios-form>
   </div>
 </ng-template>

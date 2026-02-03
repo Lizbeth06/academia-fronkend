@@ -1083,28 +1083,26 @@ button:disabled {
 
 .modalidad-mensaje-presencial {
   display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  padding: 15px;
+  margin: 0;
   background: linear-gradient(135deg, rgba(255, 152, 0, 0.1), rgba(255, 193, 7, 0.1));
   border-left: 4px solid #ff9800;
   border-radius: 8px;
-  margin-top: 15px;
 }
 
 .modalidad-mensaje-presencial mat-icon {
+  padding-top: 24px;
   color: #ff9800;
   font-size: 24px;
-  width: 24px;
+  width: auto;
   height: 24px;
-  margin-top: 2px;
 }
 
 .modalidad-mensaje-presencial p {
-  margin: 0;
   font-size: 13px;
   color: #333;
   line-height: 1.5;
+  margin: 0;
+  padding: 12px;
 }
 
 /* Archivos Digitales */
@@ -1419,10 +1417,15 @@ button:disabled {
   height: 40px;
 }
 
+.carousel-prev,
+.carousel-next {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
 .carousel-prev {
   margin-left: -20px;
 }
-
 .carousel-next {
   margin-right: -20px;
 }
@@ -1547,6 +1550,7 @@ button:disabled {
 }
 
 .participante-nombre {
+  text-transform: uppercase;
   font-size: 16px;
   font-weight: 600;
   color: #333;
@@ -1829,7 +1833,6 @@ button:disabled {
   .carousel-prev {
     margin-left: -15px;
   }
-
   .carousel-next {
     margin-right: -15px;
   }

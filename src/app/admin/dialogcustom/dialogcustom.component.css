@@ -1,19 +1,32 @@
+.closeDialogUp {
+  font-size: 20px;
+  position: absolute;
+  top: 18px;
+  right: 10px;
+  background: transparent;
+  color: white;
+  border: none;
 
-.closeDialogUp{
-    font-size: 20px;
-    position: absolute;
-    top: 18px;
-    right: 10px;
-    background: transparent;
-    color:white;
-    border:none ;
-  
-    background: #3e8b87;
-    border-radius: 50%;
-    padding-top: 4px;
+  background: #3e8b87;
+  border-radius: 50%;
+  padding-top: 4px;
+}
+.closeDialogUp:hover {
+  cursor: pointer;
+  opacity: 0.9;
+}
+
+.dialog-content {
+  animation: sweetZoom 0.25s ease-out;
+}
+
+@keyframes sweetZoom {
+  from {
+    transform: scale(0.7);
+    opacity: 0;
   }
-  .closeDialogUp:hover {
-    cursor: pointer;
-    opacity: 0.9;
+  to {
+    transform: scale(1);
+    opacity: 1;
   }
-  
+}

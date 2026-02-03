@@ -31,7 +31,8 @@ import { Inscripcion, Tipoinscripcion } from "../../../../model/inscripcion.mode
 import { MaterialModule } from "../../../../material/material.module";
 import { calcularEdad } from "../../../../util/calculos.util";
 import { validarInput, ValidationType } from "../../../../util/validaciones.util";
-import { genero } from "../../../../core/data/genders.data";
+import { Genero } from "../../../../model/genero.model";
+import { GeneroService } from "../../../../services/genero.service";
 
 // Formato de fecha personalizado
 export const MY_DATE_FORMATS = {
@@ -84,7 +85,7 @@ export interface ParticipanteView {
   apellidoMaterno: string;
   nombres: string;
   fechaNacimiento: Date;
-  sexo: string;
+  genero: number;
   tipoRelacionApoderado: number;
   tipoSeguro: number;
   tieneDiscapacidad: boolean;
@@ -125,7 +126,7 @@ export class PreInscripcionComponent implements OnInit {
   ) {}
 
   mapaUrlSanitizada!: SafeResourceUrl;
-  generos = genero;
+  generos: Genero[] = [];
   // Formularios para cada paso
   apoderadoForm!: FormGroup;
   alumnoForm!: FormGroup;
@@ -228,6 +229,7 @@ export class PreInscripcionComponent implements OnInit {
 
   //Servicios
   tipodocumentoService = inject(TipodocumentoService);
+  generoService = inject(GeneroService);
   ubigeoService = inject(UbigeoService);
   tiposeguroService = inject(TiposeguroService);
   sedeService = inject(SedeService);
@@ -305,6 +307,9 @@ export class PreInscripcionComponent implements OnInit {
   }
 
   cargarDatosIniciales(): void {
+    this.generoService.findAll().subscribe((data) => {
+      this.generos = data;
+    });
     //Tipos de documentos de identidad
     this.tipodocumentoService.findAll().subscribe((data) => {
       this.tiposDocumento = data.filter((td) => td.idTipoDocumento < 3);
@@ -479,7 +484,12 @@ export class PreInscripcionComponent implements OnInit {
 
   agregarParticipante(): void {
     if (this.alumnoForm.valid) {
-      const alumnoFormValues = this.alumnoForm.value;
+      const alumnoFormValues = {
+        ...this.alumnoForm.value,
+        nombres: this.alumnoForm.value.nombres.toUpperCase().trim(),
+        apellidoPaterno: this.alumnoForm.value.apellidoPaterno.toUpperCase().trim(),
+        apellidoMaterno: this.alumnoForm.value.apellidoMaterno.toUpperCase().trim(),
+      };
       const nuevoParticipante: ParticipanteView = { ...alumnoFormValues };
 
       this.participantes.push(nuevoParticipante);
@@ -820,7 +830,11 @@ export class PreInscripcionComponent implements OnInit {
     }, 100);
   }
 
+  mostrarAsinarparticipante = false;
   yaExisteHorarioAsignado(participanteId: string): boolean {
+    if (this.participantes.length === this.horariosAsignados.length) {
+      this.mostrarAsinarparticipante = true;
+    }
     return this.horariosAsignados.some((h) => h.participanteId === participanteId);
   }
 
@@ -853,6 +867,7 @@ export class PreInscripcionComponent implements OnInit {
 
   //  NUEVO: Eliminar horario
   eliminarHorario(horario: HorarioAsignado): void {
+    this.mostrarAsinarparticipante = false;
     if (confirm(`¿Está seguro de eliminar el horario de ${horario.participanteNombre}?`)) {
       this.horariosAsignados = this.horariosAsignados.filter((h) => h.participanteId !== horario.participanteId);
 
@@ -930,7 +945,7 @@ export class PreInscripcionComponent implements OnInit {
               nombres: participanteView.nombres.toUpperCase().trim(),
               apaterno: participanteView.apellidoPaterno.toUpperCase().trim(),
               amaterno: participanteView.apellidoMaterno.toUpperCase().trim(),
-              genero: participanteView.sexo.trim(),
+              genero: { idGenero: participanteView.genero } as Genero,
               fnacimiento: participanteView.fechaNacimiento,
               tipodocumento: {
                 idTipoDocumento: participanteView.tipoDocumento,

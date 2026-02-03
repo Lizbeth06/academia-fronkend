@@ -1,134 +1,173 @@
+<mat-progress-bar *ngIf="loading" mode="indeterminate" color="primary" class="top-loader"> </mat-progress-bar>
+
 <div class="mb-4" align="end">
   <button matButton="elevated" color="warn" (click)="volver()"><mat-icon>subdirectory_arrow_left</mat-icon>Volver</button>
 </div>
 
-<div align="center">
-  <h3 class="m-4 fs-4">
-    INFORMACIÓN DE
-    {{
-      `${datosParticipante.apoderadoparticipante.participante.persona.apaterno} ${datosParticipante.apoderadoparticipante.participante.persona.amaterno} ${datosParticipante.apoderadoparticipante.participante.persona.nombres}`
-    }}
-  </h3>
-</div>
-
-<div class="datos-alumno row">
-  <div class="col-12 col-md-8">
-    <mat-accordion>
-      <mat-expansion-panel [expanded]="true">
-        <mat-expansion-panel-header>
-          <mat-panel-title class="text-center">Datos principales </mat-panel-title>
-        </mat-expansion-panel-header>
-
-        <div class="table-container">
-          <table style="width: 100%; border-collapse: collapse">
-            <tr>
-              <td style="width: 15%; padding: 8px; font-weight: 600">Tipo documento:</td>
-              <td style="width: 35%; padding: 8px">{{ datosParticipante.apoderadoparticipante.participante.persona.tipodocumento.descripcion }}</td>
-              <td style="width: 15%; padding: 8px; font-weight: 600">Núm. Documento:</td>
-              <td style="width: 35%; padding: 8px">{{ datosParticipante.apoderadoparticipante.participante.persona.numDocumento }}</td>
-            </tr>
-            <tr>
-              <td style="padding: 8px; font-weight: 600">F. Nacimiento:</td>
-              <td style="padding: 8px">{{ datosParticipante.apoderadoparticipante.participante.persona.fnacimiento }}</td>
-              <td style="padding: 8px; font-weight: 600">Dirección:</td>
-              <td style="padding: 8px">{{ datosParticipante.apoderadoparticipante.apoderado.persona.direccion }}</td>
-            </tr>
-            <tr>
-              <td style="padding: 8px; font-weight: 600">Estado:</td>
-              <td style="padding: 8px">
-                <span class="chip-estado">{{ datosParticipante.tipoinscripcion.descripcion }}</span>
-              </td>
-              <td style="padding: 8px; font-weight: 600">Deporte:</td>
-              <td style="padding: 8px">{{ datosParticipante.listahorario.horario.listadisciplina.disciplina.descripcion }}</td>
-            </tr>
-            <tr>
-              <td style="padding: 8px; font-weight: 600">Modalidad:</td>
-              <td style="padding: 8px">{{ datosParticipante.listahorario.horario.modalidad.descripcion }}</td>
-              <td style="padding: 8px; font-weight: 600">Categoria:</td>
-              <td style="padding: 8px">{{ datosParticipante.listahorario.horario.categoriaedad.edadmaxima }}</td>
-            </tr>
-            <tr>
-              <td style="padding: 8px; font-weight: 600">Complejo:</td>
-              <td style="padding: 8px">{{ datosParticipante.listahorario.horario.listadisciplina.sede.nombre }}</td>
-              <td style="padding: 8px; font-weight: 600">Horario:</td>
-              <td style="padding: 8px">{{ mostrarTiempo(datosParticipante.listahorario.horario.turno) }}</td>
-            </tr>
-          </table>
-        </div>
-      </mat-expansion-panel>
-
-      <mat-expansion-panel>
-        <mat-expansion-panel-header>
-          <mat-panel-title class="text-center">Archivos de beneficiario</mat-panel-title>
-        </mat-expansion-panel-header>
-        <div class="table-container">
-          <table class="tabla-4c">
-            <tr>
-              <td><strong>Declaración jurada:</strong></td>
-              <td>
-                <a
-                  ><img
-                    src="https://res.cloudinary.com/dpumt2sth/image/upload/v1763512471/pdf_r7zwl3.png"
-                    class="pdf-img"
-                    alt="PDF"
-                    (click)="generarDocumentos('declaracion')"
-                /></a>
-              </td>
-
-              <td><strong>Ficha de inscripción:</strong></td>
-              <td>
-                <a
-                  ><img
-                    src="https://res.cloudinary.com/dpumt2sth/image/upload/v1763512471/pdf_r7zwl3.png"
-                    class="pdf-img"
-                    alt="PDF"
-                    (click)="generarDocumentos('ficha')"
-                /></a>
-              </td>
-            </tr>
-          </table>
-        </div>
-      </mat-expansion-panel>
-
-      <mat-expansion-panel>
-        <mat-expansion-panel-header>
-          <mat-panel-title class="text-center">Datos Familiares</mat-panel-title>
-        </mat-expansion-panel-header>
-        <div class="table-container">
-          <table style="width: 100%">
-            <tr>
-              <td style="padding: 8px"><strong>Nombre Tutor:</strong></td>
-              <td style="padding: 8px">
-                {{
-                  `${datosParticipante.apoderadoparticipante.apoderado.persona.apaterno} ${datosParticipante.apoderadoparticipante.apoderado.persona.amaterno} ${datosParticipante.apoderadoparticipante.apoderado.persona.nombres}`
-                }}
-              </td>
-            </tr>
-            <tr>
-              <td style="padding: 8px"><strong>Parentesco:</strong></td>
-              <td style="padding: 8px">{{ datosParticipante.apoderadoparticipante.tiporelacion.descripcion }}</td>
-            </tr>
-            <tr>
-              <td style="padding: 8px"><strong>Número documento:</strong></td>
-              <td style="padding: 8px">{{ datosParticipante.apoderadoparticipante.apoderado.persona.numDocumento }}</td>
-            </tr>
-
-            <tr>
-              <td style="padding: 8px"><strong>Teléfono/Celular:</strong></td>
-              <td style="padding: 8px">{{ datosParticipante.apoderadoparticipante.apoderado.persona.telefono }}</td>
-            </tr>
-          </table>
-        </div>
-      </mat-expansion-panel>
-    </mat-accordion>
+<ng-container *ngIf="!loading && datosParticipante as participante">
+  <div align="center">
+    <h3 class="m-4 fs-4">
+      INFORMACIÓN DE
+      {{
+        `${participante.apoderadoparticipante.participante.persona.apaterno} ${participante.apoderadoparticipante.participante.persona.amaterno} ${participante.apoderadoparticipante.participante.persona.nombres}`
+      }}
+    </h3>
   </div>
-  <div class="col-12 col-md-4">
-    <!-- <button mat-raised-button color="primary" class="btn-phone mb-2" style="width: 100%"><mat-icon>phone</mat-icon> Llamar</button> -->
-    <button mat-raised-button color="accent" class="mb-2" style="width: 100%"><mat-icon>email</mat-icon> Enviar Correo</button>
-    <button mat-stroked-button color="warn" class="mb-2" style="width: 100%"><mat-icon>check_circle</mat-icon> Confirmar Inscripción</button>
-    <button mat-stroked-button class="btn-amarillo mb-2" style="width: 100%" (click)="generarDocumentos()">
-      <mat-icon>download</mat-icon> Carnet Digital
-    </button>
-    <button mat-flat-button class="btn-red mb-2" style="width: 100%"><mat-icon>remove_circle</mat-icon> Retirar Pre-inscripción</button>
+
+  <div class="datos-alumno row">
+    <div class="col-12 col-md-8">
+      <mat-accordion>
+        <mat-expansion-panel [expanded]="true">
+          <mat-expansion-panel-header>
+            <mat-panel-title class="text-center">Datos principales </mat-panel-title>
+          </mat-expansion-panel-header>
+
+          <div class="table-container">
+            <table style="width: 100%; border-collapse: collapse">
+              <tr>
+                <td style="width: 15%; padding: 8px; font-weight: 600">Tipo documento:</td>
+                <td style="width: 35%; padding: 8px">{{ participante.apoderadoparticipante.participante.persona.tipodocumento.descripcion }}</td>
+                <td style="width: 15%; padding: 8px; font-weight: 600">Núm. Documento:</td>
+                <td style="width: 35%; padding: 8px">{{ participante.apoderadoparticipante.participante.persona.numDocumento }}</td>
+              </tr>
+              <tr>
+                <td style="padding: 8px; font-weight: 600">F. Nacimiento:</td>
+                <td style="padding: 8px">{{ participante.apoderadoparticipante.participante.persona.fnacimiento }}</td>
+                <td style="padding: 8px; font-weight: 600">Dirección:</td>
+                <td style="padding: 8px">{{ participante.apoderadoparticipante.apoderado.persona.direccion }}</td>
+              </tr>
+              <tr>
+                <td style="padding: 8px; font-weight: 600">Estado:</td>
+                <td style="padding: 8px">
+                  <span [class]="datosParticipante.tipoinscripcion.idTipoinscripcion == 1 ? 'chip-estado-preinscrito' : 'chip-estado-inscrito'">{{
+                    datosParticipante.tipoinscripcion.descripcion
+                  }}</span>
+                </td>
+                <td style="padding: 8px; font-weight: 600">Deporte:</td>
+                <td style="padding: 8px">{{ datosParticipante.listahorario.horario.listadisciplina.disciplina.descripcion }}</td>
+              </tr>
+              <tr>
+                <td style="padding: 8px; font-weight: 600">Modalidad:</td>
+                <td style="padding: 8px">{{ datosParticipante.listahorario.horario.modalidad.descripcion }}</td>
+                <td style="padding: 8px; font-weight: 600">Categoria:</td>
+                <td style="padding: 8px">{{ datosParticipante.listahorario.horario.categoriaedad.edadmaxima }}</td>
+              </tr>
+              <tr>
+                <td style="padding: 8px; font-weight: 600">Complejo:</td>
+                <td style="padding: 8px">{{ datosParticipante.listahorario.horario.listadisciplina.sede.nombre }}</td>
+                <td style="padding: 8px; font-weight: 600">Horario:</td>
+                <td style="padding: 8px">{{ mostrarTiempo(datosParticipante.listahorario.horario.turno) }}</td>
+              </tr>
+            </table>
+          </div>
+        </mat-expansion-panel>
+
+        <mat-expansion-panel>
+          <mat-expansion-panel-header>
+            <mat-panel-title class="text-center">Archivos de beneficiario</mat-panel-title>
+          </mat-expansion-panel-header>
+          <div class="table-container">
+            <table class="tabla-4c">
+              <tr>
+                <td><strong>Declaración jurada:</strong></td>
+                <td>
+                  <a
+                    ><img
+                      src="https://res.cloudinary.com/dpumt2sth/image/upload/v1763512471/pdf_r7zwl3.png"
+                      class="pdf-img"
+                      alt="PDF"
+                      (click)="generarDocumentos('declaracion')"
+                  /></a>
+                </td>
+
+                <td><strong>Ficha de inscripción:</strong></td>
+                <td>
+                  <a
+                    ><img
+                      src="https://res.cloudinary.com/dpumt2sth/image/upload/v1763512471/pdf_r7zwl3.png"
+                      class="pdf-img"
+                      alt="PDF"
+                      (click)="generarDocumentos('ficha')"
+                  /></a>
+                </td>
+              </tr>
+            </table>
+          </div>
+        </mat-expansion-panel>
+
+        <mat-expansion-panel>
+          <mat-expansion-panel-header>
+            <mat-panel-title class="text-center">Datos Familiares</mat-panel-title>
+          </mat-expansion-panel-header>
+          <div class="table-container">
+            <table style="width: 100%">
+              <tr>
+                <td style="padding: 8px"><strong>Nombre Tutor:</strong></td>
+                <td style="padding: 8px">
+                  {{
+                    `${participante.apoderadoparticipante.apoderado.persona.apaterno} ${participante.apoderadoparticipante.apoderado.persona.amaterno} ${participante.apoderadoparticipante.apoderado.persona.nombres}`
+                  }}
+                </td>
+              </tr>
+              <tr>
+                <td style="padding: 8px"><strong>Parentesco:</strong></td>
+                <td style="padding: 8px">{{ participante.apoderadoparticipante.tiporelacion.descripcion }}</td>
+              </tr>
+              <tr>
+                <td style="padding: 8px"><strong>Número documento:</strong></td>
+                <td style="padding: 8px">{{ participante.apoderadoparticipante.apoderado.persona.numDocumento }}</td>
+              </tr>
+
+              <tr>
+                <td style="padding: 8px"><strong>Teléfono/Celular:</strong></td>
+                <td style="padding: 8px">{{ participante.apoderadoparticipante.apoderado.persona.telefono }}</td>
+              </tr>
+            </table>
+          </div>
+        </mat-expansion-panel>
+      </mat-accordion>
+    </div>
+    <div class="col-12 col-md-4">
+      <!-- <button mat-raised-button color="primary" class="btn-phone mb-2" style="width: 100%"><mat-icon>phone</mat-icon> Llamar</button> -->
+      <button mat-raised-button color="accent" class="mb-2" style="width: 100%"><mat-icon>email</mat-icon> Enviar Correo</button>
+      <button mat-stroked-button color="warn" class="mb-2" style="width: 100%" (click)="modalValidarinscripcion(validarpreinscripcion, participante)">
+        <mat-icon>check_circle</mat-icon> Confirmar Inscripción
+      </button>
+      <button mat-stroked-button class="btn-amarillo mb-2" style="width: 100%" (click)="generarDocumentos()">
+        <mat-icon>download</mat-icon> Carnet Digital
+      </button>
+      <button
+        mat-flat-button
+        class="btn-red mb-2"
+        style="width: 100%"
+        (click)="modalEliminarpreinscripcion(eliminarPreinscripcion, participante.idInscripcion!)"
+      >
+        <mat-icon>remove_circle</mat-icon> Retirar Pre-inscripción
+      </button>
+    </div>
   </div>
-</div>
+</ng-container>
+
+<ng-template #eliminarPreinscripcion>
+  <div class="title-modal" cdkFocusInitial>¡Importante!</div>
+  <div mat-dialog-content align="center">
+    <p class="fs-6 fw-400 mb-4">¿Está seguro que desea eliminar esta preinscripción?</p>
+    <p>Tener en cuenta si elimina esta preinscripción, el usuario debe preinscribirse nuevamente.</p>
+  </div>
+  <div mat-dialog-actions align="end" class="footerDialog d-flex">
+    <button mat-flat-button color="primary" class="loadButton" type="button" (click)="anularInscripcion()">SI</button>
+    <button type="button" mat-raised-button color="secondary" class="loadButton btnCancelar" mat-dialog-close>Cancelar</button>
+  </div>
+</ng-template>
+
+<ng-template #validarpreinscripcion>
+  <div class="title-modal" cdkFocusInitial>¡Importante!</div>
+  <div mat-dialog-content align="center">
+    <p class="fs-6 fw-400 mb-4">¿Está seguro de confirmar preinscripción?</p>
+    <p>Tener en cuenta que no podra eliminar despues de inscribir.</p>
+  </div>
+  <div mat-dialog-actions align="end" class="footerDialog d-flex">
+    <button mat-flat-button color="primary" class="loadButton" type="button" (click)="validarInscripcion()">SI</button>
+    <button type="button" mat-raised-button color="secondary" class="loadButton btnCancelar" mat-dialog-close>Cancelar</button>
+  </div>
+</ng-template>

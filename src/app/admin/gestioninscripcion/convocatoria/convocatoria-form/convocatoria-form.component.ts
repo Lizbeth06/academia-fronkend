@@ -2,7 +2,7 @@ import { Component, inject, OnInit, TemplateRef, ViewChild } from "@angular/core
 import { MaterialModule } from "../../../../material/material.module";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { validarInput, ValidationType } from "../../../../util/validaciones.util";
-import { Listadia } from "../../../../model/turno.model";
+import { Listadia, Turno } from "../../../../model/turno.model";
 import { CommonModule, DatePipe } from "@angular/common";
 import { Disciplina } from "../../../../model/disciplina.model";
 import { ToastrService } from "ngx-toastr";
@@ -29,11 +29,14 @@ import { ListahorarioService } from "../../../../services/listahorario.service";
 import { MatCheckboxChange } from "@angular/material/checkbox";
 import { ListahorarioComponent } from "../listahorario/listahorario.component";
 import { ConvocatoriaService } from "../../../../services/convocatoria.service";
-import { Router } from "@angular/router";
+import { Router, RouterLink } from "@angular/router";
+import { CategoriaedadService } from "../../../../services/categoriaedad.service";
+import { TurnoService } from "../../../../services/turno.service";
+import { Categoriaedad } from "../../../../model/categoriaedad.model";
 
 @Component({
   selector: "app-convocatoria-form",
-  imports: [CommonModule, MaterialModule, HorariosFormComponent, SelecthorarioFormComponent, ListahorarioComponent],
+  imports: [CommonModule, MaterialModule, HorariosFormComponent, SelecthorarioFormComponent, ListahorarioComponent, RouterLink],
   templateUrl: "./convocatoria-form.component.html",
   styleUrl: "./convocatoria-form.component.css",
   providers: [DatePipe],
@@ -51,6 +54,8 @@ export class ConvocatoriaFormComponent implements OnInit {
   private ubigeoService = inject(UbigeoService);
   private listahorarioService = inject(ListahorarioService);
   private convocatoriaService = inject(ConvocatoriaService);
+  private categoriaedadService = inject(CategoriaedadService);
+  private turnoService = inject(TurnoService);
   private sedeService = inject(SedeService);
   private temporadaService = inject(TemporadaService);
   private disciplinaService = inject(DisciplinaService);
@@ -84,6 +89,8 @@ export class ConvocatoriaFormComponent implements OnInit {
   disciplina: Disciplina[] = [];
   sedes: Sede[] = [];
   temporada: Temporada[] = [];
+  categoriahorario: Categoriaedad[] = [];
+  turnohorario: Turno[] = [];
 
   depId = "";
   nomdep = "";
@@ -128,6 +135,8 @@ export class ConvocatoriaFormComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.categoriaedadService.findAll().subscribe((data) => (this.categoriahorario = data));
+    this.turnoService.findAll().subscribe((data) => (this.turnohorario = data));
     if (Number(localStorage.getItem("editConvocatoria")) !== 0) {
       const id = Number(localStorage.getItem("editConvocatoria"));
       this.idEditConvocatoria = id;

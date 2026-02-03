@@ -294,3 +294,26 @@
   background-clip: padding-box !important;
   border: none !important;
 }
+/*Columnas*/
+.mat-column-nroRegistro {
+  min-width: 50px !important;
+}
+
+.mat-column-nombre {
+  min-width: 300px !important;
+}
+
+.mat-column-complejo {
+  min-width: 300px !important;
+}
+
+.excel-img {
+  width: 45px;
+  height: 45px;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.excel-img:hover {
+  transform: scale(1.15);
+}

@@ -107,6 +107,15 @@ export class ValidacioninscripcionListaComponent implements OnInit {
     return calcularEdad(fechaNacimiento);
   }
 
+  descargarExcel() {
+    this.inscripcionService.generarExcelpreinscritos().subscribe({
+      next: (blob) => {
+        const url = window.URL.createObjectURL(new Blob([blob], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }));
+        window.open(url, "_blank");
+      },
+    });
+  }
+
   soloNumeros(event: KeyboardEvent, type: ValidationType) {
     validarInput(event, type);
   }

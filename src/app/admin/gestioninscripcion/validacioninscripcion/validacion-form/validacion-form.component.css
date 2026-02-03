@@ -42,7 +42,7 @@
   }
 }
 
-.chip-estado {
+.chip-estado-preinscrito {
   background-color: rgba(255, 178, 43, 1) !important;
   height: auto !important;
   padding: 0.25rem;
@@ -50,4 +50,21 @@
   font-size: 0.875rem;
   font-weight: 600;
   color: hsl(40, 100%, 23%);
+}
+.chip-estado-inscrito {
+  background-color: rgba(0, 215, 75, 0.8) !important;
+  height: auto !important;
+  padding: 0.25rem;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: hsl(145, 100%, 23%);
+}
+
+.top-loader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 9999;
 }

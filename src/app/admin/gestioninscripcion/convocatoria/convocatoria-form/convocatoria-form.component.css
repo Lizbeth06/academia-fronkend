@@ -126,3 +126,18 @@ tr.mat-row:hover {
 .mat-column-id {
   max-width: 50px !important;
 }
+
+.alerta {
+  background-color: #fdecea;
+  border: 1px solid #f44336;
+  color: #b71c1c;
+  margin-bottom: 16px;
+  padding: 10px;
+  cursor: pointer;
+}
+
+.alerta-contenido {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
