@@ -79,8 +79,8 @@
                   </mat-form-field>
                   <mat-form-field appearance="outline" class="col-6">
                     <mat-label>Género</mat-label>
-                    <mat-select formControlName="sexo">
-                      <mat-option *ngFor="let genero of generos" [value]="genero.descripcion">
+                    <mat-select formControlName="genero">
+                      <mat-option *ngFor="let genero of generos" [value]="genero.idGenero">
                         {{ genero.descripcion }}
                       </mat-option>
                     </mat-select>
@@ -185,7 +185,8 @@
                             {{ participante.nombres }} {{ participante.apellidoPaterno }} {{ participante.apellidoMaterno }}
                           </span>
                           <span class="participante-datos">
-                            DNI: {{ participante.numeroDocumento }} | {{ participante.genero }} | {{ obtenerEdad(participante.fechaNacimiento) }} años
+                            DNI: {{ participante.numeroDocumento }} | {{ obtenerGenero(participante.genero) }} |
+                            {{ obtenerEdad(participante.fechaNacimiento) }} años
                             <!-- <span [class.modalidad-digital]="participante.modalidadEnvio === 'digital'"
                         [class.modalidad-presencial]="participante.modalidadEnvio === 'presencial'">
                         {{ participante.modalidadEnvio === 'digital' ? 'Digital' : 'Presencial' }}
@@ -259,13 +260,13 @@
           </div>
         }
         <!-- Formulario Actual (Para agregar o editar) -->
-        <mat-card class="form-card" *ngIf="participantes.length < 3">
+        <mat-card class="form-card" *ngIf="participantes.length < 3 || isEditando">
           <mat-card-header>
             <mat-card-title>
               {{ editandoParticipante ? "EDITAR PARTICIPANTE " : "DATOS DEL PARTICIPANTE " }}
             </mat-card-title>
 
-            <div *ngIf="!editandoParticipante && participantes.length > 0" class="form-subtitle">
+            <div *ngIf="!editandoParticipante && participantes.length > 0" class="form-subtitle ml-4">
               Agregando participante #{{ participantes.length + 1 }}
             </div>
           </mat-card-header>
@@ -342,7 +343,7 @@
                     </mat-form-field>
                     <mat-form-field appearance="outline" class="col-12">
                       <mat-label>Sexo</mat-label>
-                      <mat-select formControlName="sexo">
+                      <mat-select formControlName="genero">
                         <mat-option *ngFor="let genero of generos" [value]="genero.idGenero">
                           {{ genero.descripcion }}
                         </mat-option>
@@ -674,19 +675,18 @@
                         </tbody>
                       </table>
                       <!--  NUEVO: Botón Agregar Horario -->
-                      @if (tieneHorarioSeleccionado()) {
-                        <div class="btn-agregar-horario-container">
-                          <button
-                            mat-raised-button
-                            color="accent"
-                            (click)="agregarHorario()"
-                            [disabled]="!sedeDeporteForm.valid || !tieneHorarioSeleccionado()"
-                          >
-                            <mat-icon>add_circle</mat-icon>
-                            Agregar Horario
-                          </button>
-                        </div>
-                      }
+
+                      <div class="btn-agregar-horario-container">
+                        <button
+                          mat-raised-button
+                          color="accent"
+                          (click)="agregarHorario()"
+                          [disabled]="!sedeDeporteForm.valid || !tieneHorarioSeleccionado"
+                        >
+                          <mat-icon>add_circle</mat-icon>
+                          Agregar Horario
+                        </button>
+                      </div>
                     </div>
                   }
                 </form>

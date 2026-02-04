@@ -33,6 +33,7 @@ import { calcularEdad } from "../../../../util/calculos.util";
 import { validarInput, ValidationType } from "../../../../util/validaciones.util";
 import { Genero } from "../../../../model/genero.model";
 import { GeneroService } from "../../../../services/genero.service";
+import { ToastrService } from "ngx-toastr";
 
 // Formato de fecha personalizado
 export const MY_DATE_FORMATS = {
@@ -123,6 +124,7 @@ export class PreInscripcionComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private sanitizer: DomSanitizer,
+    private toastrService: ToastrService,
   ) {}
 
   mapaUrlSanitizada!: SafeResourceUrl;
@@ -143,6 +145,7 @@ export class PreInscripcionComponent implements OnInit {
   participanteSeleccionadoId: string | null = null;
   editandoHorario: boolean = false;
   horarioActualIndex: number = 0;
+  isEditando = false;
 
   //  NUEVO: Modalidad envío
   // modalidadEnvioActual: 'digital' | 'presencial' | null = null;
@@ -200,6 +203,7 @@ export class PreInscripcionComponent implements OnInit {
   cargandoAlumno = false;
   tieneDiscapacidad = false;
   horarioSeleccionado: HorarioView | null = null;
+  tieneHorarioSeleccionado = false;
 
   // Modal informativo
   mostrarModalInformativo = false;
@@ -261,7 +265,7 @@ export class PreInscripcionComponent implements OnInit {
       apellidoMaterno: ["", Validators.required],
       nombres: ["", Validators.required],
       fechaNacimiento: ["", Validators.required],
-      sexo: [1, Validators.required],
+      genero: ["", Validators.required],
       departamento: ["", Validators.required],
       provincia: ["", Validators.required],
       distrito: ["", Validators.required],
@@ -278,7 +282,7 @@ export class PreInscripcionComponent implements OnInit {
       apellidoMaterno: ["", Validators.required],
       nombres: ["", Validators.required],
       fechaNacimiento: [<Date | undefined>undefined, Validators.required],
-      sexo: [1, Validators.required],
+      genero: ["", Validators.required],
       tipoRelacionApoderado: [1, Validators.required],
       tipoSeguro: [1, Validators.required],
       tieneDiscapacidad: [false],
@@ -352,7 +356,7 @@ export class PreInscripcionComponent implements OnInit {
           apellidoMaterno: data.persona.amaterno.toUpperCase().trim(),
           nombres: data.persona.nombres.toUpperCase().trim(),
           fechaNacimiento: data.persona.fnacimiento,
-          sexo: data.persona.genero,
+          genero: data.persona.genero.descripcion,
           departamento: data.persona.ubigeo.ubiDpto,
           provincia: data.persona.ubigeo.ubiProvincia,
           distrito: data.persona.ubigeo.idUbigeo,
@@ -429,7 +433,7 @@ export class PreInscripcionComponent implements OnInit {
             apellidoMaterno: data.persona.amaterno,
             nombres: data.persona.nombres,
             fechaNacimiento: data.persona.fnacimiento,
-            sexo: data.persona.genero,
+            genero: data.persona.genero.descripcion,
             tipoSeguro: undefined,
             tieneDiscapacidad: data.presentaDiscapacidad,
           });
@@ -471,7 +475,7 @@ export class PreInscripcionComponent implements OnInit {
       form.get("apellidoMaterno")?.value &&
       form.get("nombres")?.value &&
       form.get("fechaNacimiento")?.value &&
-      form.get("sexo")?.value &&
+      form.get("genero")?.value &&
       form.get("tipoRelacionApoderado")?.value &&
       form.get("tipoSeguro")?.value &&
       form.get("tieneDiscapacidad")?.value !== null
@@ -507,7 +511,6 @@ export class PreInscripcionComponent implements OnInit {
   limpiarFormularioApoderado(): void {
     this.apoderadoForm.reset({
       tipoDocumento: 1,
-      sexo: 1,
     });
     this.apoderadoForm.markAsPristine();
     this.apoderadoForm.markAsUntouched();
@@ -516,7 +519,6 @@ export class PreInscripcionComponent implements OnInit {
   limpiarFormularioAlumno(): void {
     this.alumnoForm.reset({
       tipoDocumento: 1,
-      sexo: 1,
       tipoRelacionApoderdo: 1,
       tipoSeguro: 1,
       tieneDiscapacidad: false,
@@ -534,6 +536,7 @@ export class PreInscripcionComponent implements OnInit {
   }
 
   editarParticipante(participante: ParticipanteView): void {
+    this.isEditando = true;
     this.editandoParticipante = true;
     this.participanteActualIndex = this.participantes.findIndex((p) => p.numeroDocumento === participante.numeroDocumento);
 
@@ -548,6 +551,7 @@ export class PreInscripcionComponent implements OnInit {
   }
 
   actualizarParticipante(): void {
+    this.isEditando = false;
     if (this.alumnoForm.valid && this.editandoParticipante) {
       this.participantes[this.participanteActualIndex] = {
         ...this.participantes[this.participanteActualIndex],
@@ -717,6 +721,9 @@ export class PreInscripcionComponent implements OnInit {
     this.sedeService.findAllByCodubi(distId).subscribe((data) => {
       this.complejosDeportivos = data;
     });
+    if (this.complejosDeportivos.length === 0) {
+      this.toastrService.warning("No existe un complejo para esta sede.", "¡Importante!", { timeOut: 3200, progressBar: true });
+    }
     this.deportes.clear();
     this.horarios = [];
     this.sedeDeporteForm.patchValue({ complejoDeportivo: "", deporte: "" });
@@ -727,6 +734,8 @@ export class PreInscripcionComponent implements OnInit {
     this.deportes.clear();
     this.horariosFiltrados = [];
     const participante: ParticipanteView = this.participantes.find((p) => p.numeroDocumento === this.participanteSeleccionadoId)!;
+
+    console.log("selecciono data          " + participante.tieneDiscapacidad);
     this.listahorarioService
       .findDisponibles(calcularEdad(participante.fechaNacimiento), participante.tieneDiscapacidad ? 2 : 1, complejoId)
       .subscribe((data) => {
@@ -769,7 +778,9 @@ export class PreInscripcionComponent implements OnInit {
   seleccionarHorario(horario: HorarioView, event: any): void {
     if (event.checked) {
       this.horarioSeleccionado = horario;
+      this.tieneHorarioSeleccionado = true;
     } else {
+      this.tieneHorarioSeleccionado = false;
       if (this.horarioSeleccionado?.idHorario === horario.idHorario) {
         this.horarioSeleccionado = null;
       }
@@ -778,10 +789,6 @@ export class PreInscripcionComponent implements OnInit {
 
   esHorarioSeleccionado(horario: HorarioView): boolean {
     return this.horarioSeleccionado?.idHorario === horario.idHorario;
-  }
-
-  tieneHorarioSeleccionado(): boolean {
-    return this.horarioSeleccionado !== null;
   }
 
   //  NUEVO: Agregar horario a participante
@@ -819,7 +826,7 @@ export class PreInscripcionComponent implements OnInit {
       horario: { ...this.horarioSeleccionado },
     };
 
-    this.horariosAsignados.push(nuevoHorario);
+    this.horariosAsignados = [...this.horariosAsignados, nuevoHorario];
 
     // Limpiar formulario
     this.limpiarFormularioHorario();
@@ -857,6 +864,7 @@ export class PreInscripcionComponent implements OnInit {
     this.provinciasSede = [];
     this.distritosSede = [];
     this.complejosDeportivos = [];
+    this.tieneHorarioSeleccionado = false;
   }
 
   //  NUEVO: Editar horario
@@ -959,7 +967,7 @@ export class PreInscripcionComponent implements OnInit {
               nombres: apoderado.nombres.toUpperCase().trim(),
               apaterno: apoderado.apellidoPaterno.toUpperCase().trim(),
               amaterno: apoderado.apellidoMaterno.toUpperCase().trim(),
-              genero: apoderado.sexo.trim(),
+              genero: { idGenero: apoderado.genero } as Genero,
               correo: apoderado.correo.trim(),
               telefono: apoderado.telefono,
               direccion: apoderado.direccion.toLowerCase().trim(),
@@ -1216,5 +1224,10 @@ export class PreInscripcionComponent implements OnInit {
     console.log("stepper cambiado");
     this.alumnoForm.markAsUntouched({ emitEvent: true });
     this.alumnoForm.markAsPristine({ emitEvent: true });
+  }
+
+  obtenerGenero(id: number): string {
+    const genero = this.generos.find((d) => d.idGenero === id)?.descripcion;
+    return String(genero);
   }
 }
