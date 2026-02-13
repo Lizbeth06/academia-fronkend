@@ -22,7 +22,10 @@ import { Sede } from "../../../../model/sede.model";
   styleUrl: "./convocatorias-card.component.css",
 })
 export class ConvocatoriasCardComponent implements OnInit {
-  constructor(private router: Router, private formBuild: FormBuilder) {
+  constructor(
+    private router: Router,
+    private formBuild: FormBuilder,
+  ) {
     this.buildForm();
   }
 
@@ -152,8 +155,13 @@ export class ConvocatoriasCardComponent implements OnInit {
     const tipohorario = data.turno.tipoturno!.abreviatura === "M" ? "AM" : "PM";
     return `${dias} : ${hora}  ${tipohorario}`;
   }
+  validandoEstado(conv: DisciplinaSede) {
+    const existe = conv.horario.some((h) => h.contador < h.limitePreinscripcion);
+
+    return existe ? "ACTIVA" : "CERRADA";
+  }
 
   volverConvocatoria() {
-    this.router.navigate(["/admin/inscripcion/convocatoria"]);
+    this.router.navigate(["/admin/convocatoria/convocatoria"]);
   }
 }

@@ -7,17 +7,17 @@
 
   <!-- Stepper -->
   @if (!mostrarConfirmacion && !mostrarPasoDocumentos) {
-    <mat-stepper [linear]="true" #stepper (selectionChange)="onStepChange($event)">
+    <mat-stepper linear #stepper (selectionChange)="onStepChange($event)">
       <!-- ========================================== -->
       <!-- PASO 1: DATOS DEL PADRE Y/O APODERADO(A) -->
       <!-- ========================================== -->
       <mat-step [stepControl]="apoderadoForm">
-        <ng-template matStepLabel>Datos del Padre y/o Apoderado(a)</ng-template>
+        <ng-template matStepLabel>Datos del apoderado</ng-template>
         <form [formGroup]="apoderadoForm" class="row">
           <div class="col-12 col-md-6">
             <mat-card class="form-card card-datos-apoderado">
               <mat-card-header>
-                <mat-card-title>DATOS DEL PADRE Y/O APODERADO(A)</mat-card-title>
+                <mat-card-title>DATOS DEL APODERADO</mat-card-title>
               </mat-card-header>
               <mat-card-content>
                 <!--  Fila 1: Tipo de Apoderado, Tipo Documento y Número (los 3 juntos) -->
@@ -36,7 +36,7 @@
                     <input
                       matInput
                       formControlName="numeroDocumento"
-                      (keydown)="soloNumeros($event, 'numero')"
+                      (keydown)="validarDatosinput($event, 'numero')"
                       [attr.maxlength]="apoderadoForm.get('tipoDocumento')?.value == 1 ? 8 : 12"
                     />
                     <button
@@ -45,7 +45,7 @@
                       type="button"
                       (click)="buscarApoderado()"
                       [disabled]="disabledSearchButtonApoderado()"
-                      matTooltip="Buscar en RENIEC"
+                      matTooltip="Buscar"
                     >
                       <mat-icon *ngIf="!cargandoApoderado">search</mat-icon>
                       <mat-spinner *ngIf="cargandoApoderado" diameter="20"></mat-spinner>
@@ -71,15 +71,20 @@
                   <!-- Fila 3: Fecha de Nacimiento y Sexo -->
                   <mat-form-field appearance="outline" class="col-6">
                     <mat-label>Fecha de Nacimiento</mat-label>
-                    <input matInput [matDatepicker]="pickerApoderado" formControlName="fechaNacimiento" />
+                    <input
+                      matInput
+                      [matDatepicker]="pickerApoderado"
+                      formControlName="fechaNacimiento"
+                      (keydown)="validarDatosinput($event, 'fecha')"
+                    />
                     <mat-datepicker-toggle matSuffix [for]="pickerApoderado"></mat-datepicker-toggle>
                     <mat-datepicker #pickerApoderado></mat-datepicker>
                     <!-- <mat-hint>Formato: DD/MM/YYYY</mat-hint> -->
                     <mat-error>Campo obligatorio</mat-error>
                   </mat-form-field>
                   <mat-form-field appearance="outline" class="col-6">
-                    <mat-label>Género</mat-label>
-                    <mat-select formControlName="genero">
+                    <mat-label>Sexo</mat-label>
+                    <mat-select formControlName="genero" placeholder="Seleccione sexo">
                       <mat-option *ngFor="let genero of generos" [value]="genero.idGenero">
                         {{ genero.descripcion }}
                       </mat-option>
@@ -140,10 +145,18 @@
                   <mat-form-field appearance="outline" class="col-6">
                     <mat-label>Correo Electrónico</mat-label>
                     <input matInput type="email" formControlName="correo" />
+                    <mat-error>
+                      <span *ngIf="apoderadoForm.get('correo')?.hasError('required')">Campo obligatorio</span>
+                      <span *ngIf="apoderadoForm.get('correo')?.hasError('email')">Correo incorrecto</span>
+                    </mat-error>
                   </mat-form-field>
                   <mat-form-field appearance="outline" class="col-6">
                     <mat-label>Número de teléfono</mat-label>
-                    <input matInput type="text" formControlName="telefono" minlength="9" maxlength="9" />
+                    <input matInput type="text" formControlName="telefono" maxlength="9" (keypress)="validarDatosinput($event, 'numero')" />
+                    <mat-error>
+                      <span *ngIf="apoderadoForm.get('telefono')?.hasError('required')">Campo obligatorio</span>
+                      <span *ngIf="apoderadoForm.get('telefono')?.hasError('pattern')">Datos incorrectos</span>
+                    </mat-error>
                   </mat-form-field>
                 </div>
               </mat-card-content>
@@ -151,6 +164,7 @@
           </div>
         </form>
         <div class="button-row">
+          <button mat-stroked-button color="warn" type="button" routerLink="/admin" mat-dialog-close><mat-icon>close</mat-icon>Cancelar</button>
           <button mat-raised-button color="primary" matStepperNext [disabled]="!apoderadoForm.valid">
             Continuar
             <mat-icon>arrow_forward</mat-icon>
@@ -160,13 +174,21 @@
       <!-- ========================================== -->
       <!-- PASO 2: DATOS DE LOS PARTICIPANTES         -->
       <!-- ========================================== -->
-      <mat-step>
+      <mat-step [stepControl]="alumnoForm" [optional]="participantes.length > 0">
         <ng-template matStepLabel>Datos de los Participantes</ng-template>
         <!-- Advertencia: Debe agregar al menos 1 participante -->
         <div *ngIf="participantes.length === 0" class="advertencia-participantes">
           <mat-icon>warning</mat-icon>
           <span>Debe agregar al menos un participante para continuar</span>
         </div>
+        <div *ngIf="participantes.length > 0" class="info-participantes">
+          <mat-icon>info</mat-icon>
+          <span>
+            Ha agregado <strong>{{ participantes.length }}</strong> {{ participantes.length === 1 ? "participante" : "participantes" }}: puede agregar
+            solo 3 participantes.
+          </span>
+        </div>
+
         <!-- Participantes Agregados (Cards colapsables arriba) -->
         @if (participantes.length > 0) {
           <div class="participantes-agregados">
@@ -261,9 +283,22 @@
         }
         <!-- Formulario Actual (Para agregar o editar) -->
         <mat-card class="form-card" *ngIf="participantes.length < 3 || isEditando">
+          <div *ngIf="!editandoParticipante" align="end">
+            <button
+              mat-raised-button
+              color="accent"
+              type="button"
+              (click)="agregarParticipante()"
+              [disabled]="!alumnoForm.valid"
+              class="btn-agregar-participante"
+            >
+              Agregar este participante
+            </button>
+          </div>
+
           <mat-card-header>
             <mat-card-title>
-              {{ editandoParticipante ? "EDITAR PARTICIPANTE " : "DATOS DEL PARTICIPANTE " }}
+              {{ editandoParticipante ? "EDITAR PARTICIPANTE" : "DATOS DEL PARTICIPANTE" }}
             </mat-card-title>
 
             <div *ngIf="!editandoParticipante && participantes.length > 0" class="form-subtitle ml-4">
@@ -292,7 +327,7 @@
                       <input
                         matInput
                         formControlName="numeroDocumento"
-                        (keydown)="soloNumeros($event, 'numero')"
+                        (keydown)="validarDatosinput($event, 'numero')"
                         [attr.maxlength]="apoderadoForm.get('tipoDocumento')?.value == 1 ? 8 : 12"
                       />
                       <button
@@ -301,7 +336,7 @@
                         type="button"
                         (click)="buscarAlumno()"
                         [disabled]="disabledSearchButtonAlumno()"
-                        matTooltip="Buscar en RENIEC"
+                        matTooltip="Buscar"
                       >
                         @if (!cargandoAlumno) {
                           <mat-icon>search</mat-icon>
@@ -335,7 +370,12 @@
                   <div class="row">
                     <mat-form-field appearance="outline" class="col-12">
                       <mat-label>Fecha de Nacimiento</mat-label>
-                      <input matInput [matDatepicker]="pickerAlumno" formControlName="fechaNacimiento" />
+                      <input
+                        matInput
+                        [matDatepicker]="pickerAlumno"
+                        formControlName="fechaNacimiento"
+                        (keydown)="validarDatosinput($event, 'fecha')"
+                      />
                       <mat-datepicker-toggle matSuffix [for]="pickerAlumno"></mat-datepicker-toggle>
                       <mat-datepicker #pickerAlumno></mat-datepicker>
                       <!-- <mat-hint>Formato: DD/MM/YYYY</mat-hint> -->
@@ -343,7 +383,7 @@
                     </mat-form-field>
                     <mat-form-field appearance="outline" class="col-12">
                       <mat-label>Sexo</mat-label>
-                      <mat-select formControlName="genero">
+                      <mat-select formControlName="genero" placeholder="Seleccione sexo">
                         <mat-option *ngFor="let genero of generos" [value]="genero.idGenero">
                           {{ genero.descripcion }}
                         </mat-option>
@@ -387,21 +427,7 @@
                   </div>
                 }
               </div>
-              <!-- Botones de Acción del Formulario -->
               <div class="form-acciones">
-                <!-- Botón Agregar Participante -->
-                @if (!editandoParticipante) {
-                  <button
-                    mat-raised-button
-                    color="accent"
-                    type="button"
-                    (click)="agregarParticipante()"
-                    [disabled]="!alumnoForm.valid"
-                    class="btn-agregar-participante"
-                  >
-                    Agregar este participante
-                  </button>
-                }
                 <!-- Botones Actualizar y Cancelar -->
                 @if (editandoParticipante) {
                   <div class="botones-edicion">
@@ -419,17 +445,7 @@
             </form>
           </mat-card-content>
         </mat-card>
-        <!-- Info: Cuántos participantes hay -->
-        @if (participantes.length > 0) {
-          <div class="info-participantes">
-            <mat-icon>info</mat-icon>
-            <span>
-              Ha agregado <strong>{{ participantes.length }}</strong> {{ participantes.length === 1 ? "participante" : "participantes" }}.
-              {{ !editandoParticipante ? `Puede agregar solo ${participantes.length} participantes.` : "" }}
-            </span>
-          </div>
-        }
-        <!-- Botones Navegación -->
+
         <div class="button-row">
           <button mat-raised-button matStepperPrevious type="button">
             <mat-icon>arrow_back</mat-icon>
@@ -707,10 +723,7 @@
       </mat-step>
     </mat-stepper>
   }
-
-  <!-- ========================================== -->
   <!--  MODALES INFORMATIVOS (UNO POR PARTICIPANTE) -->
-  <!-- ========================================== -->
   @if (mostrarModalInformativo && modalInformativoActual) {
     <div class="modal-overlay" (click)="$event.stopPropagation()">
       <div class="modal-contenido">
@@ -765,9 +778,7 @@
     </div>
   }
 
-  <!-- ========================================== -->
   <!--  CONFIRMACIÓN CON CAROUSEL -->
-  <!-- ========================================== -->
   @if (mostrarConfirmacion) {
     <div class="confirmacion-container">
       <div class="confirmacion-grid">
@@ -949,4 +960,11 @@
       </div>
     </div>
   }
+</div>
+
+<div class="cargar-final" *ngIf="loading">
+  <div class="cargar-contenido">
+    <div class="loader"></div>
+    <p>Espere un momento...</p>
+  </div>
 </div>

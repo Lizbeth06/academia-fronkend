@@ -103,7 +103,7 @@ export class SelecthorarioFormComponent implements OnInit {
         this.dataHorarios = data;
         this.horariosSeleccionados.emit(this.dataHorarios);
         if (this.dataHorarios.length === 0) {
-          this.toastrService.warning("Agregar un horario a la sede", "!Importante¡", { timeOut: 3200, progressBar: true });
+          this.toastrService.warning("Agregar un horario a la sede", "¡Importante!", { timeOut: 3200, progressBar: true });
         }
       },
     });

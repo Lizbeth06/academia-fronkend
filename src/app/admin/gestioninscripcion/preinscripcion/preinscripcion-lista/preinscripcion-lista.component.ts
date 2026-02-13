@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from "@angular/core";
+import { AfterViewInit, ChangeDetectorRef, Component, inject, OnInit } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { DomSanitizer, SafeResourceUrl } from "@angular/platform-browser";
 import { MAT_DATE_FORMATS, MAT_DATE_LOCALE } from "@angular/material/core";
@@ -34,6 +34,8 @@ import { validarInput, ValidationType } from "../../../../util/validaciones.util
 import { Genero } from "../../../../model/genero.model";
 import { GeneroService } from "../../../../services/genero.service";
 import { ToastrService } from "ngx-toastr";
+import { DnirucService } from "../../../../services/apiexterno/dniruc.service";
+import { RouterLink } from "@angular/router";
 
 // Formato de fecha personalizado
 export const MY_DATE_FORMATS = {
@@ -120,11 +122,12 @@ export interface FichaView {
   templateUrl: "./preinscripcion-lista.component.html",
   styleUrl: "./preinscripcion-lista.component.css",
 })
-export class PreInscripcionComponent implements OnInit {
+export class PreinscripcionListaComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private sanitizer: DomSanitizer,
     private toastrService: ToastrService,
+    private cd: ChangeDetectorRef,
   ) {}
 
   mapaUrlSanitizada!: SafeResourceUrl;
@@ -134,6 +137,8 @@ export class PreInscripcionComponent implements OnInit {
   alumnoForm!: FormGroup;
   sedeDeporteForm!: FormGroup;
   documentosForm!: FormGroup;
+
+  loading = false;
 
   //  Participantes
   participantes: ParticipanteView[] = [];
@@ -150,8 +155,8 @@ export class PreInscripcionComponent implements OnInit {
   //  NUEVO: Modalidad envío
   // modalidadEnvioActual: 'digital' | 'presencial' | null = null;
 
-  msgErrorNroDocApoderado: "Debe ingresar 8 dígitos" | "Debe ingresar entre 9 y 20 digitos" = "Debe ingresar 8 dígitos";
-  msgErrorNroDocAlumno: "Debe ingresar 8 dígitos" | "Debe ingresar entre 9 y 20 digitos" = "Debe ingresar 8 dígitos";
+  msgErrorNroDocApoderado: "Debe ingresar 8 dígitos" | "Debe ingresar 12 digitos" = "Debe ingresar 8 dígitos";
+  msgErrorNroDocAlumno: "Debe ingresar 8 dígitos" | "Debe ingresar 12 digitos" = "Debe ingresar 8 dígitos";
 
   //  NUEVO: Archivos digitales temporales (mientras edita formulario)
   archivosDigitalesTemp: {
@@ -226,8 +231,6 @@ export class PreInscripcionComponent implements OnInit {
   // Mapa
   mapaVisible = false;
   ubicacionComplejo: any = null;
-
-  // Mostrar paso de documentos
   mostrarPasoDocumentos = false;
   mostrarConfirmacion = false;
 
@@ -237,6 +240,7 @@ export class PreInscripcionComponent implements OnInit {
   ubigeoService = inject(UbigeoService);
   tiposeguroService = inject(TiposeguroService);
   sedeService = inject(SedeService);
+  dnirucService = inject(DnirucService);
   apiExternoService = inject(ApiExternoService);
   disciplinaService = inject(DisciplinaService);
   apoderadoService = inject(ApoderadoService);
@@ -270,8 +274,8 @@ export class PreInscripcionComponent implements OnInit {
       provincia: ["", Validators.required],
       distrito: ["", Validators.required],
       direccion: ["", Validators.required],
-      correo: ["", Validators.email],
-      telefono: ["", Validators.pattern(/^\d{9}$/)],
+      correo: ["", [Validators.required, Validators.email]],
+      telefono: ["", [Validators.required, Validators.pattern(/^\d{9}$/)]],
     });
 
     // PASO 2: Datos del Alumno ( NUEVO: modalidadEnvio)
@@ -348,45 +352,60 @@ export class PreInscripcionComponent implements OnInit {
     this.apoderadoForm.patchValue({
       numeroDocumento: dni,
     });
-
     this.apoderadoService.findByDocumento(tipoDoc, dni).subscribe({
       next: (data) => {
+        this.cargandoApoderado = false;
         this.apoderadoForm.patchValue({
-          apellidoPaterno: data.persona.apaterno.toUpperCase().trim(),
-          apellidoMaterno: data.persona.amaterno.toUpperCase().trim(),
-          nombres: data.persona.nombres.toUpperCase().trim(),
-          fechaNacimiento: data.persona.fnacimiento,
-          genero: data.persona.genero.descripcion,
-          departamento: data.persona.ubigeo.ubiDpto,
-          provincia: data.persona.ubigeo.ubiProvincia,
-          distrito: data.persona.ubigeo.idUbigeo,
-          direccion: data.persona.direccion,
-          correo: data.persona.correo,
-          telefono: data.persona.telefono,
+          apellidoPaterno: data.value.persona.apaterno.toUpperCase().trim(),
+          apellidoMaterno: data.value.persona.amaterno.toUpperCase().trim(),
+          nombres: data.value.persona.nombres.toUpperCase().trim(),
+          fechaNacimiento: data.value.persona.fnacimiento,
+          genero: data.value.persona.genero.descripcion,
+          departamento: data.value.persona.ubigeo.ubiDpto,
+          provincia: data.value.persona.ubigeo.ubiProvincia,
+          distrito: data.value.persona.ubigeo.idUbigeo,
+          direccion: data.value.persona.direccion,
+          correo: data.value.persona.correo,
+          telefono: data.value.persona.telefono,
         });
-        this.ubigeoService.findProvincias(data.persona.ubigeo.ubiDpto!).subscribe((data) => {
+        this.ubigeoService.findProvincias(data.value.persona.ubigeo.ubiDpto!).subscribe((data) => {
           this.provincias = data;
         });
-        this.ubigeoService.findDistritos(data.persona.ubigeo.ubiDpto!, data.persona.ubigeo.ubiProvincia!).subscribe((data) => {
+        this.ubigeoService.findDistritos(data.value.persona.ubigeo.ubiDpto!, data.value.persona.ubigeo.ubiProvincia!).subscribe((data) => {
           this.distritos = data;
         });
-        this.cargandoApoderado = false;
       },
       error: (err) => {
-        console.log("Entró dentro del flujo de error");
-        this.apiExternoService.findPersonaByDNI(dni).subscribe({
-          next: (data: ApiDniResponse) => {
-            if (data.code == 200) {
-              this.apoderadoForm.patchValue({
-                apellidoPaterno: data.personal.apPrimer,
-                apellidoMaterno: data.personal.apSegundo,
-                nombres: data.personal.prenombres,
-              });
-            }
+        this.dnirucService.getDniInfo(dni).subscribe({
+          next: (data) => {
             this.cargandoApoderado = false;
+            if (data.success) {
+              this.apoderadoForm.patchValue({
+                apellidoPaterno: data.apellidoPaterno,
+                apellidoMaterno: data.apellidoMaterno,
+                nombres: data.nombres,
+              });
+            } else {
+              this.toastrService.warning("Apoderado no encontrado", "¡Importante!", { timeOut: 3200, closeButton: true });
+            }
           },
           error: (error: any) => {
-            this.cargandoApoderado = false;
+            this.apiExternoService.findPersonaByDNI(dni).subscribe({
+              next: (data: ApiDniResponse) => {
+                if (data.code == 200) {
+                  this.apoderadoForm.patchValue({
+                    apellidoPaterno: data.personal.apPrimer,
+                    apellidoMaterno: data.personal.apSegundo,
+                    nombres: data.personal.prenombres,
+                  });
+                }
+                this.cargandoApoderado = false;
+              },
+              error: (error: any) => {
+                this.cargandoApoderado = false;
+                this.toastrService.warning("Apoderado no encontrado", "¡Importante!", { timeOut: 3200, closeButton: true });
+              },
+            });
           },
         });
       },
@@ -429,37 +448,37 @@ export class PreInscripcionComponent implements OnInit {
       this.participanteService.findByDocumento(tipoDoc, dni).subscribe({
         next: (data) => {
           this.alumnoForm.patchValue({
-            apellidoPaterno: data.persona.apaterno,
-            apellidoMaterno: data.persona.amaterno,
-            nombres: data.persona.nombres,
-            fechaNacimiento: data.persona.fnacimiento,
-            genero: data.persona.genero.descripcion,
+            apellidoPaterno: data.value.persona.apaterno,
+            apellidoMaterno: data.value.persona.amaterno,
+            nombres: data.value.persona.nombres,
+            fechaNacimiento: data.value.persona.fnacimiento,
+            genero: data.value.persona.genero.descripcion,
             tipoSeguro: undefined,
-            tieneDiscapacidad: data.presentaDiscapacidad,
+            tieneDiscapacidad: data.value.presentaDiscapacidad,
           });
-          //TODO: Encontrar la relacion entre apoderado y alumno
-          const idTipoDocApoderado = this.apoderadoForm.get("tipoDocumento")?.value;
-          const numDocumentoApoderado = this.apoderadoForm.get("numeroDocumento")?.value;
-          const idTipoDocAlumno = this.alumnoForm.get("tipoDocumento")?.value;
-          const numDocumentoAlumno = this.alumnoForm.get("numeroDocumento")?.value;
-          this.apoderadoparticipanteService
-            .findByDocumento(idTipoDocApoderado, numDocumentoApoderado, idTipoDocAlumno, numDocumentoAlumno)
-            .subscribe({
-              next: (data) => {
-                this.alumnoForm.patchValue({
-                  tipoRelacionApoderado: data.tiporelacion.idTiporelacion,
-                });
-              },
-              error: (error) => {
-                this.alumnoForm.patchValue({
-                  tipoRelacionApoderado: undefined,
-                });
-              },
-            });
+          // const idTipoDocApoderado = this.apoderadoForm.get("tipoDocumento")?.value;
+          // const numDocumentoApoderado = this.apoderadoForm.get("numeroDocumento")?.value;
+          // const idTipoDocAlumno = this.alumnoForm.get("tipoDocumento")?.value;
+          // const numDocumentoAlumno = this.alumnoForm.get("numeroDocumento")?.value;
+          // this.apoderadoparticipanteService
+          //   .findByDocumento(idTipoDocApoderado, numDocumentoApoderado, idTipoDocAlumno, numDocumentoAlumno)
+          //   .subscribe({
+          //     next: (data) => {
+          //       this.alumnoForm.patchValue({
+          //         tipoRelacionApoderado: data.tiporelacion.idTiporelacion,
+          //       });
+          //     },
+          //     error: (error) => {
+          //       this.alumnoForm.patchValue({
+          //         tipoRelacionApoderado: undefined,
+          //       });
+          //     },
+          //   });
           this.cargandoAlumno = false;
         },
         error: (error) => {
           this.cargandoAlumno = false;
+          this.toastrService.warning("No existe en nuestros registros", "¡Importante!", { timeOut: 3200, closeButton: true });
         },
       });
     }
@@ -720,10 +739,10 @@ export class PreInscripcionComponent implements OnInit {
     const distId = this.sedeDeporteForm.get("distrito")?.value;
     this.sedeService.findAllByCodubi(distId).subscribe((data) => {
       this.complejosDeportivos = data;
+      if (data.length === 0) {
+        this.toastrService.warning("No existe un complejo para esta sede.", "¡Importante!", { timeOut: 3200, progressBar: true });
+      }
     });
-    if (this.complejosDeportivos.length === 0) {
-      this.toastrService.warning("No existe un complejo para esta sede.", "¡Importante!", { timeOut: 3200, progressBar: true });
-    }
     this.deportes.clear();
     this.horarios = [];
     this.sedeDeporteForm.patchValue({ complejoDeportivo: "", deporte: "" });
@@ -831,6 +850,8 @@ export class PreInscripcionComponent implements OnInit {
     // Limpiar formulario
     this.limpiarFormularioHorario();
 
+    this.cd.detectChanges();
+
     setTimeout(() => {
       const elemento = document.querySelector(".horarios-agregados");
       elemento?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -908,14 +929,17 @@ export class PreInscripcionComponent implements OnInit {
   // ==================== FINALIZAR Y MODALES ====================
 
   finalizarPreInscripcion(): void {
+    this.loading = true;
     if (this.horariosAsignados.length === 0) {
       alert("Debe asignar al menos un horario a un participante");
+      this.loading = false;
       return;
     }
 
     // Validar que TODOS los participantes tengan horario
     if (!this.puedeFinalizarInscripcion()) {
       alert("Todos los participantes deben tener un horario asignado antes de finalizar");
+      this.loading = false;
       return;
     }
 
@@ -986,7 +1010,6 @@ export class PreInscripcionComponent implements OnInit {
         } as Apoderadoparticipante,
       } as Inscripcion;
     });
-    console.log(JSON.stringify(inscripciones, null, 2));
     this.inscripcionService.saveAll(inscripciones).subscribe({
       next: (data) => {
         this.inscripcionService.findAllbyId(data.map((d) => d.idInscripcion!)).subscribe({
@@ -1011,14 +1034,13 @@ export class PreInscripcionComponent implements OnInit {
                   `de ${e.listahorario.horario?.turno.horainicio?.slice(0, 5)} a ${e.listahorario.horario?.turno.horafin?.slice(0, 5)}`,
               } as FichaView;
             });
-            console.log("inscripción exitosa");
-            console.log("Modales a mostrar:", this.modalesInformativos.length);
 
             data.forEach((d) => {
               this.inscripcionService.notificarCorreo(d.idInscripcion!).subscribe((d) => {
                 console.log(d);
               });
             });
+            this.loading = false;
 
             // Primero mostrar la confirmación
             this.mostrarConfirmacion = true;
@@ -1038,6 +1060,7 @@ export class PreInscripcionComponent implements OnInit {
         console.log(error);
       },
     });
+    this.loading = false;
   }
 
   mostrarSiguienteModal(): void {
@@ -1141,7 +1164,7 @@ export class PreInscripcionComponent implements OnInit {
     return /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/.test(char);
   }
 
-  soloNumeros(event: KeyboardEvent, type: ValidationType) {
+  validarDatosinput(event: KeyboardEvent, type: ValidationType) {
     validarInput(event, type);
   }
 
@@ -1173,11 +1196,10 @@ export class PreInscripcionComponent implements OnInit {
       // Carnet de Extranjería: 12 caracteres alfanuméricos
       this.apoderadoForm.get("numeroDocumento")?.setValidators([
         Validators.required,
-        Validators.minLength(9),
-        Validators.maxLength(20), // Por si acaso hay formatos con dígitos adicionales
+        Validators.minLength(12),
         Validators.pattern(/^[A-Z0-9]+$/i), // Alfanumérico
       ]);
-      this.msgErrorNroDocApoderado = "Debe ingresar entre 9 y 20 digitos";
+      this.msgErrorNroDocApoderado = "Debe ingresar 12 digitos";
     }
 
     // Importante: actualizar el estado de validación
@@ -1197,11 +1219,10 @@ export class PreInscripcionComponent implements OnInit {
       // Carnet de Extranjería: 12 caracteres alfanuméricos
       this.alumnoForm.get("numeroDocumento")?.setValidators([
         Validators.required,
-        Validators.minLength(9),
-        Validators.maxLength(20), // Por si acaso hay formatos con dígitos adicionales
+        Validators.minLength(12),
         Validators.pattern(/^[A-Z0-9]+$/i), // Alfanumérico
       ]);
-      this.msgErrorNroDocAlumno = "Debe ingresar entre 9 y 20 digitos";
+      this.msgErrorNroDocAlumno = "Debe ingresar 12 digitos";
     }
 
     // Importante: actualizar el estado de validación

@@ -103,9 +103,9 @@
           <span class="badge-tipo" [ngClass]="conv.horario[0].modalidad.idModalidad === 2 ? 'tipo-paradeporte' : 'tipo-deporte'">{{
             conv.horario[0].modalidad.descripcion
           }}</span>
-          <span class="badge-estado" [ngClass]="conv.convocatoria.estado === '1' ? 'estado-activa' : 'estado-cerrada'">
-            <mat-icon>{{ conv.convocatoria.estado === "1" ? "check_circle" : "cancel" }}</mat-icon>
-            {{ conv.convocatoria.estado === "1" ? "ACTIVA" : "CERRADA" }}
+          <span class="badge-estado" [ngClass]="validandoEstado(conv) === 'ACTIVA' ? 'estado-activa' : 'estado-cerrada'">
+            <mat-icon>{{ validandoEstado(conv) === "ACTIVA" ? "check_circle" : "cancel" }}</mat-icon>
+            {{ validandoEstado(conv) === "ACTIVA" ? "ACTIVA" : "CERRADA" }}
           </span>
         </div>
 
@@ -124,9 +124,9 @@
       <!-- REVERSO -->
       <div class="flip-card-back">
         <div class="back-header">
-          <span class="back-estado" [ngClass]="conv.convocatoria.estado === '1' ? 'estado-activa' : 'estado-cerrada'">
-            <mat-icon>{{ conv.convocatoria.estado === "1" ? "check_circle" : "cancel" }}</mat-icon>
-            {{ conv.convocatoria.estado === "1" ? "ACTIVA" : "CERRADA" }}
+          <span class="badge-estado" [ngClass]="validandoEstado(conv) === 'ACTIVA' ? 'estado-activa' : 'estado-cerrada'">
+            <mat-icon>{{ validandoEstado(conv) === "ACTIVA" ? "check_circle" : "cancel" }}</mat-icon>
+            {{ validandoEstado(conv) === "ACTIVA" ? "ACTIVA" : "CERRADA" }}
           </span>
           <span class="back-tipo" [ngClass]="conv.horario[0].modalidad.idModalidad === 2 ? 'tipo-paradeporte' : 'tipo-deporte'">{{
             conv.horario[0].modalidad.descripcion
@@ -143,14 +143,14 @@
                 <span class="horario-turno">{{ obtenerDiasHora(horario) }}</span>
                 <span class="horario-cupos">
                   <mat-icon>groups</mat-icon>
-                  {{ horario.numVacante - horario.contador }}/{{ horario.numVacante }}
+                  {{ horario.contador }}/{{ horario.numVacante }}
                 </span>
               </div>
             </div>
           </div>
 
           <!-- BOTÓN DE ACCIÓN -->
-          <button type="button" class="btn-inscribirse">
+          <button type="button" class="btn-inscribirse" *ngIf="validandoEstado(conv) === 'ACTIVA'">
             <mat-icon>how_to_reg</mat-icon>
             <span>Inscribirse Ahora</span>
           </button>

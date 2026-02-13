@@ -42,7 +42,11 @@ import { Disciplina } from "../../../../model/disciplina.model";
   providers: [{ provide: MatPaginatorIntl, useClass: PaginatorService }],
 })
 export class ConvocatoriaComponent implements OnInit {
-  constructor(private router: Router, private dialogService: DialogService, private toastrService: ToastrService) {}
+  constructor(
+    private router: Router,
+    private dialogService: DialogService,
+    private toastrService: ToastrService,
+  ) {}
 
   private matDialogRef!: MatDialogRef<DialogcustomComponent>;
 
@@ -196,7 +200,7 @@ export class ConvocatoriaComponent implements OnInit {
 
   /* Gestionar */
   verConvocatoriaCard(): void {
-    this.router.navigate(["/admin/inscripcion/convocatoria/cards"]);
+    this.router.navigate(["/admin/convocatoria/convocatoria/cards"]);
   }
 
   abrirFormularioNueva(): void {
@@ -210,7 +214,7 @@ export class ConvocatoriaComponent implements OnInit {
 
   editarConvocatoria(id: number): void {
     localStorage.setItem("editConvocatoria", id.toString());
-    this.router.navigate(["/admin/inscripcion/convocatoria/editar"]);
+    this.router.navigate(["/admin/convocatoria/convocatoria/editar"]);
   }
 
   cerrarFormulario(): void {
@@ -327,9 +331,11 @@ export class ConvocatoriaComponent implements OnInit {
   //   );
   // }
 
-  verPreview(convocatoria: Convocatoria): void {
+  verPreview(template: TemplateRef<any>, convocatoria: Convocatoria): void {
     this.convocatoriaPreview = convocatoria;
-    this.mostrarPreview = true;
+    this.matDialogRef = this.dialogService.openDialogCustom({
+      template,
+    });
   }
 
   cerrarPreview(): void {

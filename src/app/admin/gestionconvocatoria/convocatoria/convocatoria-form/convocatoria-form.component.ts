@@ -307,7 +307,7 @@ export class ConvocatoriaFormComponent implements OnInit {
           this.formSelect.resetFormulario();
           this.dataHorario.data = [];
           this.selection.clear();
-          this.router.navigate(["/admin/inscripcion/convocatoria"]);
+          this.router.navigate(["/admin/convocatoria/convocatoria"]);
           if (!this.selectedFile) {
             this.toastrService.success("Actualización correcta", "Éxitoso", { timeOut: 3200 });
           }
@@ -324,7 +324,7 @@ export class ConvocatoriaFormComponent implements OnInit {
           this.formSelect.resetFormulario();
           this.dataHorario.data = [];
           this.selection.clear();
-          this.router.navigate(["/admin/inscripcion/convocatoria"]);
+          this.router.navigate(["/admin/convocatoria/convocatoria"]);
         },
         error: (error) => {
           this.toastrService.error("Error al cargar los datos", "Error", { timeOut: 3200 });
@@ -572,6 +572,6 @@ export class ConvocatoriaFormComponent implements OnInit {
     return c1 && c2 ? c1.idTemporada === c2.idTemporada : c1 === c2;
   }
   volverConvocatoria() {
-    this.router.navigate(["/admin/inscripcion/convocatoria"]);
+    this.router.navigate(["/admin/convocatoria/convocatoria"]);
   }
 }

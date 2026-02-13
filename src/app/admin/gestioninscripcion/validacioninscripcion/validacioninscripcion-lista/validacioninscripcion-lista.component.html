@@ -1,20 +1,15 @@
 <div class="container">
   <div class="row">
-    <!-- ENCABEZADO MODERNO -->
     <div class="header-section">
       <h2>CONFIRMAR PRE-INSCRIPCIÓN</h2>
     </div>
-
-    <!-- INFO DEBAJO DEL ENCABEZADO -->
     <div class="info-banner">
       <p>Confirma la inscripción de los participantes buscando por el número de registro que aparece en su ficha de pre-inscripción.</p>
     </div>
 
-    <!-- SECCIÓN PRINCIPAL -->
     <div class="card-modern">
-      <h3 class="subtitle-1">Listan de Pre-inscritos</h3>
+      <h3 class="subtitle-1">Listado de Pre-inscritos</h3>
 
-      <!-- BUSCAR POR REGISTRO -->
       <form [formGroup]="filtroForm" class="row dense-3">
         <div class="col-12 col-sm-6 col-md-5">
           <mat-form-field appearance="outline">
@@ -59,7 +54,6 @@
           Excel
         </button>
       </div>
-      <!-- TABLA -->
       <div class="table-container">
         <table mat-table [dataSource]="dataSource" class="table-modern mat-elevation-z8">
           <ng-container matColumnDef="nroRegistro">

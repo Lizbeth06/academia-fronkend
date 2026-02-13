@@ -1,4 +1,4 @@
-<mat-progress-bar *ngIf="loading" mode="indeterminate" color="primary" class="top-loader"> </mat-progress-bar>
+<mat-progress-bar *ngIf="loading" mode="determinate" [value]="progress" class="top-loader"> </mat-progress-bar>
 
 <div class="mb-4" align="end">
   <button matButton="elevated" color="warn" (click)="volver()"><mat-icon>subdirectory_arrow_left</mat-icon>Volver</button>
@@ -76,7 +76,7 @@
                       src="https://res.cloudinary.com/dpumt2sth/image/upload/v1763512471/pdf_r7zwl3.png"
                       class="pdf-img"
                       alt="PDF"
-                      (click)="generarDocumentos('declaracion')"
+                      (click)="generarDocumentos(mostrarPdf, 'declaracion')"
                   /></a>
                 </td>
 
@@ -87,7 +87,7 @@
                       src="https://res.cloudinary.com/dpumt2sth/image/upload/v1763512471/pdf_r7zwl3.png"
                       class="pdf-img"
                       alt="PDF"
-                      (click)="generarDocumentos('ficha')"
+                      (click)="generarDocumentos(mostrarPdf, 'ficha')"
                   /></a>
                 </td>
               </tr>
@@ -133,7 +133,7 @@
       <button mat-stroked-button color="warn" class="mb-2" style="width: 100%" (click)="modalValidarinscripcion(validarpreinscripcion, participante)">
         <mat-icon>check_circle</mat-icon> Confirmar Inscripción
       </button>
-      <button mat-stroked-button class="btn-amarillo mb-2" style="width: 100%" (click)="generarDocumentos()">
+      <button mat-stroked-button class="btn-amarillo mb-2" style="width: 100%" (click)="generarDocumentos(mostrarPdf)">
         <mat-icon>download</mat-icon> Carnet Digital
       </button>
       <button
@@ -169,5 +169,15 @@
   <div mat-dialog-actions align="end" class="footerDialog d-flex">
     <button mat-flat-button color="primary" class="loadButton" type="button" (click)="validarInscripcion()">SI</button>
     <button type="button" mat-raised-button color="secondary" class="loadButton btnCancelar" mat-dialog-close>Cancelar</button>
+  </div>
+</ng-template>
+
+<ng-template #mostrarPdf>
+  <div class="title-modal" cdkFocusInitial>Descargar documento</div>
+  <div mat-dialog-content align="center" class="pdf-container">
+    <iframe [src]="url" width="100%" height="100%" style="border: none"> </iframe>
+  </div>
+  <div mat-dialog-actions align="end" class="footerDialog d-flex">
+    <button type="button" mat-raised-button color="secondary" class="loadButton btnCancelar" mat-dialog-close>Cerrar</button>
   </div>
 </ng-template>

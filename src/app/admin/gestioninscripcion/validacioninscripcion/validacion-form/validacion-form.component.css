@@ -15,8 +15,8 @@
 }
 
 .pdf-img {
-  width: 45px; /* tamaño más grande */
-  height: 45px; /* proporción correcta */
+  width: 45px;
+  height: 45px;
   cursor: pointer;
   transition: 0.2s ease;
 }
@@ -67,4 +67,10 @@
   left: 0;
   width: 100%;
   z-index: 9999;
+}
+
+.pdf-container {
+  height: 80vh;
+  width: 100vh;
+  overflow: hidden;
 }

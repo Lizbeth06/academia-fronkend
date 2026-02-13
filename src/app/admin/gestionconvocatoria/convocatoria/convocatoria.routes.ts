@@ -1,10 +1,9 @@
 import { Routes } from "@angular/router";
 import { ConvocatoriaFormComponent } from "./convocatoria-form/convocatoria-form.component";
 import { ConvocatoriaComponent } from "./convocatoria_lista/convocatoria-lista.component";
-import { HorariosFormComponent } from "./horarios-form/horarios-form.component";
 import { ConvocatoriasCardComponent } from "./convocatorias-card/convocatorias-card.component";
 
-export const convocatoria_routes: Routes = [
+export const convocatoriaRoutes: Routes = [
   {
     path: "",
     component: ConvocatoriaComponent,

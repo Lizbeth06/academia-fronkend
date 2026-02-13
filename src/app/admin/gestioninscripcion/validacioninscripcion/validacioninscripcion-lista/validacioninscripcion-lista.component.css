@@ -2,11 +2,6 @@
   --grad1: #cb532e;
   --grad2: #542394;
 }
-/* para la tabla */
-.mat-mdc-cell {
-  width: 100%;
-  text-align: center;
-}
 
 /* Header Section */
 .header-section {
@@ -95,90 +90,6 @@
   box-shadow: 0 2px 7px rgba(0, 0, 0, 0.15);
 }
 
-.btn-buscar {
-  width: 100%;
-}
-
-/* BUSCADOR COMPACTO */
-.row-inline {
-  display: flex;
-  gap: 10px;
-}
-
-.row-inline input {
-  flex: 1;
-  padding: 10px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-}
-
-/* RESPONSIVE SOLO PARA row-inline */
-@media (max-width: 600px) {
-  .row-inline {
-    flex-direction: column; /* pasa los elementos debajo */
-  }
-
-  .row-inline input,
-  .row-inline button {
-    width: 100%; /* ambos ocupan todo el ancho */
-  }
-
-  .row-inline button {
-    justify-content: center; /* centra el contenido del botón */
-    height: 40px;
-  }
-}
-
-/*** CUADROS DE INFORMACIÓN ***/
-.info-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 18px;
-  margin-top: 15px;
-}
-
-.info-box div {
-  display: flex;
-  justify-content: space-between;
-  background: #f8f8f8;
-  padding: 6px 10px;
-  border-radius: 6px;
-  margin-bottom: 6px;
-  border: 1px solid #ddd;
-}
-
-.info-box label {
-  font-weight: 600;
-  color: #444;
-}
-
-.info-box span {
-  font-weight: 500;
-  color: #222;
-}
-
-.btn-blue {
-  background: #76c9ec;
-  padding: 8px 18px;
-  border: none;
-  border-radius: 6px;
-  color: white;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.btn-green {
-  background: #8ed28e;
-  padding: 8px 18px;
-  border: none;
-  border-radius: 6px;
-  color: white;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
 /* TABLA */
 .table-modern {
   margin-top: 15px;
@@ -192,65 +103,12 @@
   margin: 0 0 10px 0;
   color: #333;
 }
-.subtitle {
-  font-size: 18px;
-  font-weight: 600;
-  text-align: center;
-  margin: 0 0 15px 0;
-  color: #333;
-}
-
-.text-center {
-  display: block;
-  width: 100%;
-  text-align: center;
-}
 
 .table-container {
   width: 100%;
   overflow-x: auto;
 }
 
-/* Centrar subtítulos específicos: tarjeta y encabezado de tabla */
-.card-modern > .subtitle {
-  width: 100%;
-  text-align: center;
-  margin-bottom: 16px;
-  box-sizing: border-box;
-}
-
-.tabla-header > .subtitle {
-  flex-basis: 100%;
-  width: 100%;
-  text-align: center;
-  margin: 0 0 8px 0;
-  box-sizing: border-box;
-}
-
-/* Cabecera tabla + buscador: apilar y estirar para que el buscador ocupe todo el ancho del card */
-.tabla-header {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  gap: 12px;
-  margin-bottom: 16px;
-}
-
-/* Buscar: ocupar todo el ancho del card */
-.buscador {
-  width: 100%;
-  max-width: none;
-  align-self: stretch;
-}
-
-/* Si se usa Angular Material mat-form-field dentro, asegurar que se estire */
-.tabla-header .buscador .mat-form-field-flex,
-.tabla-header .buscador .mat-form-field-infix {
-  width: 100%;
-  box-sizing: border-box;
-}
-
-/* Eliminar líneas divisorias y sombras en mat-table dentro de .table-modern */
 ::ng-deep .table-modern,
 ::ng-deep .table-modern table {
   border-collapse: collapse !important;
@@ -259,7 +117,6 @@
   box-shadow: none !important;
 }
 
-/* Quitar bordes y sombras en celdas, filas y encabezados */
 ::ng-deep .table-modern th.mat-header-cell,
 ::ng-deep .table-modern td.mat-cell,
 ::ng-deep .table-modern tr.mat-row,
@@ -270,8 +127,6 @@
   background: transparent !important;
   padding: 12px 16px !important;
 }
-
-/* Ocultar pseudo-elementos que puedan dibujar líneas */
 ::ng-deep .table-modern th.mat-header-cell::before,
 ::ng-deep .table-modern th.mat-header-cell::after,
 ::ng-deep .table-modern td.mat-cell::before,
@@ -280,7 +135,6 @@
   display: none !important;
 }
 
-/* Asegurar que filas y contenido queden centrados y sin separadores */
 ::ng-deep .table-modern tr,
 ::ng-deep .table-modern tr > td,
 ::ng-deep .table-modern tr > th {
@@ -288,7 +142,6 @@
   border: none !important;
 }
 
-/* Si se usan filas con fondo alterno, mantener solo el fondo sin líneas */
 ::ng-deep .table-modern tr.mat-row:nth-child(odd),
 ::ng-deep .table-modern tr.mat-row:nth-child(even) {
   background-clip: padding-box !important;
@@ -300,10 +153,6 @@
 }
 
 .mat-column-nombre {
-  min-width: 300px !important;
-}
-
-.mat-column-complejo {
   min-width: 300px !important;
 }
 

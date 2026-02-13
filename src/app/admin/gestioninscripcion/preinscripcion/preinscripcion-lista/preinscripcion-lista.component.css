@@ -349,7 +349,7 @@ mat-card-content {
 .button-row {
   display: flex;
   gap: 12px;
-  justify-content: center;
+  justify-content: space-between;
 }
 
 .button-row button {

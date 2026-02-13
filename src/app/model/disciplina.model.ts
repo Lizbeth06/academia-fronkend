@@ -5,5 +5,6 @@ export interface Disciplina {
   edadDeporte: string;
   edadParadeporte: string;
   estado: boolean;
-  fregistro: string;
+  fRegistro: string;
+  definicion: string;
 }

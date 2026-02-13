@@ -11,6 +11,7 @@ import { MatDialogRef } from "@angular/material/dialog";
 import { DialogService } from "../../../../services/dialog/dialog.service";
 import { Validacioninscripcion, ValidacioninscripcionSave } from "../../../../model/validacioninscripcion.model";
 import { ValidacioninscripcionService } from "../../../../services/validacioninscripcion.service";
+import { DomSanitizer, SafeResourceUrl } from "@angular/platform-browser";
 
 @Component({
   selector: "app-validacion-form",
@@ -23,6 +24,7 @@ export class ValidacionFormComponent implements OnInit {
     private router: Router,
     private toastrService: ToastrService,
     private dialogService: DialogService,
+    private sanitizer: DomSanitizer,
   ) {}
   private inscripcionService = inject(InscripcionService);
   private validacioninscripcionService = inject(ValidacioninscripcionService);
@@ -33,56 +35,65 @@ export class ValidacionFormComponent implements OnInit {
   idIsncripcion = 0;
   datosParticipante: Inscripcion;
   dataValidacion: Inscripcion;
+  progress = 0;
   loading = true;
+  intervalId: any;
+  url!: SafeResourceUrl;
+  titulo = "";
 
   ngOnInit(): void {
+    this.iniciarProgreso();
     this.dataService.data.subscribe({
       next: (id) => {
+        this.idIsncripcion = id;
         if (id && id !== 0) {
           this.inscripcionService.findById(id).subscribe({
             next: (data) => {
               this.datosParticipante = data;
-              this.loading = false;
+              this.completarCarga();
             },
             error: () => {
-              this.loading = false;
+              this.completarCarga();
             },
           });
         } else {
-          this.loading = false;
+          this.completarCarga();
         }
       },
       error: () => {
-        this.loading = false;
+        this.completarCarga();
       },
     });
   }
-  generarDocumentos(tipodocumento?: string) {
-    if (tipodocumento === "declaracion") {
-      this.inscripcionService.generarDeclaracionJurada(this.idIsncripcion).subscribe({
-        next: (blob) => {
-          const url = window.URL.createObjectURL(new Blob([blob], { type: "application/pdf" }));
+  generarDocumentos(template: TemplateRef<any>, tipodocumento?: string) {
+    let servicio$;
+  
+    switch (tipodocumento) {
+      case "declaracion":
+        servicio$ = this.inscripcionService.generarDeclaracionJurada(this.idIsncripcion);
+        titulo = "Declaración Jurada";
+        break;
 
-          window.open(url, "_blank");
-        },
-      });
-    } else if (tipodocumento === "ficha") {
-      this.inscripcionService.generarFichaPreInscripcion(this.idIsncripcion).subscribe({
-        next: (blob) => {
-          const url = window.URL.createObjectURL(new Blob([blob], { type: "application/pdf" }));
+      case "ficha":
+        servicio$ = this.inscripcionService.generarFichaPreInscripcion(this.idIsncripcion);
+        titulo = "Ficha de Preinscripción";
+        break;
 
-          window.open(url, "_blank");
-        },
-      });
-    } else {
-      this.inscripcionService.generarCarnetDigital(this.idIsncripcion).subscribe({
-        next: (blob) => {
-          const url = window.URL.createObjectURL(new Blob([blob], { type: "application/pdf" }));
-
-          window.open(url, "_blank");
-        },
-      });
+      default:
+        servicio$ = this.inscripcionService.generarCarnetDigital(this.idIsncripcion);
+        titulo = "Carnet Digital";
+        break;
     }
+
+    servicio$.subscribe({
+      next: (blob: Blob) => {
+        const blobUrl = URL.createObjectURL(new Blob([blob], { type: "application/pdf" }));
+        this.url = this.sanitizer.bypassSecurityTrustResourceUrl(blobUrl);
+        this.matDialogRef = this.dialogService.openDialogCustom({
+          template,
+        });
+      },
+    });
   }
 
   mostrarTiempo(turno: Turno): string {
@@ -141,5 +152,25 @@ export class ValidacionFormComponent implements OnInit {
     this.matDialogRef = this.dialogService.openDialogCustom({
       template,
     });
+  }
+
+  iniciarProgreso() {
+    this.progress = 0;
+    this.loading = true;
+
+    this.intervalId = setInterval(() => {
+      if (this.progress < 90) {
+        this.progress += 1;
+      }
+    }, 30);
+  }
+
+  completarCarga() {
+    clearInterval(this.intervalId);
+    this.progress = 100;
+
+    setTimeout(() => {
+      this.loading = false;
+    }, 300);
   }
 }
