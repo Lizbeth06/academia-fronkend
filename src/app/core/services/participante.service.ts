@@ -1,0 +1,31 @@
+import { Injectable } from "@angular/core";
+import { GenericService } from "./generic.service";
+import { Observable, Subject } from "rxjs";
+import { HttpClient, HttpParams } from "@angular/common/http";
+import { environment } from "../../../environments/environment";
+import { Participante } from "../model/participante.model";
+import { RespuestaApi } from "../model/respuestaApi.model";
+
+@Injectable({
+  providedIn: "root",
+})
+export class ParticipanteService extends GenericService<Participante> {
+  private participanteChange: Subject<Participante[]> = new Subject<Participante[]>();
+
+  constructor(protected override http: HttpClient) {
+    super(http, `${environment.HOST}/api/participante`);
+  }
+
+  findByDocumento(idTipodocumento: number, numDocumento: string): Observable<RespuestaApi<Participante>> {
+    const params = new HttpParams().set("idTipodocumento", idTipodocumento).set("numDocumento", numDocumento);
+    return this.http.get<RespuestaApi<Participante>>(`${this.url}/documento`, { params });
+  }
+
+  setParticipanteChange(data: Participante[]) {
+    this.participanteChange.next(data);
+  }
+
+  getParticipanteChange() {
+    return this.participanteChange.asObservable();
+  }
+}

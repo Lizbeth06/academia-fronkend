@@ -1,0 +1,10 @@
+.adminx-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.adminx-main-content {
+  padding-bottom: 100px;
+  flex: 1;
+}

@@ -1,0 +1,74 @@
+<!-- Sidebar -->
+<div
+  class="adminx-sidebar expand-hover push"
+  style="z-index: 10"
+  [class.collapsed-sidebar]="isCollapsed"
+  [class.sidebar-hovered]="isCollapsed && isHovered"
+  [class.expanded-sidebar]="!isCollapsed"
+  (mouseenter)="onSidebarHover(true)"
+  (mouseleave)="onSidebarHover(false)"
+>
+  <ul class="sidebar-nav">
+    <!-- Principal -->
+    <li class="sidebar-nav-item">
+      <a routerLink="/admin" class="sidebar-nav-link active">
+        <span class="sidebar-nav-icon menu-icon-wrapper">
+          <mat-icon class="small-icon">home</mat-icon>
+          <span class="icon-label">Principal</span>
+        </span>
+        <span class="sidebar-nav-name">Principal</span>
+      </a>
+    </li>
+
+    <!-- Menús con grupos -->
+    @for (grupoMenu of menusSidebar; track grupoMenu.idMenu) {
+      <li class="sidebar-nav-item">
+        @if (grupoMenu.children && grupoMenu.children.length > 0) {
+          <a class="sidebar-nav-link collapsed" data-toggle="collapse" [attr.href]="'#menuGrupo' + grupoMenu.idMenu">
+            <span class="sidebar-nav-icon menu-icon-wrapper" [matTooltip]="grupoMenu.nombre">
+              <mat-icon class="small-icon">{{ grupoMenu.icono }}</mat-icon>
+              <span class="icon-label">{{ grupoMenu.codigo }}</span>
+            </span>
+            <span class="sidebar-nav-name">{{ grupoMenu.nombre }}</span>
+            <span class="sidebar-nav-end">
+              <mat-icon class="nav-collapse-icon">chevron_right</mat-icon>
+            </span>
+          </a>
+          <ul class="sidebar-sub-nav collapse" [attr.id]="'menuGrupo' + grupoMenu.idMenu">
+            @for (item of grupoMenu.children; track item.idMenu) {
+              <menu-option
+                [itemOption]="{
+                  href: item.urlMenu!,
+                  icono: item.codigo,
+                  nombre: item.nombre! | titlecase,
+                }"
+              ></menu-option>
+            }
+          </ul>
+        }
+        <!-- Menús sin grupo -->
+        @else {
+          <a [routerLink]="grupoMenu.urlMenu" class="sidebar-nav-link" [ngClass]="{ active: grupoMenu.urlMenu === '/admin' }">
+            <span class="sidebar-nav-icon menu-icon-wrapper">
+              <mat-icon>{{ grupoMenu.icono }}</mat-icon>
+              <span class="icon-label">{{ grupoMenu.codigo | titlecase }}</span>
+            </span>
+            <span class="sidebar-nav-name">{{ grupoMenu.nombre | titlecase }}</span>
+          </a>
+        }
+      </li>
+    }
+
+    <!-- Cerrar sesión -->
+    <li class="sidebar-nav-item logout-item">
+      <a class="sidebar-nav-link text-danger" (click)="confirmLogout()">
+        <span class="sidebar-nav-icon menu-icon-wrapper" matTooltip="Cerrar sesión">
+          <mat-icon class="small-icon">logout</mat-icon>
+          <span class="icon-label">Salir</span>
+        </span>
+        <span class="sidebar-nav-name">Cerrar sesión</span>
+      </a>
+    </li>
+  </ul>
+</div>
+<!-- Sidebar End -->

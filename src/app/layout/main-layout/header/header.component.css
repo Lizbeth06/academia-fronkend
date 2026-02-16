@@ -1,0 +1,41 @@
+/* ----------------------------
+   Cursores
+---------------------------- */
+.sidebar-nav-link,
+.sidebar-nav-icon,
+.sidebar-nav-name,
+.sidebar-nav-end,
+.menu-icon-wrapper {
+  cursor: pointer;
+}
+
+.adminx-sidebar {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: transform 0.3s ease;
+}
+
+/* Sidebar responsive: escondida en móviles */
+@media (max-width: 767.98px) {
+  .adminx-sidebar {
+    transform: translateX(-100%);
+  }
+  .adminx-sidebar.open {
+    transform: translateX(0);
+  }
+}
+
+/* Mostrar/ocultar labels según estado del sidebar */
+.adminx-sidebar.collapsed-sidebar:not(.sidebar-hovered) .icon-label {
+  display: inline;
+}
+.adminx-sidebar.expanded-sidebar .icon-label,
+.adminx-sidebar.sidebar-hovered .icon-label {
+  display: none;
+}
+
+.navbar {
+  height: 70px;
+  z-index: 10;
+}
